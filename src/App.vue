@@ -26,3 +26,26 @@ export default {
   }
 }
 </script>
+<style>
+  /* 整个滚动条 */
+  ::-webkit-scrollbar {
+    /* 对应纵向滚动条的宽度 */
+    width: 8px;
+    /* 对应横向滚动条的宽度 */
+    height: 8px;
+  }
+
+  /* 滚动条上的滚动滑块 */
+  ::-webkit-scrollbar-thumb {
+    background-color: #D9D9D9;
+    border-radius: 32px;
+  }
+  ::-webkit-scrollbar-thumb:hover{
+    background-color: #747474;
+  }
+  /*!* 滚动条轨道 *!*/
+  ::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 32px;
+  }
+</style>
