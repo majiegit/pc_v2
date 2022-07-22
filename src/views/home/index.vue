@@ -4,7 +4,7 @@
 
 <script>
 export default {
-  name: '首页',
+  name: 'dashboard',
   data () {
     return {
     }

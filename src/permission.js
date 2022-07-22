@@ -11,14 +11,15 @@ import { i18nRender } from '@/locales'
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
 const allowList = ['login', 'register', 'registerResult'] // no redirect allowList
-const loginRoutePath = '/user/login'
-const defaultRoutePath = '/dashboard/workplace'
+const loginRoutePath = '/login'
+const defaultRoutePath = '/home'
 
 router.beforeEach((to, from, next) => {
   NProgress.start() // start progress bar
   to.meta && (typeof to.meta.title !== 'undefined' && setDocumentTitle(`${i18nRender(to.meta.title)} - ${domTitle}`))
   /* has token */
   if (storage.get(ACCESS_TOKEN)) {
+    // 如果有token 情况下
     if (to.path === loginRoutePath) {
       next({ path: defaultRoutePath })
       NProgress.done()
@@ -29,9 +30,10 @@ router.beforeEach((to, from, next) => {
         store
           .dispatch('GetInfo')
           .then(res => {
-            const roles = res.result && res.result.role
+            const result = res.data
+            console.log(result,'result')
             // generate dynamic router
-            store.dispatch('GenerateRoutes', { roles }).then(() => {
+            store.dispatch('GenerateRoutes', { result }).then(() => {
               // 根据roles权限生成可访问的路由表
               // 动态添加可访问路由表
               router.addRoutes(store.getters.addRouters)
@@ -45,26 +47,28 @@ router.beforeEach((to, from, next) => {
                 next({ path: redirect })
               }
             })
-          })
-          .catch(() => {
-            notification.error({
-              message: '错误',
-              description: '请求用户信息失败，请重试'
-            })
+          }).catch(() => {
+            // notification.error({
+            //   message: '错误',
+            //   description: '请求用户信息失败，请重试'
+            // })
             // 失败时，获取用户信息失败时，调用登出，来清空历史保留信息
             store.dispatch('Logout').then(() => {
               next({ path: loginRoutePath, query: { redirect: to.fullPath } })
             })
           })
       } else {
+        // 有用户权限信息，直接进入
         next()
       }
     }
   } else {
+    // 没有token 情况下
     if (allowList.includes(to.name)) {
       // 在免登录名单，直接进入
       next()
     } else {
+      // 不在免登陆名单下，跳转登录地址，携带重定向访问地址
       next({ path: loginRoutePath, query: { redirect: to.fullPath } })
       NProgress.done() // if current page is login will not trigger afterEach hook, so manually handle it
     }

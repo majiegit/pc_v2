@@ -11,9 +11,14 @@ import { VueAxios } from './utils/request'
 import ProLayout, { PageHeaderWrapper } from '@ant-design-vue/pro-layout'
 import themePluginConfig from '../config/themePluginConfig'
 
+// ant-design-vue
+import { FormModel } from 'ant-design-vue';
+Vue.use(FormModel);
+import {Tree} from 'ant-design-vue'
+Vue.use(Tree);
 // mock
 // WARNING: `mockjs` NOT SUPPORT `IE` PLEASE DO NOT USE IN `production` ENV.
-import './mock'
+// import './mock'
 
 import bootstrap from './core/bootstrap'
 import './core/lazy_use' // use lazy load components

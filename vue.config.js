@@ -105,17 +105,18 @@ const vueConfig = {
     port: 8000,
     // If you want to turn on the proxy, please remove the mockjs /src/main.jsL11
     proxy: {
-      '/prove': {
-        target: 'http:localhost:8081',
+      '/api': {
+        target: 'http:localhost',
         ws: false,
-        changeOrigin: true
+        changeOrigin: true,
+        '^api': '/api',
       }
     }
   },
 
   // disable source map in production
   productionSourceMap: false,
-  lintOnSave: undefined,
+  lintOnSave: false,
   // babel-loader no-ignore node_modules/*
   transpileDependencies: []
 }

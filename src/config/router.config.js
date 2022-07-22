@@ -1,44 +1,24 @@
-// eslint-disable-next-line
-import { UserLayout, BasicLayout, BlankLayout } from '@/layouts'
-import { bxAnaalyse } from '@/core/icons'
+import { UserLayout } from '@/layouts'
+// 基础
+import base from '@/router/base'
+// 系统管理
+import system from '@/router/system/index'
 
-/*
-const RouteView = {
-  name: 'RouteView',
-  render: h => h('router-view')
+/**
+ *
+ * 动态路由 根据模块定义
+ */
+export const constantRouterComponents = Object.assign(
+  base,
+  system
+)
+
+
+
+// 前端未找到页面路由（固定不用改）
+export const notFoundRouter = {
+  path: '*', redirect: '/404', hidden: true
 }
-*/
-
-export const asyncRouterMap = [
-  {
-    path: '/',
-    name: 'index',
-    component: BasicLayout,
-    meta: { title: 'menu.home' },
-    redirect: '/dashboard',
-    children: [
-      // dashboard
-      {
-        path: '/dashboard',
-        name: 'dashboard',
-        component: () => import('@/views/dashboard/index'),
-        meta: { title: 'menu.dashboard', keepAlive: true, icon: bxAnaalyse, permission: ['dashboard'] }
-      },
-      // list
-      {
-        path: '/list',
-        name: 'list',
-        component: () => import('@/views/list/index'),
-        meta: { title: 'menu.list', icon: 'table', permission: ['table'] }
-      }
-    ]
-  },
-  {
-    path: '*',
-    redirect: '/404',
-    hidden: true
-  }
-]
 
 /**
  * 基础路由
@@ -46,16 +26,20 @@ export const asyncRouterMap = [
  */
 export const constantRouterMap = [
   {
-    path: '/user',
+    path: '/',
     component: UserLayout,
-    redirect: '/user/login',
+    redirect: '/login',
     hidden: true,
     children: [
       {
         path: 'login',
         name: 'login',
-        component: () => import(/* webpackChunkName: "user" */ '@/views/user/Login')
+        component: () => import(/* webpackChunkName: "user" */ '@/views/login/Login')
       }
     ]
+  },
+  {
+    path: '/404',
+    component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404')
   }
 ]
