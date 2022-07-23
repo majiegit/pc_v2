@@ -2,7 +2,30 @@ import request from '@/utils/request'
 import {System_Path} from '@/utils/modulePath'
 
 /**
- * 查询数据字典
+ * 查询字段数据
+ */
+export function queryFieldList(param) {
+  return request({
+    url: System_Path + "/dict/getFieldList",
+    method: 'post',
+    data: param
+  })
+}
+
+/**
+ * 查询数据字典列表 - 分页
+ */
+export function queryDictPage(current,size) {
+  return request({
+    url: System_Path + "/dict/page",
+    method: 'post',
+    params: {current: current, size: size}
+  })
+}
+
+
+/**
+ * 查询数据字典列表
  */
 export function queryDictList() {
   return request({
@@ -16,7 +39,7 @@ export function queryDictList() {
  */
 export function saveDict(data) {
   return request({
-    url: System_Path + "/user/role/save",
+    url: System_Path + "/dict/save",
     data: data,
     method: 'post',
   })
@@ -27,7 +50,7 @@ export function saveDict(data) {
  */
 export function deleteDict(id) {
   return request({
-    url: System_Path + "/user/role/deleteById",
+    url: System_Path + "/dict/deleteById",
     params: { roleId: id },
     method: 'post',
   })
