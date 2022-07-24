@@ -30,9 +30,9 @@ export default {
   /* 整个滚动条 */
   ::-webkit-scrollbar {
     /* 对应纵向滚动条的宽度 */
-    width: 8px;
+    width: 5px;
     /* 对应横向滚动条的宽度 */
-    height: 8px;
+    height: 5px;
   }
 
   /* 滚动条上的滚动滑块 */

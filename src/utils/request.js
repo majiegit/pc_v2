@@ -49,20 +49,20 @@ request.interceptors.request.use(config => {
 request.interceptors.response.use((response) => {
   let res = response.data
   // 请求数据成功, 直接 return
-  if (res.code == 200) {
+  if (res.code === 200) {
     return res
-  } else if (res.code == 401) {
+  } else if (res.code === 401) {
     // 如果身份失效，调用注销接口
     notification.error({
       message: 'Forbidden',
-      description: data.message
+      description: res.message
     })
     store.dispatch('Logout').then(() => {
       setTimeout(() => {
         window.location.reload()
       }, 1500)
     })
-  } else if (res.code !== 200) {
+  } else{
     message.error(res.message)
   }
 }, errorHandler)

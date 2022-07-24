@@ -6,7 +6,7 @@ import {System_Path} from '@/utils/modulePath'
  */
 export function queryFieldList(param) {
   return request({
-    url: System_Path + "/dict/getFieldList",
+    url: System_Path + "/dictGroup/getFieldList",
     method: 'post',
     data: param
   })
@@ -15,9 +15,9 @@ export function queryFieldList(param) {
 /**
  * 查询数据字典列表 - 分页
  */
-export function queryDictPage(current,size) {
+export function queryDictGroupPage(current,size) {
   return request({
-    url: System_Path + "/dict/page",
+    url: System_Path + "/dictGroup/page",
     method: 'post',
     params: {current: current, size: size}
   })
@@ -27,9 +27,9 @@ export function queryDictPage(current,size) {
 /**
  * 查询数据字典列表
  */
-export function queryDictList() {
+export function queryDictGroupList() {
   return request({
-    url: System_Path + "/dict/list",
+    url: System_Path + "/dictGroup/list",
     method: 'post'
   })
 }
@@ -37,9 +37,9 @@ export function queryDictList() {
 /**
  * 保存数据字典
  */
-export function saveDict(data) {
+export function saveDictGroup(data) {
   return request({
-    url: System_Path + "/dict/save",
+    url: System_Path + "/dictGroup/save",
     data: data,
     method: 'post'
   })
@@ -48,9 +48,9 @@ export function saveDict(data) {
 /**
  * 删除数据字典
  */
-export function deleteDict(id) {
+export function deleteDictGroup(id) {
   return request({
-    url: System_Path + "/dict/deleteById",
+    url: System_Path + "/dictGroup/deleteById",
     params: { id: id },
     method: 'post'
   })
@@ -59,9 +59,9 @@ export function deleteDict(id) {
 /**
  * 批量删除数据字典
  */
-export function deleteDictBatch(ids) {
+export function deleteDictGroupBatch(ids) {
   return request({
-    url: System_Path + "/dict/deleteByIds",
+    url: System_Path + "/dictGroup/deleteByIds",
     data: ids,
     method: 'post'
   })
