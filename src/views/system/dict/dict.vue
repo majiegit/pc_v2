@@ -14,7 +14,25 @@
               <a-card title="字典分组">
                 <a-button type="primary" slot="extra" icon="plus" @click="addDictGroup"/>
                 <div class="dict_group_body">
-                  <p v-for="(item,index) in dictGroupData" :key="index">{{ item.dictGroupName }}</p>
+                  <a-empty v-if="dictGroupData.length < 1"/>
+                  <a-row v-for="(item,index) in dictGroupData" :key="index" class="dict_group_body_item">
+                    <a-col span="20" @click="dictGroupClick(item)" style="overflow:scroll;word-wrap:break-word;">
+                      <span :style="{'color': item.status ? '#1989fa': ''}">{{ item.dictGroupName }}</span>
+                    </a-col>
+                    <a-col span="2">
+                      <a href="javascript:;">
+                        <a-icon type="edit"
+                                @click="editDictGroup(item)"/>
+                      </a>
+                    </a-col>
+                    <a-col span="2">
+                      <a-popconfirm title="是否确认删除此分组" @confirm="deleteDictGroup(item)">
+                        <a href="javascript:;">
+                          <a-icon type="delete"/>
+                        </a>
+                      </a-popconfirm>
+                    </a-col>
+                  </a-row>
                 </div>
               </a-card>
             </a-col>
@@ -49,10 +67,10 @@
             </span>
                 <template slot="operation" slot-scope="text,record">
                   <a href="javascript:;" class="operation" @click="updateDict(record)">编辑</a>
-                  <a href="javascript:;" class="operation" @click="updateDict(record)">字典配置</a>
-                  <a href="javascript:;" class="operation" style="color: red;">
+                  <a href="javascript:;" class="operation" @click="configDict(record)">字典配置</a>
+                  <a href="javascript:;" class="operation">
                     <a-popconfirm
-                      title="确定要删除此数据字典吗?"
+                      title="确认删除此数据字典吗?"
                       @confirm="() => removeDict(record)"
                     >删除
                     </a-popconfirm>
@@ -74,15 +92,26 @@
         @cancel="cancelDictModal"
       >
         <a-form-model :model="dictForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 16 }" colon labelAlign="right"
+                      ref="dictFormRef"
                       :rules="dictFormRules">
           <a-form-model-item label="字典名称" prop="dictName">
-            <a-input v-model="dictForm.dictName"/>
+            <a-input v-model="dictForm.dictName" placeholder="请输入字典名称"/>
           </a-form-model-item>
           <a-form-model-item label="字典编码" prop="dictCode">
-            <a-input v-model="dictForm.dictCode"/>
+            <a-input v-model="dictForm.dictCode" placeholder="请输入字字典编码"/>
+          </a-form-model-item>
+          <a-form-model-item label="字典类型" prop="dictType">
+            <a-select v-model="dictForm.dictType" :options="dictTypeData" placeholder="请输入字典类型"/>
+          </a-form-model-item>
+          <a-form-model-item label="字典分组" prop="dictGroupId">
+            <a-select v-model="dictForm.dictGroupId" placeholder="请输入字典分组">
+              <a-select-option v-for="item in dictGroupData" :key="index" :value="item.id">
+                {{item.dictGroupName}}
+              </a-select-option>
+            </a-select>
           </a-form-model-item>
           <a-form-model-item label="字典描述" prop="description">
-            <a-textarea v-model="dictForm.description"/>
+            <a-textarea v-model="dictForm.description" placeholder="请输入字典描述"/>
           </a-form-model-item>
         </a-form-model>
       </a-modal>
@@ -94,20 +123,40 @@
         @ok="saveDictGroupModal"
         @cancel="cancelDictGroupModal"
       >
-        <a-form-model :model="dictGroupForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 16 }" colon labelAlign="right"
+        <a-form-model :model="dictGroupForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }" colon
+                      ref="dictFormGroupRef"
+                      labelAlign="right"
                       :rules="dictGroupFormRules">
           <a-form-model-item label="字典分组名称" prop="dictGroupName">
-            <a-input v-model="dictGroupForm.dictGroupName"/>
+            <a-input v-model="dictGroupForm.dictGroupName" placeholder="请输入字典描述"/>
           </a-form-model-item>
         </a-form-model>
       </a-modal>
+    </div>
+    <!--数据字典配置窗口-->
+    <div>
+      <a-drawer
+        title="字典列表"
+        placement="right"
+        width="600"
+        :visible="dictItemVisible"
+        @close="dictItemClose"
+      >
+        <div class="item_body">
+          <a-row>
+            <a-col span="10"></a-col>
+          </a-row>
+          <a-row>
+          </a-row>
+        </div>
+      </a-drawer>
     </div>
   </a-spin>
 </template>
 
 <script>
   import {queryDictPage, deleteDict, deleteDictBatch, queryFieldList, saveDict} from '@/api/dict'
-  import {queryDictGroupList} from '@/api/dictGroup'
+  import {queryDictGroupList, saveDictGroup, deleteDictGroup,queryDictGroupListByGroupName} from '@/api/dictGroup'
   import ACol from "ant-design-vue/es/grid/Col";
 
   export default {
@@ -115,7 +164,23 @@
     components: {ACol},
     data() {
       return {
+        // 数据字典列表
+        dictItemData: [],
+        dictItemVisible: false,
+
+        // 字典类型
+        dictTypeData: [
+          {
+            value: 0,
+            title: '数组'
+          },
+          {
+            value: 1,
+            title: '树形'
+          }
+        ],
         // 字典分组数据
+        dictGroupId: '',
         dictGroupForm: {
           dictGroupName: ''
         },
@@ -141,7 +206,9 @@
           hideOnSinglePage: true
         },
         // 新增、修改时候Form表单
-        dictForm: {},
+        dictForm: {
+          dictType: 0,
+        },
         dictFormRules,
         // 弹出框相关参数
         modalTitle: '',
@@ -156,27 +223,82 @@
       this.getDictGroupList()
     },
     methods: {
+
       /**
-       * 取消数据字典窗口
+       * 数据字典明细窗口关闭方法
+       **/
+
+      dictItemClose() {
+        this.dictItemData = []
+        this.dictItemVisible = false
+      },
+      /**
+       * 数据字典配置
+       */
+      configDict(item) {
+        this.dictItemVisible = true
+      },
+      /**
+       * 取消数据字典分组窗口
        */
       cancelDictGroupModal() {
         this.dictGroupVisible = false
-        this.dictGroupForm = {}
+        this.$refs['dictFormGroupRef'].clearValidate()
+        this.dictGroupForm = {
+          dictGroupName: ''
+        }
       },
       /**
-       * 保存数据字典
+       * 保存数据字典分组
        */
       saveDictGroupModal() {
-        saveDict(this.dictGroupForm).then(res => {
-          this.$message.success(res.message)
-          this.cancelDictGroupModal()
-          this.getDictGroupList()
+        this.$refs.dictFormGroupRef.validate(valid => {
+          if (!valid) {
+            return false
+          } else {
+            saveDictGroup(this.dictGroupForm).then(res => {
+              this.$message.success(res.message)
+              this.cancelDictGroupModal()
+              this.getDictGroupList()
+            })
+          }
         })
       },
       /**
-       * 新增数据字典分组
+       * 点击数据字典分组事件
        */
-      addDictGroup(){
+      dictGroupClick(item) {
+        this.dictGroupData.forEach(row => {
+          this.$set(row, 'status', false)
+        })
+        item.status = true
+        this.dictGroupId = item.id
+        this.dictForm.dictGroupId = item.id
+        this.getDictData()
+      },
+      /**
+       * 修改数据字典分组
+       */
+      editDictGroup(item) {
+        this.dictGroupVisible = true
+        this.dictGroupForm = JSON.parse(JSON.stringify(item))
+      },
+      /**
+       * 删除数据字典分组
+       * */
+      deleteDictGroup(item) {
+        deleteDictGroup(item.id).then(res => {
+          this.$message.success(res.message)
+          this.dictGroupId = null
+          this.dictForm.dictGroupId = null
+          this.getDictGroupList()
+          this.getDictData()
+        })
+      },
+      /**
+       * 新增数据字典分组窗口
+       */
+      addDictGroup() {
         this.dictGroupVisible = true
         this.dictGroupForm = {
           groupName: ''
@@ -186,7 +308,9 @@
        * 搜索数据字典分组
        */
       searchDictGroup(val) {
-        console.log(val)
+        queryDictGroupListByGroupName(val).then(res => {
+          this.dictGroupData = res.data
+        })
       },
       /**
        * 查询数数据字典分组数据
@@ -195,7 +319,6 @@
       getDictGroupList() {
         queryDictGroupList().then(res => {
           this.dictGroupData = res.data
-          console.log(res)
         })
       },
       /**
@@ -212,7 +335,7 @@
        */
       getDictData() {
         this.loading = true
-        queryDictPage(this.page.current, this.page.pageSize).then(res => {
+        queryDictPage(this.page.current, this.page.pageSize, this.dictGroupId).then(res => {
           this.getTableColumns()
           this.loading = false
           this.dictData = res.data.records  // 用户数据
@@ -227,16 +350,27 @@
        */
       cancelDictModal() {
         this.modalVisible = false
-        this.dictForm = {}
+        this.$refs['dictFormRef'].clearValidate()
+        this.dictForm = {
+          dictType: 0,
+          dictGroupId: this.dictGroupId
+        }
       },
       /**
        * 保存数据字典
        */
       saveDictModal() {
-        saveDict(this.dictForm).then(res => {
-          this.$message.success(res.message)
-          this.cancelDictModal()
-          this.getDictData()
+        // 校验表单
+        this.$refs.dictFormRef.validate(valid => {
+          if (!valid) {
+            return false
+          } else {
+            saveDict(this.dictForm).then(res => {
+              this.$message.success(res.message)
+              this.cancelDictModal()
+              this.getDictData()
+            })
+          }
         })
       },
       /**
@@ -322,11 +456,13 @@
     },
   }
   const dictFormRules = {
-    dictName: [{required: true, message: '请输入数据字典名称', trigger: 'blur'}],
-    dictCode: [{required: true, message: '请输入数据字典编码', trigger: 'blur'}]
+    dictGroupId: [{required: false, message: '请选择数据字典分组', whitespace: true, trigger: 'blur'}],
+    dictType: [{required: true, message: '请选择数据字典类型', whitespace: true, trigger: 'blur'}],
+    dictName: [{required: true, message: '请输入数据字典名称', whitespace: true, trigger: 'blur'}],
+    dictCode: [{required: true, message: '请输入数据字典编码', whitespace: true, trigger: 'blur'}]
   }
   const dictGroupFormRules = {
-    dictGroupName: [{required: true, message: '请输入数据字典分组名称', trigger: 'blur'}]
+    dictGroupName: [{required: true, message: '请输入数据字典分组名称', whitespace: true, trigger: 'blur'}]
   }
 </script>
 
@@ -350,7 +486,16 @@
   }
 
   .dict_group_body {
-    max-height: 560px;
+    max-height: 565px;
     overflow-y: auto;
+  }
+
+  .dict_group_body_item {
+    border-bottom: 1px solid #e8e8e8;
+    line-height: 40px;
+    cursor: pointer;
+  }
+  .item_body{
+    border: 1px solid #e8e8e8;
   }
 </style>

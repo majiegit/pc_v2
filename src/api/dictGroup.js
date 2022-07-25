@@ -15,7 +15,7 @@ export function queryFieldList(param) {
 /**
  * 查询数据字典列表 - 分页
  */
-export function queryDictGroupPage(current,size) {
+export function queryDictGroupPage(current, size) {
   return request({
     url: System_Path + "/dictGroup/page",
     method: 'post',
@@ -23,6 +23,17 @@ export function queryDictGroupPage(current,size) {
   })
 }
 
+
+/**
+ * 查询数据字典列表
+ */
+export function queryDictGroupListByGroupName(groupName) {
+  return request({
+    url: System_Path + "/dictGroup/list",
+    method: 'post',
+    params: { groupName: groupName}
+  })
+}
 
 /**
  * 查询数据字典列表
@@ -51,7 +62,7 @@ export function saveDictGroup(data) {
 export function deleteDictGroup(id) {
   return request({
     url: System_Path + "/dictGroup/deleteById",
-    params: { id: id },
+    params: {id: id},
     method: 'post'
   })
 }

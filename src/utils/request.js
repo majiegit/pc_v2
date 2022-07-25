@@ -15,21 +15,27 @@ const request = axios.create({
 
 // 异常拦截处理器
 const errorHandler = (error) => {
-  // if (error.response) {
-  //   const data = error.response.data
-  //   if (error.response.status === 403) {
-  //     notification.error({
-  //       message: 'Forbidden',
-  //       description: data.message
-  //     })
-  //   }
-  //   if (error.response.status === 401 && !(data.result && data.result.isLogin)) {
-  //     notification.error({
-  //       message: 'Unauthorized',
-  //       description: 'Authorization verification failed'
-  //     })
-  //   }
-  // }
+  if (error.response) {
+    const data = error.response.data
+    if (error.response.status === 403) {
+      notification.error({
+        message: 'Forbidden',
+        description: data.message
+      })
+    }
+    if (error.response.status === 401 && !(data.result && data.result.isLogin)) {
+      notification.error({
+        message: 'Unauthorized',
+        description: 'Authorization verification failed'
+      })
+    }
+    if (error.response.status === 500) {
+      notification.error({
+        message: '网络异常',
+        description: '网络异常，请检查网络'
+      })
+    }
+  }
   return Promise.reject(error)
 }
 

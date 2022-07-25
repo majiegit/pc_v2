@@ -15,11 +15,11 @@ export function queryFieldList(param) {
 /**
  * 查询数据字典列表 - 分页
  */
-export function queryDictPage(current,size) {
+export function queryDictPage(current,size,groupId) {
   return request({
     url: System_Path + "/dict/page",
     method: 'post',
-    params: {current: current, size: size}
+    params: {current: current, size: size,groupId: groupId}
   })
 }
 

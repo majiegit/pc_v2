@@ -14,6 +14,8 @@ import themePluginConfig from '../config/themePluginConfig'
 // ant-design-vue
 import { FormModel } from 'ant-design-vue';
 Vue.use(FormModel);
+import {Empty} from 'ant-design-vue'
+Vue.use(Empty);
 import {Tree} from 'ant-design-vue'
 Vue.use(Tree);
 // mock
