@@ -13,11 +13,13 @@ import themePluginConfig from '../config/themePluginConfig'
 
 // ant-design-vue
 import { FormModel } from 'ant-design-vue';
-Vue.use(FormModel);
+import {TreeSelect} from "ant-design-vue";
 import {Empty} from 'ant-design-vue'
-Vue.use(Empty);
 import {Tree} from 'ant-design-vue'
+Vue.use(FormModel);
+Vue.use(Empty);
 Vue.use(Tree);
+Vue.use(TreeSelect);
 // mock
 // WARNING: `mockjs` NOT SUPPORT `IE` PLEASE DO NOT USE IN `production` ENV.
 // import './mock'

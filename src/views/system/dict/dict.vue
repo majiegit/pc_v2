@@ -61,20 +61,22 @@
                 :row-selection="{ selectedRowKeys: selectedDataIds, onChange: changeTableSelect }"
                 @change="changeTablePage"
               >
-            <span slot="dictType" slot-scope="dictType">
-                <a-tag color="orange" v-if="dictType == 0">数组</a-tag>
-                <a-tag color="green" v-if="dictType == 1">树形</a-tag>
-            </span>
+                <span slot="dictType" slot-scope="dictType">
+                    <a-tag color="orange" v-if="dictType == dictConstant.dict_type_array ">数组</a-tag>
+                    <a-tag color="green" v-if="dictType == dictConstant.dict_type_tree">树形</a-tag>
+                </span>
                 <template slot="operation" slot-scope="text,record">
-                  <a href="javascript:;" class="operation" @click="updateDict(record)">编辑</a>
-                  <a href="javascript:;" class="operation" @click="configDict(record)">字典配置</a>
-                  <a href="javascript:;" class="operation">
-                    <a-popconfirm
-                      title="确认删除此数据字典吗?"
-                      @confirm="() => removeDict(record)"
-                    >删除
-                    </a-popconfirm>
-                  </a>
+                  <a-space>
+                    <a href="javascript:;" @click="updateDict(record)">编辑</a>
+                    <a href="javascript:;" @click="configDict(record)">字典配置</a>
+                    <a href="javascript:;">
+                      <a-popconfirm
+                        title="确认删除此数据字典吗?"
+                        @confirm="() => removeDict(record)"
+                      >删除
+                      </a-popconfirm>
+                    </a>
+                  </a-space>
                 </template>
               </a-table>
             </a-col>
@@ -98,14 +100,14 @@
             <a-input v-model="dictForm.dictName" placeholder="请输入字典名称"/>
           </a-form-model-item>
           <a-form-model-item label="字典编码" prop="dictCode">
-            <a-input v-model="dictForm.dictCode" placeholder="请输入字字典编码"/>
+            <a-input v-model="dictForm.dictCode" placeholder="请输入字典编码"/>
           </a-form-model-item>
           <a-form-model-item label="字典类型" prop="dictType">
-            <a-select v-model="dictForm.dictType" :options="dictTypeData" placeholder="请输入字典类型"/>
+            <a-select v-model="dictForm.dictType" :options="dictTypeData" placeholder="请选择字典类型"/>
           </a-form-model-item>
           <a-form-model-item label="字典分组" prop="dictGroupId">
             <a-select v-model="dictForm.dictGroupId" placeholder="请输入字典分组">
-              <a-select-option v-for="item in dictGroupData" :key="index" :value="item.id">
+              <a-select-option v-for="(item,index) in dictGroupData" :key="index" :value="item.id">
                 {{item.dictGroupName}}
               </a-select-option>
             </a-select>
@@ -133,22 +135,16 @@
         </a-form-model>
       </a-modal>
     </div>
-    <!--数据字典配置窗口-->
+    <!--数据字典明细配置窗口-->
     <div>
       <a-drawer
         title="字典列表"
         placement="right"
-        width="600"
+        width="750"
         :visible="dictItemVisible"
         @close="dictItemClose"
       >
-        <div class="item_body">
-          <a-row>
-            <a-col span="10"></a-col>
-          </a-row>
-          <a-row>
-          </a-row>
-        </div>
+        <DictItem :dict="dictEdit" ></DictItem>
       </a-drawer>
     </div>
   </a-spin>
@@ -156,26 +152,29 @@
 
 <script>
   import {queryDictPage, deleteDict, deleteDictBatch, queryFieldList, saveDict} from '@/api/dict'
-  import {queryDictGroupList, saveDictGroup, deleteDictGroup,queryDictGroupListByGroupName} from '@/api/dictGroup'
+  import {queryDictGroupList, saveDictGroup, deleteDictGroup, queryDictGroupListByGroupName} from '@/api/dictGroup'
+  import {DictConstant} from '@/utils/system/dictConstant'
+  import DictItem from './dictItem'
   import ACol from "ant-design-vue/es/grid/Col";
+  import AFormModelItem from "ant-design-vue/es/form-model/FormItem";
 
   export default {
     name: "dict",
-    components: {ACol},
+    components: {AFormModelItem, ACol, DictItem},
     data() {
       return {
-        // 数据字典列表
-        dictItemData: [],
+        dictConstant: DictConstant,
+        // 字典明细
         dictItemVisible: false,
-
+        dictEdit: {},
         // 字典类型
         dictTypeData: [
           {
-            value: 0,
+            value: DictConstant.dict_type_array,
             title: '数组'
           },
           {
-            value: 1,
+            value: DictConstant.dict_type_tree,
             title: '树形'
           }
         ],
@@ -207,7 +206,7 @@
         },
         // 新增、修改时候Form表单
         dictForm: {
-          dictType: 0,
+          dictType: DictConstant.dict_type_array,
         },
         dictFormRules,
         // 弹出框相关参数
@@ -223,20 +222,18 @@
       this.getDictGroupList()
     },
     methods: {
-
       /**
        * 数据字典明细窗口关闭方法
        **/
-
       dictItemClose() {
-        this.dictItemData = []
         this.dictItemVisible = false
       },
       /**
-       * 数据字典配置
+       * 数据字典明细配置
        */
       configDict(item) {
         this.dictItemVisible = true
+        this.dictEdit = JSON.parse(JSON.stringify(item))
       },
       /**
        * 取消数据字典分组窗口
@@ -360,6 +357,7 @@
        * 保存数据字典
        */
       saveDictModal() {
+        console.log(this.dictForm)
         // 校验表单
         this.$refs.dictFormRef.validate(valid => {
           if (!valid) {
@@ -455,9 +453,10 @@
       }
     },
   }
+
   const dictFormRules = {
-    dictGroupId: [{required: false, message: '请选择数据字典分组', whitespace: true, trigger: 'blur'}],
-    dictType: [{required: true, message: '请选择数据字典类型', whitespace: true, trigger: 'blur'}],
+    dictGroupId: [{required: false, message: '请选择数据字典分组', trigger: 'blur'}],
+    dictType: [{required: true, message: '请选择数据字典类型', trigger: 'blur'}],
     dictName: [{required: true, message: '请输入数据字典名称', whitespace: true, trigger: 'blur'}],
     dictCode: [{required: true, message: '请输入数据字典编码', whitespace: true, trigger: 'blur'}]
   }
@@ -476,11 +475,6 @@
   .header {
     padding-bottom: 20px;
   }
-
-  .operation {
-    margin-left: 5px;
-  }
-
   .row_div {
     padding-bottom: 5px;
   }
@@ -495,7 +489,5 @@
     line-height: 40px;
     cursor: pointer;
   }
-  .item_body{
-    border: 1px solid #e8e8e8;
-  }
+
 </style>

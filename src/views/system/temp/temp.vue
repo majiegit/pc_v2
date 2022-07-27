@@ -35,14 +35,16 @@
                 <a-tag color="green" v-if="dictType == 1">树形</a-tag>
             </span>
             <template slot="operation" slot-scope="text,record">
-              <a href="javascript:;" class="operation" @click="updateDict(record)">编辑</a>
-              <a href="javascript:;" class="operation" style="color: red;">
-                <a-popconfirm
-                  title="确定要删除此模板吗?"
-                  @confirm="() => removeDict(record)"
-                >删除
-                </a-popconfirm>
-              </a>
+              <a-space>
+                <a href="javascript:;" @click="updateDict(record)">编辑</a>
+                <a href="javascript:;" style="color: red;">
+                  <a-popconfirm
+                    title="确定要删除此模板吗?"
+                    @confirm="() => removeDict(record)"
+                  >删除
+                  </a-popconfirm>
+                </a>
+              </a-space>
             </template>
           </a-table>
         </a-col>
@@ -243,9 +245,5 @@
 
   .header {
     padding-bottom: 20px;
-  }
-
-  .operation {
-    margin-left: 5px;
   }
 </style>
