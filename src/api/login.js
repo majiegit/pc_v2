@@ -12,7 +12,7 @@ export function login(parameter) {
 
 export function getInfo() {
   return request({
-    url: System_Path + '/user/userPermissionInfoByToken',
+    url: System_Path + '/user/userPermissionMenuByToken',
     method: 'post'
   })
 }

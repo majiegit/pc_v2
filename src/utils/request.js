@@ -60,7 +60,7 @@ request.interceptors.response.use((response) => {
   } else if (res.code === 401) {
     // 如果身份失效，调用注销接口
     notification.error({
-      message: 'Forbidden',
+      message: '身份已失效',
       description: res.message
     })
     store.dispatch('Logout').then(() => {

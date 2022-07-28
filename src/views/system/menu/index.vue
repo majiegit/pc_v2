@@ -6,8 +6,8 @@
       <a-space>
         <a-button type="primary" icon="plus" @click="addMenu()">新增</a-button>
         <a-button icon="delete">批量删除</a-button>
-        <a-button>展开全部</a-button>
-        <a-button>折叠全部</a-button>
+        <a-button @click="openAllMenu">展开全部</a-button>
+        <a-button @click="foldAllMenu">折叠全部</a-button>
       </a-space>
     </a-col>
     <!-- table 区域-->
@@ -17,6 +17,8 @@
         :loading="loading"
         :columns="columns"
         :data-source="menuList"
+        :expandRowByClick="expandRowByClick"
+        :expandedRowKeys="expandedRowKeys"
         :row-selection="rowSelection"
       >
         <span slot="hidden" slot-scope="hidden">
@@ -202,6 +204,7 @@
         columns,
         rowSelection,
         menuList: [],
+        expandRowByClick: true,
         loading: false,
         expandedRowKeys: []
       }
@@ -210,6 +213,22 @@
       this.getPermissionTree()
     },
     methods: {
+      /**
+       * 折叠全部
+       * */
+      foldAllMenu(){
+        this.expandedRowKeys = []
+      },
+      /**
+       * 展开全部
+       * */
+      openAllMenu(){
+        let arr = []
+        this.menuList.forEach(item =>{
+          arr.push(item.id)
+        })
+        this.expandedRowKeys = arr
+      },
       /**
        *初始化菜单表单
        */
@@ -259,6 +278,8 @@
         this.editVisible = false
         // 重置表单
         this.initMenuForm()
+        // 清楚验证
+        this.$refs['menuFormRef'].clearValidate()
       },
       /**
        *  保存菜单
@@ -378,7 +399,7 @@
     icon: [{required: true, message: '请选择菜单图标', trigger: 'blur'}],
     path: [{required: true, message: '请输入路径', trigger: 'blur'}],
     // component: [{required: true, message: '请输入菜单组件', trigger: 'blur'}],
-    description: [{required: false, message: '请输入菜单描述', trigger: 'blur'}],
+    name: [{required: true, message: '请输入路由名称', trigger: 'blur'}],
     sortNo: [{required: false, message: '请输入菜单排序号', trigger: 'blur'}],
     hidden: [{required: false, message: '请选择是否隐藏', trigger: 'blur'}]
 
