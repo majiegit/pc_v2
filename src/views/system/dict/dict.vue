@@ -427,7 +427,7 @@
        */
       getTableColumns() {
         // 排除显示字段
-        let columnsFilters = ['id', 'dictGroupId', 'createUser', 'updateUser', 'updateTime']
+        let columnsFilters = ['id', 'dictGroupId', 'createTime','createUser', 'updateUser']
         let arr = []
         this.dictColumns.forEach(field => {
           if (!columnsFilters.includes(field.field)) {

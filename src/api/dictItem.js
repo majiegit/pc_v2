@@ -1,15 +1,25 @@
 import request from '@/utils/request'
 import {System_Path} from '@/utils/modulePath'
 
+/**
+ * 查询数据字典列表 根据编码
+ */
+export function queryDictItemListByCode(dictCode, status) {
+  return request({
+    url: System_Path + "/dictItem/list",
+    method: 'post',
+    params: {dictCode: dictCode, status: status}
+  })
+}
 
 /**
  * 查询数据字典列表 根据Name 状态
  */
-export function queryDictItemListByName(dictId, status, itemText) {
+export function queryDictItemListByName(dictId, status, title) {
   return request({
     url: System_Path + "/dictItem/list",
     method: 'post',
-    params: {dictId: dictId, status: status, itemText: itemText}
+    params: {dictId: dictId, status: status, title: title}
   })
 }
 

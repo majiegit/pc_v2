@@ -51,11 +51,11 @@
                       ref="dictItemFormRef"
                       labelAlign="right"
                       :rules="dictItemFormRules">
-          <a-form-model-item label="名称" prop="itemText">
-            <a-input v-model="dictItemForm.itemText" placeholder="请输入名称"/>
+          <a-form-model-item label="名称" prop="title">
+            <a-input v-model="dictItemForm.title" placeholder="请输入名称"/>
           </a-form-model-item>
-          <a-form-model-item label="数据值" prop="itemValue">
-            <a-input v-model="dictItemForm.itemValue" placeholder="请输入数据值"/>
+          <a-form-model-item label="数据值" prop="value">
+            <a-input v-model="dictItemForm.value" placeholder="请输入数据值"/>
           </a-form-model-item>
           <a-form-model-item label="父级" prop="dictItemPid" v-if="dict.dictType == dictConstant.dict_type_tree">
             <a-tree-select
@@ -96,7 +96,7 @@
       return {
         replaceFields: {
           children: 'children',
-          title: 'itemText',
+          title: 'title',
           key: 'id',
           value: 'id'
         },
@@ -107,8 +107,8 @@
         dictItemVisible: false,
         modalConfirmLoading: false,
         dictItemForm: {
-          itemText: '',
-          itemValue: '',
+          title: '',
+          value: '',
           status: 1,
           dictItemPid: null
         },
@@ -217,8 +217,8 @@
       cancelDictItemModal() {
         this.dictItemVisible = false
         this.dictItemForm = {
-          itemText: '',
-          itemValue: '',
+          title: '',
+          value: '',
           status: 1,
           dictItemPid: null
         }
@@ -257,20 +257,20 @@
 
   const dictItemFormRules = {
     dictItemPid: [{required: false, message: '请选择父级', trigger: 'blur'}],
-    itemText: [{required: true, message: '请输入名称', whitespace: true, trigger: 'blur'}],
-    itemValue: [{required: true, message: '请输入数据值', whitespace: true, trigger: 'blur'}]
+    title: [{required: true, message: '请输入名称', whitespace: true, trigger: 'blur'}],
+    value: [{required: true, message: '请输入数据值', whitespace: true, trigger: 'blur'}]
   }
 
   const dictItemTableColumns = [
     {
       title: '名称',
-      dataIndex: 'itemText',
-      scopedSlots: {customRender: 'itemText'}
+      dataIndex: 'title',
+      scopedSlots: {customRender: 'title'}
     },
     {
       title: '数据值',
-      dataIndex: 'itemValue',
-      scopedSlots: {customRender: 'itemValue'}
+      dataIndex: 'value',
+      scopedSlots: {customRender: 'value'}
     },
     {
       title: '状态',
