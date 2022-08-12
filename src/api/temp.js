@@ -2,17 +2,6 @@ import request from '@/utils/request'
 import {System_Path} from '@/utils/modulePath'
 
 /**
- * 查询字段数据
- */
-export function queryFieldList(param) {
-  return request({
-    url: System_Path + "/dict/getFieldList",
-    method: 'post',
-    data: param
-  })
-}
-
-/**
  * 查询数据字典列表 - 分页
  */
 export function queryDictPage(current,size) {

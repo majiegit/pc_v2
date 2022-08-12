@@ -121,19 +121,9 @@
                   @check="onSelectPermission"
           />
         </div>
-        <div :style="{
-          position: 'absolute',
-          right: 0,
-          bottom: 0,
-          width: '100%',
-          borderTop: '1px solid #e9e9e9',
-          padding: '10px 16px',
-          background: '#fff',
-          textAlign: 'right',
-          zIndex: 1,
-        }">
+        <div class="model_foot">
           <a-row>
-            <a-col span="14" pull="9">
+            <a-col span="16">
               <a-dropdown placement="topCenter">
                 <a-button>树 操 作
                   <a-icon type="up"/>
@@ -146,12 +136,12 @@
                 </a-menu>
               </a-dropdown>
             </a-col>
-            <a-col span="5">
+            <a-col span="4">
               <a-button @click="cancelSavePermission">
                 取 消
               </a-button>
             </a-col>
-            <a-col span="5">
+            <a-col span="4">
               <a-button type="primary" @click="savePermission">
                 保 存
               </a-button>
@@ -166,7 +156,7 @@
   import {getRoleList, saveRole, deleteRole} from '@/api/role'
   import {permissionTree} from '@/api/permission'
   import {rolePermissionListByRoleId, saveRolePermission} from '@/api/rolePermission'
-  import {queryRoleUser, removeRoleUser} from '@/api/roleUser'
+  import {queryRoleUser, removeRoleUser} from '@/api/userRole'
   import {queryDictItemListByCode} from '@/api/dictItem'
   import {DictCode} from '@/utils/system/dictCode'
   import {DictConstant} from '@/utils/system/dictConstant'
@@ -229,13 +219,13 @@
       /**
        * 获取用户状态名称
        * */
-      getStatusName(status){
+      getStatusName(status) {
         console.log(status)
         var arr = this.userStatusData.filter(item => item.value == status)
         console.log()
-        if(arr.length == 0){
+        if (arr.length == 0) {
           return ''
-        }else {
+        } else {
           return arr[0].title
         }
       },
@@ -244,7 +234,7 @@
        */
       queryUserStatus() {
         this.userDataLoading = true
-        queryDictItemListByCode(DictCode.user_status, DictConstant.dict_status_enable).then(res => {
+        queryDictItemListByCode(DictCode.user.user_status, DictConstant.dict_status_enable).then(res => {
           this.userStatusData = res.data
         })
       },
@@ -527,10 +517,20 @@
     margin-left: 5px
   }
 
+  .model_foot {
+    width: 100%;
+    borderTop: 1px solid #e9e9e9;
+    padding: 10px 16px;
+    background: #fff;
+    textAlign: right;
+    zIndex: 1
+  }
+
   .model_center {
     overflow-y: auto;
     width: 100%;
-    height: 850px;
+    padding: 10px 0px;
+    height: 810px;
     background: #fff;
   }
 </style>

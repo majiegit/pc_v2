@@ -6,7 +6,7 @@ import {System_Path} from '@/utils/modulePath'
  */
 export function queryDictItemListByCode(dictCode, status) {
   return request({
-    url: System_Path + "/dictItem/list",
+    url: System_Path + "/dictItem/listByDictCode",
     method: 'post',
     params: {dictCode: dictCode, status: status}
   })
@@ -17,7 +17,7 @@ export function queryDictItemListByCode(dictCode, status) {
  */
 export function queryDictItemListByName(dictId, status, title) {
   return request({
-    url: System_Path + "/dictItem/list",
+    url: System_Path + "/dictItem/listByDictId",
     method: 'post',
     params: {dictId: dictId, status: status, title: title}
   })
@@ -28,7 +28,7 @@ export function queryDictItemListByName(dictId, status, title) {
  */
 export function queryDictItemList(dictId, status) {
   return request({
-    url: System_Path + "/dictItem/list",
+    url: System_Path + "/dictItem/listByDictId",
     method: 'post',
     params: {dictId: dictId, status: status}
   })

@@ -18,16 +18,21 @@
         :columns="columns"
         :data-source="menuList"
         :expandRowByClick="expandRowByClick"
-        :expandedRowKeys="expandedRowKeys"
         :row-selection="rowSelection"
       >
         <span slot="hidden" slot-scope="hidden">
           <a-tag :color="hidden ? 'orange' : 'green'">{{hidden ? '隐藏' : '可见'}}</a-tag>
         </span>
+        <template slot="hidden" slot-scope="value,record">
+          <a-tag v-if="record.menuType != 2 " :color="value ? 'orange' : 'green'">{{value ? '隐藏' : '可见'}}</a-tag>
+        </template>
+        <template slot="isDisable" slot-scope="value,record">
+          <a-tag v-if="record.menuType == 2 " :color="value ? 'orange' : 'green'">{{value ? '禁用' : '启用'}}</a-tag>
+        </template>
         <span slot="menuType" slot-scope="menuType">
           <a-tag :color="menuType == 2 ? 'orange' : 'green'">{{menuType == 2 ? '按钮' : '菜单'}}</a-tag>
         </span>
-        <template slot="action" slot-scope="text,record">
+        <template slot="operation" slot-scope="text,record">
           <a href="javascript:;" class="operation"  @click="addMenuClick(record)">添加</a>
           <a href="javascript:;" class="operation" @click="updateMenuClick(record)">编辑</a>
           <a href="javascript:;" class="operation">
@@ -204,7 +209,7 @@
         columns,
         rowSelection,
         menuList: [],
-        expandRowByClick: true,
+        expandRowByClick: false,
         loading: false,
         expandedRowKeys: []
       }
@@ -363,7 +368,7 @@
        * 修改菜单
        */
       updateMenuClick(row) {
-        delete row.children
+        // delete row.children
         this.menuForm = JSON.parse(JSON.stringify(row))
         this.editVisible = true
         console.log(row)
@@ -432,9 +437,14 @@
       scopedSlots: {customRender: 'menuType'},
     },
     {
-      title: '可见',
+      title: '是否隐藏',
       dataIndex: 'hidden',
       scopedSlots: {customRender: 'hidden'},
+    },
+    {
+      title: '是否禁用',
+      dataIndex: 'isDisable',
+      scopedSlots: {customRender: 'isDisable'},
     },
     {
       title: '排序',
@@ -442,8 +452,8 @@
     },
     {
       title: '操作',
-      dataIndex: 'action',
-      scopedSlots: {customRender: 'action'},
+      dataIndex: 'operation',
+      scopedSlots: {customRender: 'operation'},
     },
   ];
 

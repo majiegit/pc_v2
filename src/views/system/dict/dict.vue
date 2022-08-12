@@ -1,157 +1,160 @@
 <template>
-  <a-spin :spinning="loading">
-    <div class="body">
-      <a-row type="flex">
-        <!-- 数据字典分组-->
-        <a-col span="5">
-          <a-row class="row_div">
-            <a-col span="24">
-              <a-input-search placeholder="输入数据字典分组名" @search="searchDictGroup"/>
-            </a-col>
-          </a-row>
-          <a-row class="row_div">
-            <a-col span="24">
-              <a-card title="字典分组">
-                <a-button type="primary" slot="extra" icon="plus" @click="addDictGroup"/>
-                <div class="dict_group_body">
-                  <a-empty v-if="dictGroupData.length < 1"/>
-                  <a-row v-for="(item,index) in dictGroupData" :key="index" class="dict_group_body_item">
-                    <a-col span="20" @click="dictGroupClick(item)" style="overflow:scroll;word-wrap:break-word;">
-                      <span :style="{'color': item.status ? '#1989fa': ''}">{{ item.dictGroupName }}</span>
-                    </a-col>
-                    <a-col span="2">
+  <a-row type="flex" :gutter="[24,24]" style="background: #fff;">
+    <a-spin :spinning="loading">
+      <!-- 数据字典分组-->
+      <a-col span="5">
+        <a-row class="row_div">
+          <a-col span="24">
+            <a-input-search placeholder="输入数据字典分组名" @search="searchDictGroup"/>
+          </a-col>
+        </a-row>
+        <a-row class="row_div">
+          <a-col span="24">
+            <a-card title="字典分组">
+              <a-button type="primary" slot="extra" icon="plus" @click="addDictGroup"/>
+              <div class="dict_group_body">
+                <a-empty v-if="dictGroupData.length < 1"/>
+                <a-row v-for="(item,index) in dictGroupData" :key="index" class="dict_group_body_item">
+                  <a-col span="20" @click="dictGroupClick(item)" style="overflow:scroll;word-wrap:break-word;">
+                    <span :style="{'color': item.status ? '#1989fa': ''}">{{ item.dictGroupName }}</span>
+                  </a-col>
+                  <a-col span="2">
+                    <a href="javascript:;">
+                      <a-icon type="edit"
+                              @click="editDictGroup(item)"/>
+                    </a>
+                  </a-col>
+                  <a-col span="2">
+                    <a-popconfirm title="是否确认删除此分组" @confirm="deleteDictGroup(item)">
                       <a href="javascript:;">
-                        <a-icon type="edit"
-                                @click="editDictGroup(item)"/>
+                        <a-icon type="delete"/>
                       </a>
-                    </a-col>
-                    <a-col span="2">
-                      <a-popconfirm title="是否确认删除此分组" @confirm="deleteDictGroup(item)">
-                        <a href="javascript:;">
-                          <a-icon type="delete"/>
-                        </a>
-                      </a-popconfirm>
-                    </a-col>
-                  </a-row>
-                </div>
-              </a-card>
-            </a-col>
-          </a-row>
-        </a-col>
-        <a-col span="18" offset="1">
-          <!--操作按钮区域-->
-          <a-row>
-            <a-col :span="24" class="header">
-              <a-space>
-                <a-button type="primary" icon="plus" @click="openDictModal">新增数据字典</a-button>
-                <a-button @click="removeBatchDict" type="danger" icon="delete" v-if="selectedDataIds.length > 0">批量删除
-                </a-button>
-              </a-space>
-            </a-col>
-          </a-row>
-          <!--数据字典列表区域-->
-          <a-row>
-            <a-col span="24">
-              <a-table
-                align="center"
-                row-key="id"
-                :columns="dictTableColumns"
-                :pagination="page"
-                :data-source="dictData"
-                :row-selection="{ selectedRowKeys: selectedDataIds, onChange: changeTableSelect }"
-                @change="changeTablePage"
-              >
+                    </a-popconfirm>
+                  </a-col>
+                </a-row>
+              </div>
+            </a-card>
+          </a-col>
+        </a-row>
+      </a-col>
+      <a-col span="18" offset="1">
+        <!--操作按钮区域-->
+        <a-row>
+          <a-col :span="24" class="header">
+            <a-space>
+              <a-button type="primary" icon="plus" @click="openDictModal">新增数据字典</a-button>
+              <a-button @click="removeBatchDict" type="danger" icon="delete" v-if="selectedDataIds.length > 0">批量删除
+              </a-button>
+            </a-space>
+          </a-col>
+        </a-row>
+        <!--数据字典列表区域-->
+        <a-row>
+          <a-col span="24">
+            <a-table
+              align="center"
+              row-key="id"
+              :columns="dictTableColumns"
+              :pagination="page"
+              :data-source="dictData"
+              :row-selection="{ selectedRowKeys: selectedDataIds, onChange: changeTableSelect }"
+              @change="changeTablePage"
+            >
                 <span slot="dictType" slot-scope="dictType">
                     <a-tag color="orange" v-if="dictType == dictConstant.dict_type_array ">数组</a-tag>
                     <a-tag color="green" v-if="dictType == dictConstant.dict_type_tree">树形</a-tag>
                 </span>
-                <template slot="operation" slot-scope="text,record">
-                  <a-space>
-                    <a href="javascript:;" @click="updateDict(record)">编辑</a>
-                    <a href="javascript:;" @click="configDict(record)">字典配置</a>
-                    <a href="javascript:;">
-                      <a-popconfirm
-                        title="确认删除此数据字典吗?"
-                        @confirm="() => removeDict(record)"
-                      >删除
-                      </a-popconfirm>
-                    </a>
-                  </a-space>
-                </template>
-              </a-table>
-            </a-col>
-          </a-row>
-        </a-col>
-      </a-row>
-    </div>
-    <!-- 添加、修改数据字典窗口-->
-    <div>
-      <a-modal
-        :title="modalTitle"
-        :visible="modalVisible"
-        :confirm-loading="modalConfirmLoading"
-        @ok="saveDictModal"
-        @cancel="cancelDictModal"
-      >
-        <a-form-model :model="dictForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 16 }" colon labelAlign="right"
-                      ref="dictFormRef"
-                      :rules="dictFormRules">
-          <a-form-model-item label="字典名称" prop="dictName">
-            <a-input v-model="dictForm.dictName" placeholder="请输入字典名称"/>
-          </a-form-model-item>
-          <a-form-model-item label="字典编码" prop="dictCode">
-            <a-input v-model="dictForm.dictCode" placeholder="请输入字典编码"/>
-          </a-form-model-item>
-          <a-form-model-item label="字典类型" prop="dictType">
-            <a-select v-model="dictForm.dictType" :options="dictTypeData" placeholder="请选择字典类型"/>
-          </a-form-model-item>
-          <a-form-model-item label="字典分组" prop="dictGroupId">
-            <a-select v-model="dictForm.dictGroupId" placeholder="请输入字典分组">
-              <a-select-option v-for="(item,index) in dictGroupData" :key="index" :value="item.id">
-                {{item.dictGroupName}}
-              </a-select-option>
-            </a-select>
-          </a-form-model-item>
-          <a-form-model-item label="字典描述" prop="description">
-            <a-textarea v-model="dictForm.description" placeholder="请输入字典描述"/>
-          </a-form-model-item>
-        </a-form-model>
-      </a-modal>
-      <!-- 添加、修改 数据字典分组窗口-->
-      <a-modal
-        :title="dictGroupModelTitle"
-        :visible="dictGroupVisible"
-        :confirm-loading="modalConfirmLoading"
-        @ok="saveDictGroupModal"
-        @cancel="cancelDictGroupModal"
-      >
-        <a-form-model :model="dictGroupForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }" colon
-                      ref="dictFormGroupRef"
-                      labelAlign="right"
-                      :rules="dictGroupFormRules">
-          <a-form-model-item label="字典分组名称" prop="dictGroupName">
-            <a-input v-model="dictGroupForm.dictGroupName" placeholder="请输入字典描述"/>
-          </a-form-model-item>
-        </a-form-model>
-      </a-modal>
-    </div>
-    <!--数据字典明细配置窗口-->
-    <div>
-      <a-drawer
-        title="字典列表"
-        placement="right"
-        width="750"
-        :visible="dictItemVisible"
-        @close="dictItemClose"
-      >
-        <DictItem :dict="dictEdit" ></DictItem>
-      </a-drawer>
-    </div>
-  </a-spin>
+              <span slot="dictGroupName" slot-scope="dictGroupName">
+                    <a-tag color="green" v-if="dictGroupName">{{dictGroupName}}</a-tag>
+                </span>
+              <template slot="operation" slot-scope="text,record">
+                <a-space>
+                  <a href="javascript:;" @click="updateDict(record)">编辑</a>
+                  <a href="javascript:;" @click="configDict(record)">字典配置</a>
+                  <a href="javascript:;">
+                    <a-popconfirm
+                      title="确认删除此数据字典吗?"
+                      @confirm="() => removeDict(record)"
+                    >删除
+                    </a-popconfirm>
+                  </a>
+                </a-space>
+              </template>
+            </a-table>
+          </a-col>
+        </a-row>
+      </a-col>
+
+
+      <!-- 添加、修改数据字典窗口-->
+      <div>
+        <a-modal
+          :title="modalTitle"
+          :visible="modalVisible"
+          :confirm-loading="modalConfirmLoading"
+          @ok="saveDictModal"
+          @cancel="cancelDictModal"
+        >
+          <a-form-model :model="dictForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 16 }" colon labelAlign="right"
+                        ref="dictFormRef"
+                        :rules="dictFormRules">
+            <a-form-model-item label="字典名称" prop="dictName">
+              <a-input v-model="dictForm.dictName" placeholder="请输入字典名称"/>
+            </a-form-model-item>
+            <a-form-model-item label="字典编码" prop="dictCode">
+              <a-input v-model="dictForm.dictCode" placeholder="请输入字典编码"/>
+            </a-form-model-item>
+            <a-form-model-item label="字典类型" prop="dictType">
+              <a-select v-model="dictForm.dictType" :options="dictTypeData" placeholder="请选择字典类型"/>
+            </a-form-model-item>
+            <a-form-model-item label="字典分组" prop="dictGroupId">
+              <a-select v-model="dictForm.dictGroupId" placeholder="请输入字典分组">
+                <a-select-option v-for="(item,index) in dictGroupData" :key="index" :value="item.id">
+                  {{item.dictGroupName}}
+                </a-select-option>
+              </a-select>
+            </a-form-model-item>
+            <a-form-model-item label="字典描述" prop="description">
+              <a-textarea v-model="dictForm.description" placeholder="请输入字典描述"/>
+            </a-form-model-item>
+          </a-form-model>
+        </a-modal>
+        <!-- 添加、修改 数据字典分组窗口-->
+        <a-modal
+          :title="dictGroupModelTitle"
+          :visible="dictGroupVisible"
+          :confirm-loading="modalConfirmLoading"
+          @ok="saveDictGroupModal"
+          @cancel="cancelDictGroupModal"
+        >
+          <a-form-model :model="dictGroupForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }" colon
+                        ref="dictFormGroupRef"
+                        labelAlign="right"
+                        :rules="dictGroupFormRules">
+            <a-form-model-item label="字典分组名称" prop="dictGroupName">
+              <a-input v-model="dictGroupForm.dictGroupName" placeholder="请输入字典描述"/>
+            </a-form-model-item>
+          </a-form-model>
+        </a-modal>
+      </div>
+      <!--数据字典明细配置窗口-->
+      <div>
+        <a-drawer
+          title="字典列表"
+          placement="right"
+          width="750"
+          :visible="dictItemVisible"
+          @close="dictItemClose"
+        >
+          <DictItem :dict="dictEdit"></DictItem>
+        </a-drawer>
+      </div>
+    </a-spin>
+  </a-row>
 </template>
 
 <script>
-  import {queryDictPage, deleteDict, deleteDictBatch, queryFieldList, saveDict} from '@/api/dict'
+  import {queryDictPage, deleteDict, deleteDictBatch, saveDict} from '@/api/dict'
   import {queryDictGroupList, saveDictGroup, deleteDictGroup, queryDictGroupListByGroupName} from '@/api/dictGroup'
   import {DictConstant} from '@/utils/system/dictConstant'
   import DictItem from './dictItem'
@@ -189,8 +192,7 @@
         dictGroupData: [],
         // 字典数据
         dictData: [],
-        dictColumns: [],
-        dictTableColumns: [],
+        dictTableColumns,
         selectedDataIds: [],
         loading: true,
         // 分页对象
@@ -218,8 +220,8 @@
     created() {
     },
     mounted() {
-      this.getFieldList()
       this.getDictGroupList()
+      this.getDictData()
     },
     methods: {
       /**
@@ -319,21 +321,11 @@
         })
       },
       /**
-       * 查询用户显示字段
-       */
-      getFieldList() {
-        queryFieldList().then(res => {
-          this.dictColumns = res.data
-          this.getDictData()
-        })
-      },
-      /**
        * 查询数据
        */
       getDictData() {
         this.loading = true
         queryDictPage(this.page.current, this.page.pageSize, this.dictGroupId).then(res => {
-          this.getTableColumns()
           this.loading = false
           this.dictData = res.data.records  // 用户数据
           this.page.current = res.data.current
@@ -420,36 +412,6 @@
           this.$message.success(res.message)
           this.getDictData()
         })
-      },
-
-      /**
-       * 处理表格显示字段
-       */
-      getTableColumns() {
-        // 排除显示字段
-        let columnsFilters = ['id', 'dictGroupId', 'createTime','createUser', 'updateUser']
-        let arr = []
-        this.dictColumns.forEach(field => {
-          if (!columnsFilters.includes(field.field)) {
-            var obj = {
-              title: field.name,
-              dataIndex: field.field,
-              scopedSlots: {
-                customRender: field.field
-              },
-              ellipsis: true
-            }
-            arr.push(obj)
-          }
-        })
-        // 添加操作列
-        let operation = {
-          title: '操作',
-          dataIndex: 'operation',
-          scopedSlots: {customRender: 'operation'},
-        }
-        arr.push(operation)
-        this.dictTableColumns = arr
       }
     },
   }
@@ -463,6 +425,54 @@
   const dictGroupFormRules = {
     dictGroupName: [{required: true, message: '请输入数据字典分组名称', whitespace: true, trigger: 'blur'}]
   }
+  const dictTableColumns = [
+
+    {
+      title: '字典名称',
+      dataIndex: 'dictName',
+      scopedSlots: {
+        customRender: 'dictName'
+      },
+      ellipsis: true
+    },
+    {
+      title: '字典编码',
+      dataIndex: 'dictCode',
+      scopedSlots: {
+        customRender: 'dictCode'
+      },
+      ellipsis: true
+    },
+    {
+      title: '字典描述',
+      dataIndex: 'description',
+      scopedSlots: {
+        customRender: 'description'
+      },
+      ellipsis: true
+    },
+    {
+      title: '字典分组',
+      dataIndex: 'dictGroupName',
+      scopedSlots: {
+        customRender: 'dictGroupName'
+      },
+      ellipsis: true
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'createTime',
+      scopedSlots: {
+        customRender: 'createTime'
+      },
+      ellipsis: true
+    },
+    {
+      title: '操作',
+      dataIndex: 'operation',
+      scopedSlots: {customRender: 'operation'}
+    }
+  ]
 </script>
 
 <style scoped>
@@ -475,6 +485,7 @@
   .header {
     padding-bottom: 20px;
   }
+
   .row_div {
     padding-bottom: 5px;
   }

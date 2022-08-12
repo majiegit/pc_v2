@@ -6,7 +6,7 @@ import {System_Path} from '@/utils/modulePath'
  */
 export function permissionTree() {
   return request({
-    url: System_Path + "/user/permission/tree",
+    url: System_Path + "/permission/tree",
     method: 'get',
   })
 }
@@ -16,7 +16,7 @@ export function permissionTree() {
  */
 export function permissionSave(data) {
   return request({
-    url: System_Path + "/user/permission/save",
+    url: System_Path + "/permission/save",
     data: data,
     method: 'post',
   })
@@ -27,7 +27,7 @@ export function permissionSave(data) {
  */
 export function deletePermission(ids) {
   return request({
-    url: System_Path + "/user/permission/deleteById",
+    url: System_Path + "/permission/deleteById",
     data: ids,
     method: 'post',
   })

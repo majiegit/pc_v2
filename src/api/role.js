@@ -6,8 +6,9 @@ import {System_Path} from '@/utils/modulePath'
  */
 export function getRoleList() {
   return request({
-    url: System_Path + "/user/role/list",
+    url: System_Path + "/role/list",
     method: 'get',
+    // params: {roleType: 0}
   })
 }
 
@@ -16,7 +17,7 @@ export function getRoleList() {
  */
 export function saveRole(data) {
   return request({
-    url: System_Path + "/user/role/save",
+    url: System_Path + "/role/save",
     data: data,
     method: 'post',
   })
@@ -27,7 +28,7 @@ export function saveRole(data) {
  */
 export function deleteRole(id) {
   return request({
-    url: System_Path + "/user/role/delete",
+    url: System_Path + "/role/delete",
     params: { roleId: id },
     method: 'post',
   })

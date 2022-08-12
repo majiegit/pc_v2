@@ -2,33 +2,23 @@ import request from '@/utils/request'
 import {System_Path} from '@/utils/modulePath'
 
 /**
- * 查询所有角色
+ * 查询角色用户
  */
-export function getRoleList() {
+export function queryRoleUser(roleId) {
   return request({
-    url: System_Path + "/user/role/list",
-    method: 'get',
+    url: System_Path + "/userRole/queryUserList",
+    method: 'post',
+    params: {roleId: roleId}
   })
 }
 
 /**
- * 保存角色
+ * 取消关联角色用户
  */
-export function saveRole(data) {
+export function removeRoleUser(roleId, userIds) {
   return request({
-    url: System_Path + "/user/role/save",
-    data: data,
+    url: System_Path + "/userRole/removeUser",
     method: 'post',
-  })
-}
-
-/**
- * 删除角色
- */
-export function deleteRole(id) {
-  return request({
-    url: System_Path + "/user/role/delete",
-    params: { roleId: id },
-    method: 'post',
+    data: {roleId: roleId, userIds: userIds}
   })
 }

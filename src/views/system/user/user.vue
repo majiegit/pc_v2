@@ -14,8 +14,7 @@
             :pagination="page"
             :data-source="userList"
           >
-            <userDetail slot="expandedRowRender" slot-scope="record" style="margin: 0" :userDetail="record"
-                        :userColumns="userColumns"/>
+            <userDetail slot="expandedRowRender" slot-scope="record" style="margin: 0" :userDetail="record"/>
             <template slot="operation" slot-scope="text,record">
               <a href="javascript:;" class="operation" @click="updateMenuClick(record)">编辑</a>
               <a href="javascript:;" class="operation">
@@ -36,15 +35,14 @@
 <script>
   import ACol from "ant-design-vue/es/grid/Col";
   import userDetail from './userDetail'
-  import {queryUserListPage, queryUserFieldList} from '@/api/user'
+  import {queryUserListPage} from '@/api/user'
 
   export default {
     name: "user",
     components: {ACol, userDetail},
     data() {
       return {
-        userColumns: [],
-        tableUserColumns: [],
+        tableUserColumns,
         loading: true,
         userList: [],
         // 分页对象
@@ -62,25 +60,14 @@
     created() {
     },
     mounted() {
-      this.getUserFieldList()
+      this.getUserPageList()
     },
     methods: {
-
-      /**
-       * 查询用户显示字段
-       */
-      getUserFieldList() {
-        queryUserFieldList([]).then(res => {
-          this.userColumns = res.data
-          this.getUserList()
-        })
-      },
       /**
        * 查询用户列表
        */
-      getUserList() {
+      getUserPageList() {
         queryUserListPage(this.page.current, this.page.pageSize).then(res => {
-          this.getTableUserColumns()
           this.loading = false
           this.userList = res.data.records  // 用户数据
           this.page.current = res.data.current
@@ -88,38 +75,58 @@
           this.page.total = res.data.total
           this.page.pages = res.data.pages
         })
-      },
-      /**
-       * 处理表格显示字段
-       */
-      getTableUserColumns() {
-        // 排除显示字段
-        let userColumnsFilters = ['id', 'password', 'relTenantIds', 'userIdentity', 'thirdId', 'thirdType', 'telephone', 'createUser', 'createTime', 'updateUser', 'updateTime']
-        let arr = []
-        this.userColumns.forEach(field => {
-          if (!userColumnsFilters.includes(field.field)) {
-            var obj = {
-              title: field.name,
-              dataIndex: field.field,
-              scopedSlots: {
-                customRender: field.field
-              },
-              ellipsis: true
-            }
-            arr.push(obj)
-          }
-        })
-        // 添加操作列
-        let operation = {
-          title: '操作',
-          dataIndex: 'operation',
-          scopedSlots: {customRender: 'operation'},
-        }
-        arr.push(operation)
-        this.tableUserColumns = arr
       }
     }
   }
+
+
+  const tableUserColumns = [
+    {
+      title: '账号',
+      dataIndex: 'username',
+      scopedSlots: {
+        customRender: 'username'
+      },
+      ellipsis: true
+    },
+    {
+      title: '姓名',
+      dataIndex: 'realname',
+      scopedSlots: {
+        customRender: 'realname'
+      },
+      ellipsis: true
+    },
+    {
+      title: '头像',
+      dataIndex: 'avatar',
+      scopedSlots: {
+        customRender: 'avatar'
+      },
+      ellipsis: true
+    },
+    {
+      title: '性别',
+      dataIndex: 'sex',
+      scopedSlots: {
+        customRender: 'sex'
+      },
+      ellipsis: true
+    },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      scopedSlots: {
+        customRender: 'status'
+      },
+      ellipsis: true
+    },
+    {
+      title: '操作',
+      dataIndex: 'operation',
+      scopedSlots: {customRender: 'operation'}
+    }
+  ]
 </script>
 
 <style scoped>

@@ -6,7 +6,7 @@ import {System_Path} from '@/utils/modulePath'
  */
 export function rolePermissionListByRoleId(roleId) {
   return request({
-    url: System_Path + "/user/rolePermission/list",
+    url: System_Path + "/rolePermission/list",
     method: 'post',
     params: {roleId: roleId}
   })
@@ -16,7 +16,7 @@ export function rolePermissionListByRoleId(roleId) {
  */
 export function saveRolePermission(roleId,permissionIds) {
   return request({
-    url: System_Path + "/user/rolePermission/save",
+    url: System_Path + "/rolePermission/save",
     method: 'post',
     data: {roleId: roleId, permissionIds: permissionIds}
   })
