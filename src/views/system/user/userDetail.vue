@@ -1,7 +1,7 @@
 <template>
   <a-descriptions>
-    <a-descriptions-item :label="column" v-for="(column,index) in userColumns" :key="index">
-      {{userDetail[column]}}
+    <a-descriptions-item :label="column.name" v-for="(column,index) in userColumns" :key="index">
+      {{userDetail[column.field]}}
     </a-descriptions-item>
   </a-descriptions>
 </template>
@@ -21,15 +21,13 @@
     props: {
       userDetail: {
         type: Object
+      },
+      userColumns: {
+        default: [],
+        type: Array
       }
     }
   }
-  const userColumns = [
-    {
-      title: '名字',
-      dataIndex: 'realname'
-    }
-  ]
 </script>
 
 <style scoped>

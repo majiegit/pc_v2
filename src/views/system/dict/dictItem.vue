@@ -4,7 +4,6 @@
       <a-space>
         <a-input v-model="dictItemQuery.name" placeholder="请输入名称"/>
         <a-select v-model="dictItemQuery.status" placeholder="请选择状态" style="min-width: 150px;" :options="dictItemStatusData"/>
-
         <a-button type="primary" icon="search" @click="searchDictItemData">搜 索</a-button>
         <a-button type="primary" @click="resetDictItemQuery">重 置</a-button>
         <a-button type="primary" @click="addDictItem">新 增</a-button>
@@ -28,7 +27,7 @@
             <a href="javascript:;" v-if="dict.dictType == dictConstant.dict_type_tree"
                @click="addDictItem(record)">添加</a>
             <a href="javascript:;" @click="updateDictItem(record)">编辑</a>
-            <a href="javascript:;">
+            <a href="javascript:;"  style="color: red;">
               <a-popconfirm
                 title="确认删除此数据吗?"
                 @confirm="() => removeDictItem(record)"

@@ -55,7 +55,7 @@ request.interceptors.request.use(config => {
 request.interceptors.response.use((response) => {
   let res = response.data
   // 请求数据成功, 直接 return
-  console.log(response)
+  // console.log(response)
   if (res.code === 200) {
     return res
   } else if (res.code === 401) {

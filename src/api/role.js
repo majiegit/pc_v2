@@ -4,11 +4,11 @@ import {System_Path} from '@/utils/modulePath'
 /**
  * 查询所有角色
  */
-export function getRoleList() {
+export function getRoleList(params) {
   return request({
     url: System_Path + "/role/list",
-    method: 'get',
-    // params: {roleType: 0}
+    method: 'post',
+    params: params
   })
 }
 

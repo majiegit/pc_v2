@@ -1,75 +1,115 @@
 <template>
-  <a-row :gutter="[24,24]" style="background: #fff;">
+  <a-row type="flex" :gutter="[24,24]" style="background: #fff;">
     <a-col :span="userPopupShow ? 12 : 24">
-      <!--操作按钮区域-->
-      <a-col :span="24">
-        <a-space>
-          <a-button type="primary" icon="plus" @click="addRole()" :disabled="editingKey !==''">角色新增</a-button>
-        </a-space>
-      </a-col>
-      <!-- table 区域-->
-      <a-col :span="24">
-        <a-table
-          bordered
-          row-key="id"
-          :loading="loading"
-          :columns="columns"
-          :data-source="roleList"
-          :row-selection="rowSelection"
-        >
-          <template
-            v-for="col in ['roleName', 'roleCode', 'description']"
-            :slot="col"
-            slot-scope="text, record, index"
+      <a-spin :spinning="loading">
+        <!--操作按钮区域-->
+        <a-col :span="24">
+          <a-form layout="inline">
+            <a-row type="flex" align="middle">
+              <a-col :md="userPopupShow ? 10 : 5" :sm="24">
+                <a-form-item label="角色名称">
+                  <a-input v-model="roleQueryParam.roleName" placeholder="请输入角色名称"/>
+                </a-form-item>
+              </a-col>
+              <a-col :md="userPopupShow ? 10 : 5" :sm="24">
+                <a-form-item label="角色编码">
+                  <a-input v-model="roleQueryParam.roleCode" placeholder="请输入角色编码"/>
+                </a-form-item>
+              </a-col>
+              <a-col :md="userPopupShow ? 2 : 4" :sm="24">
+                <a-space>
+                  <a-button type="primary" @click="getRoleList" icon="search">查询</a-button>
+                </a-space>
+              </a-col>
+            </a-row>
+          </a-form>
+        </a-col>
+        <a-col :span="24">
+          <a-space>
+            <a-button type="primary" icon="plus" @click="addRole()" :disabled="editingKey !==''">角色新增</a-button>
+          </a-space>
+        </a-col>
+        <!-- table 区域-->
+        <a-col :span="24">
+          <a-table
+            bordered
+            row-key="id"
+            :columns="columns"
+            :data-source="roleList"
+            :row-selection="rowSelection"
           >
-            <div :key="col">
-              <a-form-model-item :rules="roleRules" v-if="record.editable">
-                <a-input
-                  style="margin: -5px 0"
-                  v-model="record[col]"
-                  :prop="col"
-                />
-              </a-form-model-item>
-              <template v-else>
-                {{ text }}
-              </template>
-            </div>
-          </template>
-          <template slot="operation" slot-scope="text, record, index">
-            <div class="editable-row-operations">
-        <span v-if="record.editable">
-          <a @click="() => save(record)">保存</a>
-          <a-popconfirm title="是否取消编辑?" @confirm="() => cancel(record.id)">
-            <a class="operation">取消</a>
-          </a-popconfirm>
-        </span>
-              <span v-else>
-          <a class="operation" @click="showPopupUser(record)">用户</a>
-          <a class="operation" @click="showPermission(record)">分配权限</a>
-          <a :disabled="editingKey !== ''" class="operation" @click="edit(record.id)">编辑</a>
-          <a-popconfirm :disabled="editingKey !== ''" title="是否删除此角色?" @confirm="remove(record.id)">
-            <a class="operation">删除</a>
-          </a-popconfirm>
-        </span>
-            </div>
-          </template>
-        </a-table>
-      </a-col>
+            <template
+              v-for="col in ['roleName', 'roleCode', 'description']"
+              :slot="col"
+              slot-scope="text, record, index"
+            >
+              <div :key="col">
+                <a-form-model-item :rules="roleRules" v-if="record.editable">
+                  <a-input
+                    style="margin: -5px 0"
+                    v-model="record[col]"
+                    :prop="col"
+                  />
+                </a-form-model-item>
+                <template v-else>
+                  {{ text }}
+                </template>
+              </div>
+            </template>
+            <template slot="operation" slot-scope="text, record, index">
+              <div class="editable-row-operations">
+                <span v-if="record.editable">
+                  <a @click="() => save(record)">保存</a>
+                  <a-popconfirm title="是否取消编辑?" @confirm="() => cancel(record.id)">
+                    <a class="operation" style="color: red;">取消</a>
+                  </a-popconfirm>
+                </span>
+                <span v-else>
+                  <a class="operation" @click="showPopupUser(record)">用户</a>
+                  <a class="operation" @click="showPermission(record)">分配权限</a>
+                  <a :disabled="editingKey !== ''" class="operation" @click="edit(record.id)">编辑</a>
+                  <a class="operation" style="color: red;">
+                    <a-popconfirm :disabled="editingKey !== ''" title="是否删除此角色?" @confirm="remove(record.id)">
+                      删除
+                    </a-popconfirm>
+                  </a>
+                </span>
+              </div>
+            </template>
+          </a-table>
+        </a-col>
+      </a-spin>
     </a-col>
-
 
     <!-- 用户数据操作面板-->
     <a-col :span="userPopupShow ? 12 : 0">
-      <!--用户操作-->
-      <a-col span="23">
-        <!--操作按钮区域-->
-        <a-space>
-          <a-button type="primary" icon="plus">分配用户</a-button>
-          <a-button icon="delete">取消关联</a-button>
-        </a-space>
+      <a-col :span="23">
+        <a-form layout="inline">
+          <a-row :gutter="24" type="flex" align="middle">
+            <a-col :md="userPopupShow ? 10 : 5" :sm="24">
+              <a-form-item label="用户名称">
+                <a-input v-model="userQueryParam.realname" placeholder="请输入用户名称"/>
+              </a-form-item>
+            </a-col>
+            <a-col :md="userPopupShow ? 10 : 2" :sm="24">
+              <a-space>
+                <a-button type="primary" @click="queryRoleUserClick" icon="search">查询</a-button>
+                <a-button icon="redo">重置</a-button>
+              </a-space>
+            </a-col>
+          </a-row>
+        </a-form>
       </a-col>
       <a-col span="1">
         <a-icon type="close" @click="closeUserPopup"/>
+      </a-col>
+      <!--用户操作-->
+      <a-col span="24">
+        <!--操作按钮区域-->
+        <a-space>
+          <a-button type="primary" icon="plus" @click="distributionUserClick">分配用户</a-button>
+          <a-button icon="delete" v-if="userDataSelectUserIds.length > 0" @click="cancelRoleUserBatch">取消关联</a-button>
+        </a-space>
       </a-col>
       <!--用户数据-->
       <a-col span="24">
@@ -78,18 +118,18 @@
           row-key="id"
           :loading="userDataLoading"
           :columns="userColumns"
-          :row-selection="rowSelection"
+          :row-selection="{ selectedRowKeys: userDataSelectUserIds, onChange: changeUserDataSelect }"
           :data-source="userData"
         >
           <template slot="status" slot-scope="status">
-            <a-tag color="orange">{{getStatusName(status)}}</a-tag>
+            <a-tag color="orange" v-if="status">{{getStatusName(status)}}</a-tag>
           </template>
           <template slot="operation" slot-scope="text,record">
             <a-space>
               <a href="javascript:;">编辑</a>
               <a href="javascript:;" style="color: red;">
                 <a-popconfirm
-                  title="确定要删除此模板吗?"
+                  title="确定要取消关联吗?"
                   @confirm="() => cancelRoleUser(record)"
                 >取消关联
                 </a-popconfirm>
@@ -100,6 +140,47 @@
       </a-col>
     </a-col>
 
+    <!--分配用户窗口-->
+    <a-modal
+      title="分配用户"
+      width="50%"
+      :visible="distributionUserVisible"
+      :confirm-loading="modalConfirmLoading"
+      @ok="saveDistributionUserModal"
+      @cancel="cancelDistributionUserModal"
+    >
+      <a-input-group>
+        <a-row :gutter="4" type="flex" align="middle" style="padding-bottom: 20px;">
+          <a-col span="2">
+            用户账号：
+          </a-col>
+          <a-col span="6">
+            <a-input placeholder="用户账号" v-model="allocated.queryParam.username"/>
+          </a-col>
+          <a-col span="3" offset="1">
+            <a-space>
+              <a-button type="primary" icon="search" @click="queryAllocatedUserData">查询</a-button>
+              <a-button @click="resetQueryParam" icon="redo">重置</a-button>
+            </a-space>
+          </a-col>
+        </a-row>
+      </a-input-group>
+      <a-row>
+        <a-col span="24">
+          <a-table
+            :scroll="{ y: 330 }"
+            align="center"
+            row-key="id"
+            :pagination="allocated.page"
+            :columns="allocated.tableColumns"
+            :loading="allocated.tableLoading"
+            :row-selection="{ selectedRowKeys: allocated.selectedUserIds, onChange: changeUserTableSelect }"
+            @change="changeUserTablePage"
+            :data-source="allocated.userList"
+          />
+        </a-col>
+      </a-row>
+    </a-modal>
 
     <!--分配角色权限区域代码-->
     <a-drawer
@@ -155,23 +236,51 @@
 <script>
   import {getRoleList, saveRole, deleteRole} from '@/api/role'
   import {permissionTree} from '@/api/permission'
+  import {queryUserListPageByParam} from '@/api/user'
   import {rolePermissionListByRoleId, saveRolePermission} from '@/api/rolePermission'
-  import {queryRoleUser, removeRoleUser} from '@/api/userRole'
+  import {queryRoleUser, removeRoleUser, saveUserRole} from '@/api/userRole'
   import {queryDictItemListByCode} from '@/api/dictItem'
   import {DictCode} from '@/utils/system/dictCode'
   import {DictConstant} from '@/utils/system/dictConstant'
   import ARow from "ant-design-vue/es/grid/Row";
   import ACol from "ant-design-vue/es/grid/Col";
+  import AFormItem from "ant-design-vue/es/form/FormItem";
 
   export default {
-    components: {ACol, ARow},
+    components: {AFormItem, ACol, ARow},
     data() {
       return {
+        // 待分配定义数据
+        allocated: {
+          queryParam: { //查询参数
+            username: '' // 用户账号
+          },
+          selectedUserIds: [], // 已选择数据
+          tableLoading: false,
+          tableColumns: allocatedUserDataTableColumns,
+          userList: [],// 待分配用户数据
+          page: { // 分页对象
+            current: 1,
+            pageSize: 10,
+            pageSizeOptions: ['10', '20', '50', '100'],
+            showSizeChanger: true,
+            showQuickJumper: true,
+            total: 0,
+            pages: 0,
+            hideOnSinglePage: true
+          }
+        },
+        distributionUserVisible: false,
+        modalConfirmLoading: false,
         // 用户分配
         userPopupShow: false,
         role: {},
+        userQueryParam: {
+          realname: ''
+        },
         userStatusData: [], // 用户状态
         userData: [],
+        userDataSelectUserIds: [], // 选择用户id
         userDataLoading: false,
         userColumns,
         // 分配权限
@@ -195,6 +304,11 @@
         rowSelection,
         editingKey: '',
         roleList: [],
+        roleQueryParam: {
+          roleType: '',
+          roleName: '',
+          roleCode: ''
+        },
         roleListBackUp: [],
         loading: false,
       }
@@ -205,6 +319,98 @@
       this.queryUserStatus()
     },
     methods: {
+      /**
+       * 重置待选用户查询参数
+       */
+      resetQueryParam() {
+        this.allocated.queryParam = {}
+      },
+      /**
+       * 待选用户查询事件
+       */
+      queryAllocatedUserData() {
+        console.log(this.allocated.queryParam)
+        this.getUserPageList()
+      },
+      /**
+       * 分配用户事件
+       */
+      distributionUserClick() {
+        this.distributionUserVisible = true
+        this.allocated.selectedUserIds = []
+        for (let i = 0; i < this.userData.length; i++) {
+          this.allocated.selectedUserIds.push(this.userData[i].id)
+        }
+        this.getUserPageList()
+      },
+      /**
+       * 表格选择事件
+       */
+      changeUserTableSelect(selectedUserIds) {
+        this.allocated.selectedUserIds = selectedUserIds
+      },
+      /**
+       * 分页改变事件
+       */
+      changeUserTablePage(val) {
+        this.allocated.page.current = val.current
+        this.allocated.page.pageSize = val.pageSize
+        this.getUserPageList()
+      },
+      /**
+       * 查询用户列表
+       */
+      getUserPageList() {
+        this.allocated.tableLoading = true
+        let param = {
+          current: this.allocated.page.current,
+          size: this.allocated.page.pageSize
+        }
+        if (this.allocated.queryParam.username) {
+          param.realName = this.allocated.queryParam.username
+        }
+        queryUserListPageByParam(param).then(res => {
+          this.allocated.tableLoading = false
+          this.allocated.userList = res.data.records  // 用户数据
+          this.allocated.page.current = res.data.current
+          this.allocated.page.pageSize = res.data.size
+          this.allocated.page.total = res.data.total
+          this.allocated.page.pages = res.data.pages
+        })
+      },
+      /**
+       * 取消分配用户分组窗口
+       */
+      cancelDistributionUserModal() {
+        this.distributionUserVisible = false
+      },
+      /**
+       * 保存分配用户
+       */
+      saveDistributionUserModal() {
+        saveUserRole(this.role.id, this.allocated.selectedUserIds).then(res => {
+          this.distributionUserVisible = false
+          this.$message.success(res.message)
+          this.queryUserList(this.role.id)
+        })
+      },
+      /**
+       * 批量取消角色关联用户
+       */
+      cancelRoleUserBatch() {
+        removeRoleUser(this.role.id, this.userDataSelectUserIds).then(res => {
+          this.$message.success(res.message)
+          this.queryUserList(this.role.id)
+          this.userDataSelectUserIds = []
+        })
+      },
+      /**
+       * 选择用户表格改变事件
+       */
+      changeUserDataSelect(selectedUserIds) {
+        this.userDataSelectUserIds = selectedUserIds
+        console.log(this.userDataSelectUserIds)
+      },
       /**
        * 取消用户角色关联
        */
@@ -220,7 +426,6 @@
        * 获取用户状态名称
        * */
       getStatusName(status) {
-        console.log(status)
         var arr = this.userStatusData.filter(item => item.value == status)
         console.log()
         if (arr.length == 0) {
@@ -239,11 +444,24 @@
         })
       },
       /**
+       * 查询角色用户事件
+       */
+      queryRoleUserClick() {
+        this.queryUserList(this.role.id)
+      },
+
+      /**
        *  查询角色关联用户
        */
       queryUserList(roleId) {
         this.userDataLoading = true
-        queryRoleUser(roleId).then(res => {
+        let param = {
+          roleId: roleId
+        }
+        if (this.userQueryParam.realname) {
+          param.realname = this.userQueryParam.realname
+        }
+        queryRoleUser(param).then(res => {
           this.userData = res.data
           this.userDataLoading = false
         })
@@ -422,7 +640,7 @@
        */
       getRoleList() {
         this.loading = true
-        getRoleList().then(res => {
+        getRoleList(this.roleQueryParam).then(res => {
           this.roleList = res.data
           this.roleListBackUp = JSON.parse(JSON.stringify(res.data))
           this.loading = false
@@ -434,15 +652,34 @@
   const rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
       console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
-    },
-    onSelect: (record, selected, selectedRows) => {
-      console.log(record, selected, selectedRows)
-    },
-    onSelectAll: (selected, selectedRows, changeRows) => {
-      console.log(selected, selectedRows, changeRows)
-    },
+    }
   }
-  // 用户数据列名
+
+  // 待分配用户数据列
+  const allocatedUserDataTableColumns = [
+    {
+      title: '账号',
+      dataIndex: 'username',
+      scopedSlots: {customRender: 'username'}
+    },
+    {
+      title: '姓名',
+      dataIndex: 'realname',
+      scopedSlots: {customRender: 'realname'}
+    },
+    {
+      title: '性别',
+      dataIndex: 'sex',
+      scopedSlots: {customRender: 'sex'}
+    },
+    {
+      title: '手机号',
+      dataIndex: 'phone',
+      scopedSlots: {customRender: 'realname'}
+    }
+  ]
+
+  // 已分配用户数据列名
   const userColumns = [
 
     {

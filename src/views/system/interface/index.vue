@@ -8,70 +8,80 @@
 <template>
   <a-row type="flex" :gutter="[24,24]" style="background: #fff;">
     <a-spin :spinning="loading">
-      <div class="body">
-        <!--操作按钮区域-->
-        <a-row>
-          <a-col :span="24" class="header">
-            <a-col :span="3">
-              <a-select v-model="queryParams.moduleName" :options="apiModuleNameList" placeholder="请选择所属模块" allowClear
-                        style="width: 100%;"/>
-            </a-col>
-            <a-col :span="3" offset="1">
-              <a-input v-model="queryParams.url" placeholder="请输入接口路径"/>
-            </a-col>
-            <a-col :span="3" offset="1">
-              <a-input v-model="queryParams.name" placeholder="请输入接口名称"/>
-            </a-col>
-            <a-col :span="3" offset="1">
-              <a-select v-model="queryParams.isFilter" :options="apiIsFilterData" style="width: 100%;" allowClear
-                        placeholder="请选择是否拦截"/>
-            </a-col>
-            <a-col :span="4" offset="1">
-              <a-button @click="queryApiDataClick" type="primary" icon="search">查询</a-button>
-              <a-button @click="emptyQueryParamClick" type="primary" style="margin-left: 10px;">清空</a-button>
-            </a-col>
-          </a-col>
-          <a-col :span="24" class="header">
-            <a-space>
-              <a-button type="primary" icon="plus" @click="openApiModal">新增接口</a-button>
-              <a-button @click="removeBatchApi" type="danger" icon="delete" v-if="selectedDataIds.length > 0">批量删除
+      <!--操作按钮区域-->
+      <a-col :span="24">
+        <div class="table-page-search-wrapper">
+          <a-form layout="inline">
+            <a-row :gutter="48">
+              <a-col :md="4" :sm="24">
+                <a-form-item label="所属模块">
+                  <a-select v-model="queryParams.moduleName" :options="apiModuleNameList" allowClear
+                            placeholder="请选择所属模块"/>
+                </a-form-item>
+              </a-col>
+              <a-col :md="4" :sm="24">
+                <a-form-item label="接口路径">
+                  <a-input v-model="queryParams.url" placeholder="请输入接口路径"/>
+                </a-form-item>
+              </a-col>
+              <a-col :md="4" :sm="24">
+                <a-form-item label="接口名称">
+                  <a-input v-model="queryParams.name" placeholder="请输入接口名称"/>
+                </a-form-item>
+              </a-col>
+              <a-col :md="4" :sm="24">
+                <a-form-item label="是否拦截">
+                  <a-select v-model="queryParams.isFilter" :options="apiIsFilterData" allowClear placeholder="请选择是否拦截"/>
+                </a-form-item>
+              </a-col>
+              <a-col :md="4" :sm="24">
+                <a-space>
+                  <a-button @click="queryApiDataClick" type="primary" icon="search">查询</a-button>
+                  <a-button @click="emptyQueryParamClick" icon="redo">重置</a-button>
+                </a-space>
+              </a-col>
+            </a-row>
+          </a-form>
+        </div>
+      </a-col>
+      <a-col :span="24">
+        <a-space>
+          <a-button type="primary" icon="plus" @click="openApiModal">新增接口</a-button>
+          <a-button @click="removeBatchApi" type="danger" icon="delete" v-if="selectedDataIds.length > 0">批量删除
+          </a-button>
+        </a-space>
+      </a-col>
+      <!--接口列表区域-->
 
-              </a-button>
-            </a-space>
-          </a-col>
-        </a-row>
-        <!--接口列表区域-->
-        <a-row>
-          <a-col span="24">
-            <a-table
-              align="center"
-              row-key="id"
-              :columns="apiTableColumns"
-              :pagination="page"
-              :data-source="apiData"
-              :row-selection="{ selectedRowKeys: selectedDataIds, onChange: changeTableSelect }"
-              @change="changeTablePage"
-            >
+      <a-col span="24">
+        <a-table
+          align="center"
+          row-key="id"
+          :columns="apiTableColumns"
+          :pagination="page"
+          :data-source="apiData"
+          :row-selection="{ selectedRowKeys: selectedDataIds, onChange: changeTableSelect }"
+          @change="changeTablePage"
+        >
             <span slot="isFilter" slot-scope="isFilter">
                 <a-tag color="green" v-if="isFilter == 0">否</a-tag>
                 <a-tag color="orange" v-if="isFilter == 1">是</a-tag>
             </span>
-              <template slot="operation" slot-scope="text,record">
-                <a-space>
-                  <a href="javascript:;" @click="updateApi(record)">编辑</a>
-                  <a href="javascript:;" style="color: red;">
-                    <a-popconfirm
-                      title="确定要删除此接口吗?"
-                      @confirm="() => removeApi(record)"
-                    >删除
-                    </a-popconfirm>
-                  </a>
-                </a-space>
-              </template>
-            </a-table>
-          </a-col>
-        </a-row>
-      </div>
+          <template slot="operation" slot-scope="text,record">
+            <a-space>
+              <a href="javascript:;" @click="updateApi(record)">编辑</a>
+              <a href="javascript:;" style="color: red;">
+                <a-popconfirm
+                  title="确定要删除此接口吗?"
+                  @confirm="() => removeApi(record)"
+                >删除
+                </a-popconfirm>
+              </a>
+            </a-space>
+          </template>
+        </a-table>
+      </a-col>
+
       <!-- 添加、修改窗口-->
       <div>
         <a-modal
@@ -133,8 +143,8 @@
         queryParams: {
           url: '',
           name: '',
-          moduleName: '',
-          isFilter: ''
+          moduleName: undefined,
+          isFilter: undefined
         },
         //
         apiIsFilterData: IsNoData,
@@ -301,9 +311,9 @@
         })
       },
       isFilterChange(val) {
-        if(val){
+        if (val) {
           this.apiForm.isFilter = 1
-        }else {
+        } else {
           this.apiForm.isFilter = 0
           this.apiForm.code = ''
         }
@@ -405,13 +415,4 @@
 </script>
 
 <style scoped>
-  .body {
-    width: 100%;
-    padding: 20px 10px 50px 10px;
-    background: #fff;
-  }
-
-  .header {
-    padding-bottom: 20px;
-  }
 </style>

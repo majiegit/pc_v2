@@ -39,8 +39,32 @@
       </a-col>
       <a-col span="18" offset="1">
         <!--操作按钮区域-->
-        <a-row>
-          <a-col :span="24" class="header">
+        <a-row type="flex" :gutter="[24,24]">
+          <a-col :span="24">
+            <div class="table-page-search-wrapper">
+              <a-form layout="inline">
+                <a-row :gutter="48">
+                  <a-col :md="6" :sm="24">
+                    <a-form-item label="字典名称">
+                      <a-input v-model="dictQueryParam.dictName" placeholder="请输入字典名称"/>
+                    </a-form-item>
+                  </a-col>
+                  <a-col :md="6" :sm="24">
+                    <a-form-item label="字典编码">
+                      <a-input v-model="dictQueryParam.dictCode" placeholder="请输入字典编码"/>
+                    </a-form-item>
+                  </a-col>
+                  <a-col :md="5" :sm="24">
+                    <a-space>
+                      <a-button type="primary" @click="queryDictDataByParam" icon="search">查询</a-button>
+                      <a-button @click="resetDictQueryParam">重置</a-button>
+                    </a-space>
+                  </a-col>
+                </a-row>
+              </a-form>
+            </div>
+          </a-col>
+          <a-col :span="24">
             <a-space>
               <a-button type="primary" icon="plus" @click="openDictModal">新增数据字典</a-button>
               <a-button @click="removeBatchDict" type="danger" icon="delete" v-if="selectedDataIds.length > 0">批量删除
@@ -49,7 +73,7 @@
           </a-col>
         </a-row>
         <!--数据字典列表区域-->
-        <a-row>
+        <a-row type="flex" :gutter="[24,24]">
           <a-col span="24">
             <a-table
               align="center"
@@ -71,7 +95,7 @@
                 <a-space>
                   <a href="javascript:;" @click="updateDict(record)">编辑</a>
                   <a href="javascript:;" @click="configDict(record)">字典配置</a>
-                  <a href="javascript:;">
+                  <a href="javascript:;"  style="color: red;">
                     <a-popconfirm
                       title="确认删除此数据字典吗?"
                       @confirm="() => removeDict(record)"
@@ -102,7 +126,7 @@
               <a-input v-model="dictForm.dictName" placeholder="请输入字典名称"/>
             </a-form-model-item>
             <a-form-model-item label="字典编码" prop="dictCode">
-              <a-input v-model="dictForm.dictCode" placeholder="请输入字典编码"/>
+              <a-input v-model="dictForm.dictCode" placeholder="请输入字典编码" :disabled="dictForm.id ? true : false"/>
             </a-form-model-item>
             <a-form-model-item label="字典类型" prop="dictType">
               <a-select v-model="dictForm.dictType" :options="dictTypeData" placeholder="请选择字典类型"/>
@@ -192,6 +216,7 @@
         dictGroupData: [],
         // 字典数据
         dictData: [],
+        dictQueryParam: {},
         dictTableColumns,
         selectedDataIds: [],
         loading: true,
@@ -224,6 +249,19 @@
       this.getDictData()
     },
     methods: {
+      /**
+       * 查询数据点击事件
+       */
+      queryDictDataByParam(){
+        console.log(this.dictQueryParam)
+        this.getDictData()
+      },
+      /**
+       * 重置查询条件
+       */
+      resetDictQueryParam(){
+        this.dictQueryParam = {}
+      },
       /**
        * 数据字典明细窗口关闭方法
        **/
@@ -325,7 +363,20 @@
        */
       getDictData() {
         this.loading = true
-        queryDictPage(this.page.current, this.page.pageSize, this.dictGroupId).then(res => {
+
+        let param = {
+          current: this.page.current,
+          size: this.page.pageSize,
+          groupId: this.dictGroupId,
+          dictName: this.dictQueryParam.dictName,
+          dictCode: this.dictQueryParam.dictCode,
+        }
+        Object.keys(param).forEach(item => {
+          if (param[item] === null || param[item] === '' || param[item] === undefined) {
+            delete param[item]
+          }
+        })
+        queryDictPage(param).then(res => {
           this.loading = false
           this.dictData = res.data.records  // 用户数据
           this.page.current = res.data.current

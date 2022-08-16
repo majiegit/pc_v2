@@ -8,67 +8,88 @@
 <template>
   <a-row type="flex" :gutter="[24,24]" style="background: #fff;">
     <a-spin :spinning="loading">
-      <div class="body">
-        <!--操作按钮区域-->
-        <a-row>
-          <a-col :span="24" class="header">
-            <a-space>
-              <a-button type="primary" icon="plus" @click="openDictModal">新增模板</a-button>
-              <a-button @click="removeBatchDict" type="danger" icon="delete" v-if="selectedDataIds.length > 0">批量删除
-              </a-button>
-            </a-space>
-          </a-col>
-        </a-row>
-        <!--模板列表区域-->
-        <a-row>
-          <a-col span="24">
-            <a-table
-              align="center"
-              row-key="id"
-              :columns="dictTableColumns"
-              :pagination="page"
-              :data-source="dictData"
-              :row-selection="{ selectedRowKeys: selectedDataIds, onChange: changeTableSelect }"
-              @change="changeTablePage"
-            >
+      <!-- 搜索行-->
+      <a-col :span="24">
+        <div class="table-page-search-wrapper">
+        <a-form layout="inline">
+          <a-row :gutter="48">
+            <a-col :md="6" :sm="24">
+              <a-form-item label="模板名称">
+                <a-input v-model="dictQueryParam.dictName" placeholder="请输入模板名称"/>
+              </a-form-item>
+            </a-col>
+            <a-col :md="6" :sm="24">
+              <a-form-item label="模板编码">
+                <a-input v-model="dictQueryParam.roleCode" placeholder="请输入模板编码"/>
+              </a-form-item>
+            </a-col>
+            <a-col :md="5" :sm="24">
+              <a-space>
+                <a-button type="primary" @click="queryDictDataByParam" icon="search">查询</a-button>
+                <a-button @click="resetDictQueryParam">重置</a-button>
+              </a-space>
+            </a-col>
+          </a-row>
+        </a-form>
+        </div>
+      </a-col>
+
+      <!--操作按钮区域-->
+      <a-col :span="24">
+        <a-space>
+          <a-button type="primary" icon="plus" @click="openDictModal">新增模板</a-button>
+          <a-button @click="removeBatchDict" type="danger" icon="delete" v-if="selectedDataIds.length > 0">批量删除
+          </a-button>
+        </a-space>
+      </a-col>
+
+
+      <!--模板列表区域-->
+      <a-col span="24">
+        <a-table
+          align="center"
+          row-key="id"
+          :columns="dictTableColumns"
+          :pagination="page"
+          :data-source="dictData"
+          :row-selection="{ selectedRowKeys: selectedDataIds, onChange: changeTableSelect }"
+          @change="changeTablePage"
+        >
             <span slot="dictType" slot-scope="dictType">
                 <a-tag color="orange" v-if="dictType == 0">数组</a-tag>
                 <a-tag color="green" v-if="dictType == 1">树形</a-tag>
             </span>
-              <template slot="operation" slot-scope="text,record">
-                <a-space>
-                  <a href="javascript:;" @click="updateDict(record)">编辑</a>
-                  <a href="javascript:;" style="color: red;">
-                    <a-popconfirm
-                      title="确定要删除此模板吗?"
-                      @confirm="() => removeDict(record)"
-                    >删除
-                    </a-popconfirm>
-                  </a>
-                </a-space>
-              </template>
-            </a-table>
-          </a-col>
-        </a-row>
-      </div>
+          <template slot="operation" slot-scope="text,record">
+            <a-space>
+              <a href="javascript:;" @click="updateDict(record)">编辑</a>
+              <a href="javascript:;" style="color: red;">
+                <a-popconfirm
+                  title="确定要删除此模板吗?"
+                  @confirm="() => removeDict(record)"
+                >删除
+                </a-popconfirm>
+              </a>
+            </a-space>
+          </template>
+        </a-table>
+      </a-col>
+
       <!-- 添加、修改窗口-->
-      <div>
-        <a-modal
-          :title="modalTitle"
-          :visible="modalVisible"
-          :confirm-loading="modalConfirmLoading"
-          @ok="saveDictModal"
-          @cancel="cancelDictModal"
-        >
-          <a-form-model :model="dictForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 16 }" colon labelAlign="left"
-                        ref="dictFormRef"
-                        :rules="dictFormRules">
-            <a-form-model-item label="字典名称" prop="dictName">
-              <a-input v-model="dictForm.dictName"/>
-            </a-form-model-item>
-          </a-form-model>
-        </a-modal>
-      </div>
+      <a-modal
+        :title="modalTitle"
+        :visible="modalVisible"
+        :confirm-loading="modalConfirmLoading"
+        @ok="saveDictModal"
+        @cancel="cancelDictModal"
+      >
+        <a-form-model :model="dictForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 16 }" colon labelAlign="left"
+                      ref="dictFormRef"
+                      :rules="dictFormRules">
+          <a-form-model-item label="字典名称" prop="dictName">
+            <a-input v-model="dictForm.dictName"/>
+          </a-form-model-item>
+        </a-form-model>
+      </a-modal>
     </a-spin>
   </a-row>
 </template>
@@ -83,6 +104,7 @@
         dictData: [],
         selectedDataIds: [],
         loading: true,
+        dictQueryParam: {},
         // 分页对象
         page: {
           current: 1,
@@ -111,11 +133,36 @@
     },
     methods: {
       /**
+       * 查询数据点击事件
+       */
+      queryDictDataByParam(){
+        console.log(this.dictQueryParam)
+        this.getDictData()
+      },
+      /**
+       * 重置查询条件
+       */
+      resetDictQueryParam(){
+        this.dictQueryParam = {}
+      },
+      /**
        * 查询数据
        */
       getDictData() {
         this.loading = true
-        queryDictPage(this.page.current, this.page.pageSize).then(res => {
+        let param = {
+          current: this.page.current,
+          size: this.page.pageSize,
+          groupId: this.dictGroupId,
+          dictName: this.dictQueryParam.dictName,
+          dictCode: this.dictQueryParam.dictCode,
+        }
+        Object.keys(param).forEach(item => {
+          if (param[item] === null || param[item] === '' || param[item] === undefined) {
+            delete param[item]
+          }
+        })
+        queryDictPage(param).then(res => {
           this.loading = false
           this.dictData = res.data.records  // 用户数据
           this.page.current = res.data.current

@@ -4,11 +4,11 @@ import {System_Path} from '@/utils/modulePath'
 /**
  * 查询数据字典列表 - 分页
  */
-export function queryDictPage(current,size) {
+export function queryDictPage(params) {
   return request({
     url: System_Path + "/dict/page",
     method: 'post',
-    params: {current: current, size: size}
+    params: params
   })
 }
 

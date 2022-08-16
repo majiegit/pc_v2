@@ -35,7 +35,7 @@
         <template slot="operation" slot-scope="text,record">
           <a href="javascript:;" class="operation"  @click="addMenuClick(record)">添加</a>
           <a href="javascript:;" class="operation" @click="updateMenuClick(record)">编辑</a>
-          <a href="javascript:;" class="operation">
+          <a href="javascript:;" class="operation" style="color: red;">
             <a-popconfirm
               title="确定要删除此菜单吗?"
               @confirm="() => deleteMenuRow(record)"

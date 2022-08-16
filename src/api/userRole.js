@@ -4,11 +4,11 @@ import {System_Path} from '@/utils/modulePath'
 /**
  * 查询角色用户
  */
-export function queryRoleUser(roleId) {
+export function queryRoleUser(params) {
   return request({
     url: System_Path + "/userRole/queryUserList",
     method: 'post',
-    params: {roleId: roleId}
+    params: params
   })
 }
 
@@ -22,3 +22,16 @@ export function removeRoleUser(roleId, userIds) {
     data: {roleId: roleId, userIds: userIds}
   })
 }
+
+/**
+ * 保存角色用户关联
+ */
+export function saveUserRole(roleId, userIds) {
+  return request({
+    url: System_Path + "/userRole/saveUserRole",
+    method: 'post',
+    data: {roleId: roleId, userIds: userIds}
+  })
+}
+
+
