@@ -33,7 +33,7 @@
           <a-tag :color="menuType == 2 ? 'orange' : 'green'">{{menuType == 2 ? '按钮' : '菜单'}}</a-tag>
         </span>
         <template slot="operation" slot-scope="text,record">
-          <a href="javascript:;" class="operation"  @click="addMenuClick(record)">添加</a>
+          <a href="javascript:;" class="operation" @click="addMenuClick(record)">添加</a>
           <a href="javascript:;" class="operation" @click="updateMenuClick(record)">编辑</a>
           <a href="javascript:;" class="operation" style="color: red;">
             <a-popconfirm
@@ -73,7 +73,7 @@
                   placeholder="请选择上级菜单"
                   tree-default-expand-all
                   :replaceFields="replaceFields"
-                  :tree-data="menuList"/>
+                  :tree-data="parentMenuList"/>
               </a-form-model-item>
             </a-col>
             <a-col :span="12" v-if="menuForm.menuType == 0 ">
@@ -216,20 +216,21 @@
     },
     created() {
       this.getPermissionTree()
+      this.getParentMenuTree()
     },
     methods: {
       /**
        * 折叠全部
        * */
-      foldAllMenu(){
+      foldAllMenu() {
         this.expandedRowKeys = []
       },
       /**
        * 展开全部
        * */
-      openAllMenu(){
+      openAllMenu() {
         let arr = []
-        this.menuList.forEach(item =>{
+        this.menuList.forEach(item => {
           arr.push(item.id)
         })
         this.expandedRowKeys = arr
@@ -359,7 +360,7 @@
       /**
        * 添加菜单
        */
-      addMenuClick(row){
+      addMenuClick(row) {
         this.menuForm.pid = row.id
         this.menuForm.menuType = MenuConstant.menu_type_child
         this.editVisible = true
@@ -374,13 +375,24 @@
         console.log(row)
       },
       /**
-       * 查询菜单
+       * 查询全部菜单和按钮权限
        */
       getPermissionTree() {
         this.loading = true
         permissionTree().then(res => {
           this.menuList = res.data
           this.loading = false
+        })
+      },
+      /**
+       * 查询一级菜单和子菜单
+       */
+      getParentMenuTree() {
+        let param = {
+          menuType: 'menu'
+        }
+        permissionTree(param).then(res => {
+          this.parentMenuList = res.data
         })
       }
     }

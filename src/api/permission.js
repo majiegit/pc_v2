@@ -4,10 +4,11 @@ import {System_Path} from '@/utils/modulePath'
 /**
  * 查询所有权限 树形
  */
-export function permissionTree() {
+export function permissionTree(params) {
   return request({
     url: System_Path + "/permission/tree",
     method: 'get',
+    params: params
   })
 }
 

@@ -1,18 +1,15 @@
-import { UserLayout } from '@/layouts'
-// 基础
-import base from '@/router/base'
-// 系统管理
-import system from '@/router/system/index'
-
+import {UserLayout, BasicLayout, BlankLayout, PageView, RouteView} from '@/layouts'
 /**
  *
  * 动态路由 根据模块定义
  */
-export const constantRouterComponents = Object.assign(
-  base,
-  system
-)
-
+export const constantRouterComponents = {
+  // 基础页面 layout 必须引入
+  BasicLayout: BasicLayout,
+  BlankLayout: BlankLayout,
+  RouteView: RouteView,
+  PageView: PageView
+}
 
 
 // 前端未找到页面路由（固定不用改）

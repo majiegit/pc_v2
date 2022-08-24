@@ -1,6 +1,6 @@
 import storage from 'store'
 import { login, getInfo, logout } from '@/api/login'
-import { ACCESS_TOKEN } from '@/store/mutation-types'
+import { ACCESS_TOKEN,REFRESH_TOKEN } from '@/store/mutation-types'
 import { welcome } from '@/utils/util'
 
 const user = {
@@ -14,8 +14,9 @@ const user = {
   },
 
   mutations: {
-    SET_TOKEN: (state, token) => {
-      state.token = token
+    SET_TOKEN: (state, accessToken, rfreshToken) => {
+      state.accessToken = accessToken
+      state.rfreshToken = rfreshToken
     },
     SET_NAME: (state, { name, welcome }) => {
       state.name = name
@@ -35,13 +36,13 @@ const user = {
   actions: {
     // 登录
     Login ({ commit }, userInfo) {
-      console.log(11111111111,userInfo)
       return new Promise((resolve, reject) => {
         login(userInfo).then(response => {
           const result = response.data
           if(response.code == 200){
-            storage.set(ACCESS_TOKEN, result.token, 7 * 24 * 60 * 60 * 1000)
-            commit('SET_TOKEN', result.token)
+            storage.set(ACCESS_TOKEN, result.accessToken, 7 * 24 * 60 * 60 * 1000)
+            storage.set(REFRESH_TOKEN, result.refreshToken, 7 * 24 * 60 * 60 * 1000)
+            commit('SET_TOKEN', result.accessToken, result.refreshToken)
             resolve()
           }else {
             reject(response)
@@ -77,10 +78,11 @@ const user = {
     // 登出
     Logout ({ commit, state }) {
       return new Promise((resolve) => {
-        logout(state.token).then(() => {
-          commit('SET_TOKEN', '')
+        logout(state.accessToken).then(() => {
+          commit('SET_TOKEN', '', '')
           commit('SET_ROLES', [])
           storage.remove(ACCESS_TOKEN)
+          storage.remove(REFRESH_TOKEN)
           resolve()
         }).catch(() => {
           resolve()

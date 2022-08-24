@@ -202,7 +202,9 @@
           if (!valid) {
             return false
           } else {
+            this.modalConfirmLoading = true
             saveDictItem(this.dictItemForm).then(res => {
+              this.modalConfirmLoading = false
               this.$message.success(res.message)
               this.cancelDictItemModal()
               this.queryDictItemData(this.dict.id, null)

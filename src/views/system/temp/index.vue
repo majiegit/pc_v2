@@ -11,26 +11,26 @@
       <!-- 搜索行-->
       <a-col :span="24">
         <div class="table-page-search-wrapper">
-        <a-form layout="inline">
-          <a-row :gutter="48">
-            <a-col :md="6" :sm="24">
-              <a-form-item label="模板名称">
-                <a-input v-model="dictQueryParam.dictName" placeholder="请输入模板名称"/>
-              </a-form-item>
-            </a-col>
-            <a-col :md="6" :sm="24">
-              <a-form-item label="模板编码">
-                <a-input v-model="dictQueryParam.roleCode" placeholder="请输入模板编码"/>
-              </a-form-item>
-            </a-col>
-            <a-col :md="5" :sm="24">
-              <a-space>
-                <a-button type="primary" @click="queryDictDataByParam" icon="search">查询</a-button>
-                <a-button @click="resetDictQueryParam">重置</a-button>
-              </a-space>
-            </a-col>
-          </a-row>
-        </a-form>
+          <a-form layout="inline">
+            <a-row :gutter="48">
+              <a-col :md="6" :sm="24">
+                <a-form-item label="模板名称">
+                  <a-input v-model="dictQueryParam.dictName" placeholder="请输入模板名称"/>
+                </a-form-item>
+              </a-col>
+              <a-col :md="6" :sm="24">
+                <a-form-item label="模板编码">
+                  <a-input v-model="dictQueryParam.dictCode" placeholder="请输入模板编码"/>
+                </a-form-item>
+              </a-col>
+              <a-col :md="5" :sm="24">
+                <a-space>
+                  <a-button type="primary" @click="queryDictDataByParam" icon="search">查询</a-button>
+                  <a-button @click="resetDictQueryParam">重置</a-button>
+                </a-space>
+              </a-col>
+            </a-row>
+          </a-form>
         </div>
       </a-col>
 
@@ -48,7 +48,7 @@
       <a-col span="24">
         <a-table
           align="center"
-          row-key="id"
+          row-key="dictId"
           :columns="dictTableColumns"
           :pagination="page"
           :data-source="dictData"
@@ -85,7 +85,7 @@
         <a-form-model :model="dictForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 16 }" colon labelAlign="left"
                       ref="dictFormRef"
                       :rules="dictFormRules">
-          <a-form-model-item label="字典名称" prop="dictName">
+          <a-form-model-item label="模板名称" prop="dictName">
             <a-input v-model="dictForm.dictName"/>
           </a-form-model-item>
         </a-form-model>
@@ -95,7 +95,7 @@
 </template>
 
 <script>
-  import {queryDictPage, deleteDict, deleteDictBatch, saveDict} from '@/api/dict'
+  import {queryDictPage, queryDictFieldList, deleteDict, deleteDictBatch, saveDict} from '@/api/dict'
 
   export default {
     name: "dict",
@@ -118,7 +118,8 @@
         },
         // 新增、修改时候Form表单
         dictForm: {},
-        dictTableColumns,
+        dictTableColumns:[],
+        dictColumns: [],
         dictFormRules,
         // 弹出框相关参数
         modalTitle: '',
@@ -129,20 +130,20 @@
     created() {
     },
     mounted() {
-      this.getDictData()
+      this.getDictFieldList()
     },
     methods: {
       /**
        * 查询数据点击事件
        */
-      queryDictDataByParam(){
+      queryDictDataByParam() {
         console.log(this.dictQueryParam)
         this.getDictData()
       },
       /**
        * 重置查询条件
        */
-      resetDictQueryParam(){
+      resetDictQueryParam() {
         this.dictQueryParam = {}
       },
       /**
@@ -188,10 +189,14 @@
           if (!valid) {
             return false
           } else {
+            this.modalConfirmLoading = true
             saveDict(this.dictForm).then(res => {
+              this.modalConfirmLoading = false
               this.$message.success(res.message)
               this.cancelDictModal()
               this.getDictData()
+            },error => {
+              this.modalConfirmLoading = false
             })
           }
         })
@@ -231,7 +236,9 @@
        * 批量删除
        */
       removeBatchDict() {
+        this.loading = true
         deleteDictBatch(this.selectedDataIds).then(res => {
+          this.loading = false
           this.$message.success(res.message)
           this.selectedDataIds = []
           this.getDictData()
@@ -241,75 +248,103 @@
        * 删除模板
        */
       removeDict(row) {
-        deleteDict(row.id).then(res => {
+        this.loading = true
+        deleteDict(row.dictId).then(res => {
+          this.loading = false
           this.$message.success(res.message)
           this.getDictData()
         })
+      },
+      /**
+       * 查询用户显示字段
+       */
+      getDictFieldList() {
+        queryDictFieldList().then(res => {
+          this.dictColumns = res.data
+          this.getTableDictColumns(res.data)
+          this.getDictData()
+        })
+      },
+      /**
+       * 处理表格显示字段
+       */
+      getTableDictColumns(data) {
+        let arr = []
+        data.forEach(field => {
+          var obj = {
+            title: field.name,
+            dataIndex: field.field,
+            scopedSlots: {
+              customRender: field.field
+            },
+            ellipsis: true
+          }
+          arr.push(obj)
+        })
+        // 添加操作列
+        let operation = {
+          title: '操作',
+          dataIndex: 'operation',
+          scopedSlots: {customRender: 'operation'},
+        }
+        arr.push(operation)
+        this.dictTableColumns = arr
       }
     }
   }
   const dictFormRules = {
-    dictName: [{required: true, message: '请输入字典名称', trigger: 'blur'}]
+    dictName: [{required: true, message: '请输入模板名称', trigger: 'blur'}]
   }
 
-  const dictTableColumns = [
-
-    {
-      title: '字典名称',
-      dataIndex: 'dictName',
-      scopedSlots: {
-        customRender: 'dictName'
-      },
-      ellipsis: true
-    },
-    {
-      title: '字典编码',
-      dataIndex: 'dictCode',
-      scopedSlots: {
-        customRender: 'dictCode'
-      },
-      ellipsis: true
-    },
-    {
-      title: '字典描述',
-      dataIndex: 'description',
-      scopedSlots: {
-        customRender: 'description'
-      },
-      ellipsis: true
-    },
-    {
-      title: '字典分组',
-      dataIndex: 'dictGroupName',
-      scopedSlots: {
-        customRender: 'dictGroupName'
-      },
-      ellipsis: true
-    },
-    {
-      title: '创建时间',
-      dataIndex: 'createTime',
-      scopedSlots: {
-        customRender: 'createTime'
-      },
-      ellipsis: true
-    },
-    {
-      title: '操作',
-      dataIndex: 'operation',
-      scopedSlots: {customRender: 'operation'}
-    }
-  ]
+  // const dictTableColumns = [
+  //
+  //   {
+  //     title: '字典名称',
+  //     dataIndex: 'dictName',
+  //     scopedSlots: {
+  //       customRender: 'dictName'
+  //     },
+  //     ellipsis: true
+  //   },
+  //   {
+  //     title: '字典编码',
+  //     dataIndex: 'dictCode',
+  //     scopedSlots: {
+  //       customRender: 'dictCode'
+  //     },
+  //     ellipsis: true
+  //   },
+  //   {
+  //     title: '字典描述',
+  //     dataIndex: 'description',
+  //     scopedSlots: {
+  //       customRender: 'description'
+  //     },
+  //     ellipsis: true
+  //   },
+  //   {
+  //     title: '字典分组',
+  //     dataIndex: 'dictGroupName',
+  //     scopedSlots: {
+  //       customRender: 'dictGroupName'
+  //     },
+  //     ellipsis: true
+  //   },
+  //   {
+  //     title: '创建时间',
+  //     dataIndex: 'createTime',
+  //     scopedSlots: {
+  //       customRender: 'createTime'
+  //     },
+  //     ellipsis: true
+  //   },
+  //   {
+  //     title: '操作',
+  //     dataIndex: 'operation',
+  //     scopedSlots: {customRender: 'operation'}
+  //   }
+  // ]
 </script>
 
 <style scoped>
-  .body {
-    width: 100%;
-    padding: 20px 10px 50px 10px;
-    background: #fff;
-  }
-
-  .header {
-    padding-bottom: 20px;
-  }
 </style>

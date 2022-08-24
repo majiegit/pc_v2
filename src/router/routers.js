@@ -28,7 +28,7 @@ export const generatorDynamicRouter = (res) => {
     rootRouter.children = childrenNav
     menu.push(rootRouter)
     const routers = generator(menu)
-    console.log('路由菜单',routers)
+    console.log('路由菜单', routers)
     routers.push(notFoundRouter)
     resolve(routers)
   })
@@ -43,12 +43,12 @@ export const generatorDynamicRouter = (res) => {
  */
 export const generator = (routerMap, parent) => {
   return routerMap.map(item => {
-    const {title, hidden, openMode, path, name, icon, component,isRoute} = item
+    const {title, hidden, openMode, path, name, icon, component, isRoute} = item
     const currentRouter = {
       // 如果路由设置了 path，则作为默认 path，否则 路由地址 动态拼接生成如 /dashboard/workplace
-      path: path,
+      path: path, // 不是路由菜单并打开方式为内部， 要使用嵌套组件
       // 路由名称，建议唯一
-      name: name,
+      name: name || item.id,
       // 该路由对应页面的 组件 :方案1
       // component: constantRouterComponents[item.component || item.key],
       // 该路由对应页面的 组件 :方案2 (动态加载)
@@ -59,12 +59,19 @@ export const generator = (routerMap, parent) => {
         icon: icon || undefined
       }
     }
+
+    // 是否为路由菜单
+    if (isRoute) {
+      currentRouter.component = () => import(`@/views${path}`)
+    } else {
+      if (openMode == 0) {
+        // 打开方式为内部
+        currentRouter.component = () => import(`@/views/iframe/index`)
+        currentRouter.name = item.redirect
+      }
+    }
     if (component) {
       currentRouter.component = constantRouterComponents[component]
-    }else {
-      if(isRoute){
-        currentRouter.component = () => import(`@/views${path}`)
-      }
     }
     // 是否设置了隐藏菜单
     if (hidden) {
@@ -83,7 +90,9 @@ export const generator = (routerMap, parent) => {
     //   currentRouter.path = currentRouter.path.replace('//', '/')
     // }
     // 重定向
-    item.redirect && (currentRouter.redirect = item.redirect)
+    if(item.redirect && isRoute){
+      currentRouter.redirect = item.redirect
+    }
     // 是否有子菜单，并递归处理
     if (item.children && item.children.length > 0) {
       // Recursion

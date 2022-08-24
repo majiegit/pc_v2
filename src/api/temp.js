@@ -2,7 +2,19 @@ import request from '@/utils/request'
 import {System_Path} from '@/utils/modulePath'
 
 /**
- * 查询数据字典列表 - 分页
+ * 查询模板字段
+ */
+export function queryDictFieldList(params) {
+  return request({
+    url: System_Path + "/dict/getDictFieldList",
+    method: 'post',
+    params: params
+  })
+}
+
+
+/**
+ * 查询模板列表 - 分页
  */
 export function queryDictPage(params) {
   return request({
@@ -14,7 +26,7 @@ export function queryDictPage(params) {
 
 
 /**
- * 查询数据字典列表
+ * 查询模板列表
  */
 export function queryDictList() {
   return request({
@@ -24,7 +36,7 @@ export function queryDictList() {
 }
 
 /**
- * 保存数据字典
+ * 保存模板
  */
 export function saveDict(data) {
   return request({
@@ -35,18 +47,18 @@ export function saveDict(data) {
 }
 
 /**
- * 删除数据字典
+ * 删除模板
  */
-export function deleteDict(id) {
+export function deleteDict(dictId) {
   return request({
     url: System_Path + "/dict/deleteById",
-    params: { id: id },
+    params: { dictId: dictId },
     method: 'post'
   })
 }
 
 /**
- * 批量删除数据字典
+ * 批量删除模板
  */
 export function deleteDictBatch(ids) {
   return request({

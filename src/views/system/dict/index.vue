@@ -132,7 +132,7 @@
               <a-select v-model="dictForm.dictType" :options="dictTypeData" placeholder="请选择字典类型"/>
             </a-form-model-item>
             <a-form-model-item label="字典分组" prop="dictGroupId">
-              <a-select v-model="dictForm.dictGroupId" placeholder="请输入字典分组">
+              <a-select v-model="dictForm.dictGroupId" placeholder="请选择字典分组">
                 <a-select-option v-for="(item,index) in dictGroupData" :key="index" :value="item.id">
                   {{item.dictGroupName}}
                 </a-select-option>
@@ -293,7 +293,9 @@
           if (!valid) {
             return false
           } else {
+            this.modalConfirmLoading = true
             saveDictGroup(this.dictGroupForm).then(res => {
+              this.modalConfirmLoading = false
               this.$message.success(res.message)
               this.cancelDictGroupModal()
               this.getDictGroupList()
@@ -406,7 +408,9 @@
           if (!valid) {
             return false
           } else {
+            this.modalConfirmLoading = true
             saveDict(this.dictForm).then(res => {
+              this.modalConfirmLoading = false
               this.$message.success(res.message)
               this.cancelDictModal()
               this.getDictData()
@@ -449,7 +453,9 @@
        * 批量删除
        */
       removeBatchDict() {
+        this.loading = true
         deleteDictBatch(this.selectedDataIds).then(res => {
+          this.loading = false
           this.$message.success(res.message)
           this.selectedDataIds = []
           this.getDictData()
@@ -459,7 +465,9 @@
        * 删除数据字典
        */
       removeDict(row) {
+        this.loading = true
         deleteDict(row.id).then(res => {
+          this.loading = false
           this.$message.success(res.message)
           this.getDictData()
         })

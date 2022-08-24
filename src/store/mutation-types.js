@@ -1,4 +1,5 @@
-export const ACCESS_TOKEN = 'Jay-Auth'
+export const ACCESS_TOKEN = 'Jay-Access-Auth'
+export const REFRESH_TOKEN = 'Jay-Refresh-Auth'
 
 export const SIDEBAR_TYPE = 'sidebar_type'
 export const TOGGLE_MOBILE_TYPE = 'is_mobile'
