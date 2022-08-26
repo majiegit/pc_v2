@@ -149,37 +149,7 @@
       @ok="saveDistributionUserModal"
       @cancel="cancelDistributionUserModal"
     >
-      <a-input-group>
-        <a-row :gutter="4" type="flex" align="middle" style="padding-bottom: 20px;">
-          <a-col span="2">
-            用户账号：
-          </a-col>
-          <a-col span="6">
-            <a-input placeholder="用户账号" v-model="allocated.queryParam.username"/>
-          </a-col>
-          <a-col span="3" offset="1">
-            <a-space>
-              <a-button type="primary" icon="search" @click="queryAllocatedUserData">查询</a-button>
-              <a-button @click="resetQueryParam" icon="redo">重置</a-button>
-            </a-space>
-          </a-col>
-        </a-row>
-      </a-input-group>
-      <a-row>
-        <a-col span="24">
-          <a-table
-            :scroll="{ y: 330 }"
-            align="center"
-            row-key="id"
-            :pagination="allocated.page"
-            :columns="allocated.tableColumns"
-            :loading="allocated.tableLoading"
-            :row-selection="{ selectedRowKeys: allocated.selectedUserIds, onChange: changeUserTableSelect }"
-            @change="changeUserTablePage"
-            :data-source="allocated.userList"
-          />
-        </a-col>
-      </a-row>
+      <selectUser :selectedUserIds="selectedUserIds" :show="distributionUserVisible" @select="selectUserIds"></selectUser>
     </a-modal>
 
     <!--分配角色权限区域代码-->
@@ -236,7 +206,6 @@
 <script>
   import {getRoleList, saveRole, deleteRole} from '@/api/role'
   import {permissionTree} from '@/api/permission'
-  import {queryUserListPageByParam} from '@/api/user'
   import {rolePermissionListByRoleId, saveRolePermission} from '@/api/rolePermission'
   import {queryRoleUser, removeRoleUser, saveUserRole} from '@/api/userRole'
   import {queryDictItemListByCode} from '@/api/dictItem'
@@ -245,34 +214,16 @@
   import ARow from "ant-design-vue/es/grid/Row";
   import ACol from "ant-design-vue/es/grid/Col";
   import AFormItem from "ant-design-vue/es/form/FormItem";
+  import SelectUser from '@/views/components/user/SelectUser'
 
   export default {
-    components: {AFormItem, ACol, ARow},
+    components: {AFormItem, ACol, ARow, SelectUser},
     data() {
       return {
-        // 待分配定义数据
-        allocated: {
-          queryParam: { //查询参数
-            username: '' // 用户账号
-          },
-          selectedUserIds: [], // 已选择数据
-          tableLoading: false,
-          tableColumns: allocatedUserDataTableColumns,
-          userList: [],// 待分配用户数据
-          page: { // 分页对象
-            current: 1,
-            pageSize: 10,
-            pageSizeOptions: ['10', '20', '50', '100'],
-            showSizeChanger: true,
-            showQuickJumper: true,
-            total: 0,
-            pages: 0,
-            hideOnSinglePage: true
-          }
-        },
         distributionUserVisible: false,
         modalConfirmLoading: false,
         // 用户分配
+        selectedUserIds: [],
         userPopupShow: false,
         role: {},
         userQueryParam: {
@@ -320,63 +271,14 @@
     },
     methods: {
       /**
-       * 重置待选用户查询参数
-       */
-      resetQueryParam() {
-        this.allocated.queryParam = {}
-      },
-      /**
-       * 待选用户查询事件
-       */
-      queryAllocatedUserData() {
-        console.log(this.allocated.queryParam)
-        this.getUserPageList()
-      },
-      /**
        * 分配用户事件
        */
       distributionUserClick() {
-        this.distributionUserVisible = true
-        this.allocated.selectedUserIds = []
+        this.selectedUserIds = []
         for (let i = 0; i < this.userData.length; i++) {
-          this.allocated.selectedUserIds.push(this.userData[i].id)
+         this.selectedUserIds.push(this.userData[i].id)
         }
-        this.getUserPageList()
-      },
-      /**
-       * 表格选择事件
-       */
-      changeUserTableSelect(selectedUserIds) {
-        this.allocated.selectedUserIds = selectedUserIds
-      },
-      /**
-       * 分页改变事件
-       */
-      changeUserTablePage(val) {
-        this.allocated.page.current = val.current
-        this.allocated.page.pageSize = val.pageSize
-        this.getUserPageList()
-      },
-      /**
-       * 查询用户列表
-       */
-      getUserPageList() {
-        this.allocated.tableLoading = true
-        let param = {
-          current: this.allocated.page.current,
-          size: this.allocated.page.pageSize
-        }
-        if (this.allocated.queryParam.username) {
-          param.realName = this.allocated.queryParam.username
-        }
-        queryUserListPageByParam(param).then(res => {
-          this.allocated.tableLoading = false
-          this.allocated.userList = res.data.records  // 用户数据
-          this.allocated.page.current = res.data.current
-          this.allocated.page.pageSize = res.data.size
-          this.allocated.page.total = res.data.total
-          this.allocated.page.pages = res.data.pages
-        })
+        this.distributionUserVisible = true
       },
       /**
        * 取消分配用户分组窗口
@@ -384,11 +286,18 @@
       cancelDistributionUserModal() {
         this.distributionUserVisible = false
       },
+
+      /**
+       * 选中的用户Id
+       */
+      selectUserIds(userIds){
+        this.selectedUserIds  = userIds
+      },
       /**
        * 保存分配用户
        */
       saveDistributionUserModal() {
-        saveUserRole(this.role.id, this.allocated.selectedUserIds).then(res => {
+        saveUserRole(this.role.id, this.selectedUserIds).then(res => {
           this.distributionUserVisible = false
           this.$message.success(res.message)
           this.queryUserList(this.role.id)

@@ -15,12 +15,12 @@
             <a-row :gutter="48">
               <a-col :md="6" :sm="24">
                 <a-form-item label="组织名称">
-                  <a-input v-model="orgQueryParam.orgName" placeholder="请输入组织名称"/>
+                  <a-input v-model="orgQueryParam.name" placeholder="请输入组织名称"/>
                 </a-form-item>
               </a-col>
               <a-col :md="6" :sm="24">
                 <a-form-item label="组织编码">
-                  <a-input v-model="orgQueryParam.orgCode" placeholder="请输入组织编码"/>
+                  <a-input v-model="orgQueryParam.code" placeholder="请输入组织编码"/>
                 </a-form-item>
               </a-col>
               <a-col :md="5" :sm="24">
@@ -38,8 +38,6 @@
       <a-col :span="24">
         <a-space>
           <a-button type="primary" icon="plus" @click="openOrgModal">新增组织</a-button>
-          <a-button @click="removeBatchOrg" type="danger" icon="delete" v-if="selectedDataIds.length > 0">批量删除
-          </a-button>
         </a-space>
       </a-col>
 
@@ -47,20 +45,22 @@
       <!--组织列表区域-->
       <a-col span="24">
         <a-table
+          :key="orgData.length"
           align="center"
-          row-key="orgId"
+          row-key="id"
           :columns="orgTableColumns"
+          :defaultExpandAllRows="true"
           :pagination="page"
           :data-source="orgData"
-          :row-selection="{ selectedRowKeys: selectedDataIds, onChange: changeTableSelect }"
           @change="changeTablePage"
         >
-            <span slot="orgType" slot-scope="orgType">
-                <a-tag color="orange" v-if="orgType == 0">数组</a-tag>
-                <a-tag color="green" v-if="orgType == 1">树形</a-tag>
-            </span>
+          <span slot="status" slot-scope="status">
+             <a-badge status="success" v-if="status == 1" text="启用"/>
+             <a-badge status="error" v-if="status == 2" text="停用"/>
+          </span>
           <template slot="operation" slot-scope="text,record">
             <a-space>
+              <a href="javascript:;" @click="addOrgClick(record)">添加</a>
               <a href="javascript:;" @click="updateOrg(record)">编辑</a>
               <a href="javascript:;" style="color: red;">
                 <a-popconfirm
@@ -85,8 +85,37 @@
         <a-form-model :model="orgForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 16 }" colon labelAlign="left"
                       ref="orgFormRef"
                       :rules="orgFormRules">
-          <a-form-model-item label="组织名称" prop="orgName">
-            <a-input v-model="orgForm.orgName"/>
+          <a-form-model-item label="上级组织" prop="pid">
+            <a-tree-select
+              v-model="orgForm.pid"
+              show-search
+              style="width: 100%"
+              :dropdown-style="{ maxHeight: '500px', overflow: 'auto' }"
+              placeholder="请选择上级组织"
+              tree-default-expand-all
+              :replaceFields="{children: 'children', title: 'name', key: 'id', value: 'id'}"
+              :tree-data="orgData"/>
+          </a-form-model-item>
+          <a-form-model-item label="组织名称" prop="name">
+            <a-input v-model="orgForm.name"/>
+          </a-form-model-item>
+          <a-form-model-item label="组织编码" prop="code">
+            <a-input v-model="orgForm.code"/>
+          </a-form-model-item>
+          <a-form-model-item label="组织地址" prop="address">
+            <a-input v-model="orgForm.address"/>
+          </a-form-model-item>
+          <a-form-model-item label="负责人" prop="principal">
+            <a-input v-model="orgForm.principal"/>
+          </a-form-model-item>
+          <a-form-model-item label="电话" prop="tel">
+            <a-input v-model="orgForm.tel"/>
+          </a-form-model-item>
+          <a-form-model-item label="状态" prop="status">
+            <a-radio-group v-model="orgForm.status" defaultValue="1">
+              <a-radio :value="1">启用</a-radio>
+              <a-radio :value="2">停用</a-radio>
+            </a-radio-group>
           </a-form-model-item>
         </a-form-model>
       </a-modal>
@@ -102,7 +131,6 @@
     data() {
       return {
         orgData: [],
-        selectedDataIds: [],
         loading: true,
         orgQueryParam: {},
         // 分页对象
@@ -118,7 +146,7 @@
         },
         // 新增、修改时候Form表单
         orgForm: {},
-        orgTableColumns:[],
+        orgTableColumns,
         orgColumns: [],
         orgFormRules,
         // 弹出框相关参数
@@ -130,9 +158,13 @@
     created() {
     },
     mounted() {
-      this.getOrgFieldList()
+      this.getOrgData()
     },
     methods: {
+      addOrgClick(row){
+        this.orgForm.pid = row.id
+        this.modalVisible = true
+      },
       /**
        * 查询数据点击事件
        */
@@ -154,9 +186,8 @@
         let param = {
           current: this.page.current,
           size: this.page.pageSize,
-          groupId: this.orgGroupId,
-          orgName: this.orgQueryParam.orgName,
-          orgCode: this.orgQueryParam.orgCode,
+          name: this.orgQueryParam.name,
+          code: this.orgQueryParam.code,
         }
         Object.keys(param).forEach(item => {
           if (param[item] === null || param[item] === '' || param[item] === undefined) {
@@ -195,7 +226,7 @@
               this.$message.success(res.message)
               this.cancelOrgModal()
               this.getOrgData()
-            },error => {
+            }, error => {
               this.modalConfirmLoading = false
             })
           }
@@ -218,13 +249,6 @@
         this.orgForm = form
       },
       /**
-       * 表格选择事件
-       */
-      changeTableSelect(selectedDataIds) {
-        console.log('selectedRowKeys changed: ', selectedDataIds)
-        this.selectedDataIds = selectedDataIds
-      },
-      /**
        * 分页改变事件
        */
       changeTablePage(val) {
@@ -232,118 +256,127 @@
         this.page.pageSize = val.pageSize
         this.getOrgData()
       },
-      /***
-       * 批量删除
-       */
-      removeBatchOrg() {
-        this.loading = true
-        deleteOrgBatch(this.selectedDataIds).then(res => {
-          this.loading = false
-          this.$message.success(res.message)
-          this.selectedDataIds = []
-          this.getOrgData()
-        })
-      },
       /**
        * 删除组织
        */
       removeOrg(row) {
         this.loading = true
-        deleteOrg(row.orgId).then(res => {
+        deleteOrg(row.id).then(res => {
           this.loading = false
           this.$message.success(res.message)
           this.getOrgData()
         })
       },
-      /**
-       * 查询用户显示字段
-       */
-      getOrgFieldList() {
-        queryOrgFieldList().then(res => {
-          this.orgColumns = res.data
-          this.getTableOrgColumns(res.data)
-          this.getOrgData()
-        })
-      },
-      /**
-       * 处理表格显示字段
-       */
-      getTableOrgColumns(data) {
-        let arr = []
-        data.forEach(field => {
-          var obj = {
-            title: field.name,
-            dataIndex: field.field,
-            scopedSlots: {
-              customRender: field.field
-            },
-            ellipsis: true
-          }
-          arr.push(obj)
-        })
-        // 添加操作列
-        let operation = {
-          title: '操作',
-          dataIndex: 'operation',
-          scopedSlots: {customRender: 'operation'},
-        }
-        arr.push(operation)
-        this.orgTableColumns = arr
-      }
+      // /**
+      //  * 查询用户显示字段
+      //  */
+      // getOrgFieldList() {
+      //   queryOrgFieldList().then(res => {
+      //     this.orgColumns = res.data
+      //     this.getTableOrgColumns(res.data)
+      //     this.getOrgData()
+      //   })
+      // },
+      // /**
+      //  * 处理表格显示字段
+      //  */
+      // getTableOrgColumns(data) {
+      //   let arr = []
+      //   data.forEach(field => {
+      //     var obj = {
+      //       title: field.name,
+      //       dataIndex: field.field,
+      //       scopedSlots: {
+      //         customRender: field.field
+      //       },
+      //       ellipsis: true
+      //     }
+      //     arr.push(obj)
+      //   })
+      //   // 添加操作列
+      //   let operation = {
+      //     title: '操作',
+      //     dataIndex: 'operation',
+      //     scopedSlots: {customRender: 'operation'},
+      //   }
+      //   arr.push(operation)
+      //   this.orgTableColumns = arr
+      // }
     }
   }
+
   const orgFormRules = {
-    orgName: [{required: true, message: '请输入组织名称', trigger: 'blur'}]
+    name: [{required: true, message: '请输入组织名称', trigger: 'blur'}],
+    code: [{required: true, message: '请输入组织编码', trigger: 'blur'}],
+    tel: [{required: true, message: '请输入组织联系电话', trigger: 'blur'}],
+    status: [{required: true, message: '请选择组织状态', trigger: 'blur'}],
+    address: [{required: true, message: '请输入组织地址', trigger: 'blur'}]
   }
 
-  // const orgTableColumns = [
-  //
-  //   {
-  //     title: '字典名称',
-  //     dataIndex: 'orgName',
-  //     scopedSlots: {
-  //       customRender: 'orgName'
-  //     },
-  //     ellipsis: true
-  //   },
-  //   {
-  //     title: '字典编码',
-  //     dataIndex: 'orgCode',
-  //     scopedSlots: {
-  //       customRender: 'orgCode'
-  //     },
-  //     ellipsis: true
-  //   },
-  //   {
-  //     title: '字典描述',
-  //     dataIndex: 'description',
-  //     scopedSlots: {
-  //       customRender: 'description'
-  //     },
-  //     ellipsis: true
-  //   },
-  //   {
-  //     title: '字典分组',
-  //     dataIndex: 'orgGroupName',
-  //     scopedSlots: {
-  //       customRender: 'orgGroupName'
-  //     },
-  //     ellipsis: true
-  //   },
-  //   {
-  //     title: '创建时间',
-  //     dataIndex: 'createTime',
-  //     scopedSlots: {
-  //       customRender: 'createTime'
-  //     },
-  //     ellipsis: true
-  //   },
-  //   {
-  //     title: '操作',
-  //     dataIndex: 'operation',
-  //     scopedSlots: {customRender: 'operation'}
-  //   }
-  // ]
+  const orgTableColumns = [
+
+    {
+      title: '组织名称',
+      dataIndex: 'name',
+      scopedSlots: {
+        customRender: 'name'
+      },
+      ellipsis: true
+    },
+    {
+      title: '组织编码',
+      dataIndex: 'code',
+      scopedSlots: {
+        customRender: 'code'
+      },
+      ellipsis: true
+    },
+    {
+      title: '负责人',
+      dataIndex: 'principal',
+      scopedSlots: {
+        customRender: 'principal'
+      },
+      ellipsis: true
+    },
+    {
+      title: '联系电话',
+      dataIndex: 'tel',
+      scopedSlots: {
+        customRender: 'tel'
+      },
+      ellipsis: true
+    },
+    {
+      title: '组织地址',
+      dataIndex: 'address',
+      scopedSlots: {
+        customRender: 'address'
+      },
+      ellipsis: true
+    },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      scopedSlots: {
+        customRender: 'status'
+      },
+      ellipsis: true
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'createTime',
+      scopedSlots: {
+        customRender: 'createTime'
+      },
+      ellipsis: true
+    },
+    {
+      title: '操作',
+      dataIndex: 'operation',
+      scopedSlots: {customRender: 'operation'}
+    }
+  ]
 </script>
 
 <style scoped>

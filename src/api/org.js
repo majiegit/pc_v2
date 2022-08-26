@@ -24,6 +24,17 @@ export function queryOrgPage(params) {
   })
 }
 
+/**
+ * 查询组织树
+ */
+export function queryOrgTree(params) {
+  return request({
+    url: System_Path + "/org/tree",
+    method: 'post',
+    params: params
+  })
+}
+
 
 /**
  * 查询组织列表

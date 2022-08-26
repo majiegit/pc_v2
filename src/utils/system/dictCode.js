@@ -11,5 +11,8 @@ export const DictCode = {
   // 接口管理
   api:{
     modules_list: 'modules_list', // 项目模块
+  },
+  dept: {
+    deptType:  'dept_type'
   }
 }

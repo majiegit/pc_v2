@@ -38,8 +38,7 @@
       <a-col :span="24">
         <a-space>
           <a-button type="primary" icon="plus" @click="openPostModal">新增岗位</a-button>
-          <a-button @click="removeBatchPost" type="danger" icon="delete" v-if="selectedDataIds.length > 0">批量删除
-          </a-button>
+          <a-button @click="removeBatchPost" type="danger" icon="delete" v-if="selectedDataIds.length > 0">批量删除</a-button>
         </a-space>
       </a-col>
 

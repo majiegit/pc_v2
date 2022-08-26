@@ -37,7 +37,7 @@
       <!--操作按钮区域-->
       <a-col :span="24">
         <a-space>
-          <a-button type="primary" icon="plus" @click="openDictModal">新增模板</a-button>
+          <a-button type="primary" icon="plus" @click="openDictModal">添加模板</a-button>
           <a-button @click="removeBatchDict" type="danger" icon="delete" v-if="selectedDataIds.length > 0">批量删除
           </a-button>
         </a-space>
@@ -47,6 +47,7 @@
       <!--模板列表区域-->
       <a-col span="24">
         <a-table
+          :key="dictData.length"
           align="center"
           row-key="dictId"
           :columns="dictTableColumns"
@@ -95,7 +96,7 @@
 </template>
 
 <script>
-  import {queryDictPage, queryDictFieldList, deleteDict, deleteDictBatch, saveDict} from '@/api/dict'
+  import {queryDictPage, queryDictFieldList, deleteDict, deleteDictBatch, saveDict} from '@/api/temp'
 
   export default {
     name: "dict",
@@ -116,7 +117,7 @@
           pages: 0,
           hideOnSinglePage: true
         },
-        // 新增、修改时候Form表单
+        // 添加、修改时候Form表单
         dictForm: {},
         dictTableColumns:[],
         dictColumns: [],

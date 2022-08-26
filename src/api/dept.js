@@ -14,11 +14,11 @@ export function queryDeptFieldList(params) {
 
 
 /**
- * 查询部门列表 - 分页
+ * 查询部门树
  */
-export function queryDeptPage(params) {
+export function queryDeptTree(params) {
   return request({
-    url: System_Path + "/dept/page",
+    url: System_Path + "/dept/tree",
     method: 'post',
     params: params
   })
