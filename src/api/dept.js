@@ -47,6 +47,18 @@ export function saveDept(data) {
 }
 
 /**
+ * 查询部门 根据 部门Id
+ */
+export function getDeptById(id) {
+  return request({
+    url: System_Path + "/dept/getById",
+    params: { id: id },
+    method: 'post'
+  })
+}
+
+
+/**
  * 删除部门
  */
 export function deleteDept(deptId) {
