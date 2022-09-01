@@ -212,7 +212,7 @@
               this.$message.success(res.message)
               this.cancelJobModal()
               this.getJobData()
-            },error => {
+            }).catch(res => {
               this.modalConfirmLoading = false
             })
           }

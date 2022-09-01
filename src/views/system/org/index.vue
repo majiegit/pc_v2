@@ -161,7 +161,7 @@
       this.getOrgData()
     },
     methods: {
-      addOrgClick(row){
+      addOrgClick(row) {
         this.orgForm.pid = row.id
         this.modalVisible = true
       },
@@ -226,7 +226,7 @@
               this.$message.success(res.message)
               this.cancelOrgModal()
               this.getOrgData()
-            }, error => {
+            }).catch(res => {
               this.modalConfirmLoading = false
             })
           }

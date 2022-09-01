@@ -1,22 +1,22 @@
 <template>
   <a-row type="flex" :gutter="[24,24]" style="background: #fff;">
-    <a-col :span="userPopupShow ? 12 : 24">
+    <a-col :span="24">
       <a-spin :spinning="loading">
         <!--操作按钮区域-->
         <a-col :span="24">
           <a-form layout="inline">
             <a-row type="flex" align="middle">
-              <a-col :md="userPopupShow ? 10 : 5" :sm="24">
+              <a-col :md="10" :sm="24">
                 <a-form-item label="角色名称">
                   <a-input v-model="roleQueryParam.roleName" placeholder="请输入角色名称"/>
                 </a-form-item>
               </a-col>
-              <a-col :md="userPopupShow ? 10 : 5" :sm="24">
+              <a-col :md="10" :sm="24">
                 <a-form-item label="角色编码">
                   <a-input v-model="roleQueryParam.roleCode" placeholder="请输入角色编码"/>
                 </a-form-item>
               </a-col>
-              <a-col :md="userPopupShow ? 2 : 4" :sm="24">
+              <a-col :md="4" :sm="24">
                 <a-space>
                   <a-button type="primary" @click="getRoleList" icon="search">查询</a-button>
                 </a-space>
@@ -80,78 +80,6 @@
         </a-col>
       </a-spin>
     </a-col>
-
-    <!-- 用户数据操作面板-->
-    <a-col :span="userPopupShow ? 12 : 0">
-      <a-col :span="23">
-        <a-form layout="inline">
-          <a-row :gutter="24" type="flex" align="middle">
-            <a-col :md="userPopupShow ? 10 : 5" :sm="24">
-              <a-form-item label="用户名称">
-                <a-input v-model="userQueryParam.realname" placeholder="请输入用户名称"/>
-              </a-form-item>
-            </a-col>
-            <a-col :md="userPopupShow ? 10 : 2" :sm="24">
-              <a-space>
-                <a-button type="primary" @click="queryRoleUserClick" icon="search">查询</a-button>
-                <a-button icon="redo">重置</a-button>
-              </a-space>
-            </a-col>
-          </a-row>
-        </a-form>
-      </a-col>
-      <a-col span="1">
-        <a-icon type="close" @click="closeUserPopup"/>
-      </a-col>
-      <!--用户操作-->
-      <a-col span="24">
-        <!--操作按钮区域-->
-        <a-space>
-          <a-button type="primary" icon="plus" @click="distributionUserClick">分配用户</a-button>
-          <a-button icon="delete" v-if="userDataSelectUserIds.length > 0" @click="cancelRoleUserBatch">取消关联</a-button>
-        </a-space>
-      </a-col>
-      <!--用户数据-->
-      <a-col span="24">
-        <a-table
-          bordered
-          row-key="id"
-          :loading="userDataLoading"
-          :columns="userColumns"
-          :row-selection="{ selectedRowKeys: userDataSelectUserIds, onChange: changeUserDataSelect }"
-          :data-source="userData"
-        >
-          <template slot="status" slot-scope="status">
-            <a-tag color="orange" v-if="status">{{getStatusName(status)}}</a-tag>
-          </template>
-          <template slot="operation" slot-scope="text,record">
-            <a-space>
-              <a href="javascript:;">编辑</a>
-              <a href="javascript:;" style="color: red;">
-                <a-popconfirm
-                  title="确定要取消关联吗?"
-                  @confirm="() => cancelRoleUser(record)"
-                >取消关联
-                </a-popconfirm>
-              </a>
-            </a-space>
-          </template>
-        </a-table>
-      </a-col>
-    </a-col>
-
-    <!--分配用户窗口-->
-    <a-modal
-      title="分配用户"
-      width="50%"
-      :visible="distributionUserVisible"
-      :confirm-loading="modalConfirmLoading"
-      @ok="saveDistributionUserModal"
-      @cancel="cancelDistributionUserModal"
-    >
-      <selectUser :selectedUserIds="selectedUserIds" :show="distributionUserVisible"
-                  @select="selectUserIds"></selectUser>
-    </a-modal>
 
     <!--分配角色权限区域代码-->
     <a-drawer

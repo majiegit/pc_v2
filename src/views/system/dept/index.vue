@@ -125,6 +125,12 @@
             </a-col>
           </a-row>
         </a-tab-pane>
+        <a-tab-pane key="3" tab="部门权限">
+          <a-empty v-if="!editDeptStatus" description="请先选择一个部门"/>
+          <PermissionTree v-else :treeData="permissionTreeData" :treeHeight="'500px'" :checkKeys="deptPermissionIds"
+                          :loading="deptPermissionLoading"
+                          :saveLoading="savePermissionLoading" @save="okDeptPermission"/>
+        </a-tab-pane>
         <a-tab-pane key="2" tab="部门人员">
           <a-empty v-if="!editDeptStatus" description="请先选择一个部门"/>
           <a-row type="flex" :gutter="[24,24]" v-else>
@@ -192,18 +198,26 @@
 <script>
   import {queryDeptTree, getDeptById, deleteDept, deleteDeptBatch, saveDept} from '@/api/dept'
   import {queryDeptUserList, deleteDeptUser, saveDeptUser, deleteDeptUserBatch} from '@/api/deptUser'
+  import {saveDeptPermission, queryDeptPermissionIds} from '@/api/deptPermission'
   import {queryDictItemListByCode} from '@/api/dictItem'
   import {DictCode} from '@/utils/system/dictCode'
   import {DictConstant} from '@/utils/system/dictConstant'
   import ACol from "ant-design-vue/es/grid/Col";
   import SelectUser from '@/views/components/user/SelectUser'
+  import PermissionTree from '@/views/components/permission/PermissionTree'
   import ARow from "ant-design-vue/es/grid/Row";
+  import {permissionTree} from '@/api/permission'
 
   export default {
     name: "dept",
-    components: {ARow, ACol, SelectUser},
+    components: {ARow, ACol, SelectUser, PermissionTree},
     data() {
       return {
+        // 部门权限
+        deptPermissionIds: [],
+        permissionTreeData: [],
+        deptPermissionLoading: false,
+        savePermissionLoading: false,
         // 部门用户
         userDataSelectIds: [],
         deptUserLoading: false,
@@ -242,8 +256,46 @@
     mounted() {
       this.getDeptData()
       this.getDeptTypeData()
+      this.getPermissionTree()
     },
     methods: {
+
+      /**
+       * 保存部门权限
+       */
+      okDeptPermission(permissionIds) {
+        console.log(permissionIds)
+        let params = {
+          deptId: this.selectedDeptId,
+        }
+        if(permissionIds){
+          params.permissionIds = permissionIds
+        }
+        this.savePermissionLoading = true
+        saveDeptPermission(params).then(res => {
+          this.$message.success(res.message)
+          this.savePermissionLoading = false
+          this.getDeptPermissionIds(this.selectedDeptId)
+        })
+      },
+      /**
+       * 查询部门权限Id 集合
+       */
+      getDeptPermissionIds(deptId) {
+        this.deptPermissionLoading = true
+        queryDeptPermissionIds(deptId).then(res => {
+          this.deptPermissionIds = res.data
+          this.deptPermissionLoading = false
+        })
+      },
+      /**
+       * 查询所有权限
+       */
+      getPermissionTree() {
+        permissionTree().then(res => {
+          this.permissionTreeData = res.data
+        })
+      },
       /**
        * 批量取消角色关联用户
        */
@@ -396,7 +448,7 @@
               this.$message.success(res.message)
               this.saveDeptLoading = false
               this.getDeptData()
-            }, error => {
+            }).catch(res => {
               this.saveDeptLoading = false
             })
           }
@@ -436,6 +488,7 @@
             this.selectedDeptName = res.data.name
           })
           this.queryDeptUserData(id)
+          this.getDeptPermissionIds(id)
         } else {
           this.selectedDeptId = null
           this.editDeptStatus = false

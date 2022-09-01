@@ -196,7 +196,7 @@
               this.$message.success(res.message)
               this.cancelDictModal()
               this.getDictData()
-            },error => {
+            }).catch(res => {
               this.modalConfirmLoading = false
             })
           }

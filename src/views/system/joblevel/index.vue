@@ -194,7 +194,7 @@
               this.$message.success(res.message)
               this.cancelJobLevelModal()
               this.getJobLevelData()
-            },error => {
+            }).catch(res => {
               this.modalConfirmLoading = false
             })
           }

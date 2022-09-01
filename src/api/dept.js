@@ -2,16 +2,15 @@ import request from '@/utils/request'
 import {System_Path} from '@/utils/modulePath'
 
 /**
- * 查询部门字段
+ * 查询我的部门树
  */
-export function queryDeptFieldList(params) {
+export function queryMyDeptTree(userId) {
   return request({
-    url: System_Path + "/dept/getDeptFieldList",
+    url: System_Path + "/dept/myDeptTree",
     method: 'post',
-    params: params
+    params: {userId: userId}
   })
 }
-
 
 /**
  * 查询部门树

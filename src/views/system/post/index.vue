@@ -196,10 +196,9 @@
               this.$message.success(res.message)
               this.cancelPostModal()
               this.getPostData()
-            },error => {
-                this.modalConfirmLoading = false
-              }
-            )
+            }).catch(res => {
+              this.modalConfirmLoading = false
+            })
           }
         })
       },
