@@ -466,11 +466,14 @@
        * 删除角色
        */
       remove(id) {
+        this.loading = true
         deleteRole(id).then(res => {
+          this.loading = false
           this.$message.success(res.message)
           const index = this.roleList.findIndex(item => id == item.id)
           this.roleList.splice(index, 1)
         }).catch(err => {
+          this.loading = false
         })
       },
       /**

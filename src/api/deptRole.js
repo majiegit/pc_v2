@@ -4,9 +4,9 @@ import {System_Path} from '@/utils/modulePath'
 /**
  * 查询所有角色
  */
-export function getRoleList(params) {
+export function getDeptRoleList(params) {
   return request({
-    url: System_Path + "/role/list",
+    url: System_Path + "/deptRole/list",
     method: 'post',
     params: params
   })
@@ -15,9 +15,9 @@ export function getRoleList(params) {
 /**
  * 保存角色
  */
-export function saveRole(data) {
+export function saveDeptRole(data) {
   return request({
-    url: System_Path + "/role/save",
+    url: System_Path + "/deptRole/save",
     data: data,
     method: 'post',
   })
@@ -26,10 +26,13 @@ export function saveRole(data) {
 /**
  * 删除角色
  */
-export function deleteRole(id) {
+export function deleteDeptRole(deptId,roleId) {
   return request({
-    url: System_Path + "/role/deleteById",
-    params: { roleId: id },
+    url: System_Path + "/deptRole/delete",
+    params: {
+      deptId: deptId,
+      roleId: roleId
+    },
     method: 'post',
   })
 }

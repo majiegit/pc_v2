@@ -8,17 +8,17 @@
             <a-row type="flex" align="middle">
               <a-col :md="10" :sm="24">
                 <a-form-item label="角色名称">
-                  <a-input v-model="roleQueryParam.roleName" placeholder="请输入角色名称"/>
+                  <a-input v-model="deptRoleQueryParam.roleName" placeholder="请输入角色名称"/>
                 </a-form-item>
               </a-col>
               <a-col :md="10" :sm="24">
                 <a-form-item label="角色编码">
-                  <a-input v-model="roleQueryParam.roleCode" placeholder="请输入角色编码"/>
+                  <a-input v-model="deptRoleQueryParam.roleCode" placeholder="请输入角色编码"/>
                 </a-form-item>
               </a-col>
               <a-col :md="4" :sm="24">
                 <a-space>
-                  <a-button type="primary" @click="getRoleList" icon="search">查询</a-button>
+                  <a-button type="primary" @click="queryDeptRole" icon="search">查询</a-button>
                 </a-space>
               </a-col>
             </a-row>
@@ -35,7 +35,7 @@
             bordered
             row-key="id"
             :columns="columns"
-            :data-source="roleList"
+            :data-source="deptRoleList"
             :row-selection="rowSelection"
           >
             <template
@@ -69,7 +69,7 @@
                   <a class="operation" @click="showPermission(record)">分配权限</a>
                   <a :disabled="editingKey !== ''" class="operation" @click="edit(record.id)">编辑</a>
                   <a class="operation" style="color: red;">
-                    <a-popconfirm :disabled="editingKey !== ''" title="是否删除此角色?" @confirm="remove(record.id)">
+                    <a-popconfirm :disabled="editingKey !== ''" title="是否删除此角色?" @confirm="remove(record)">
                       删除
                     </a-popconfirm>
                   </a>
@@ -90,20 +90,21 @@
       @close="cancelSavePermission"
     >
       <PermissionTree :treeData="allocation.permissionData" :treeHeight="'800px'"
-                      :checkKeys="allocation.rolePermissionIds"
-                      :loading="allocation.rolePermissionLoading"
+                      :checkKeys="allocation.deptRolePermissionIds"
+                      :loading="allocation.deptRolePermissionLoading"
                       :saveLoading="savePermissionLoading" @save="savePermission"/>
     </a-drawer>
   </a-row>
 </template>
 <script>
-  import {getRoleList, saveRole, deleteRole} from '@/api/role'
-  import {permissionTree} from '@/api/permission'
+  import {getDeptRoleList, saveDeptRole, deleteDeptRole} from '@/api/deptRole'
+  import {queryDeptPermissionTree} from '@/api/deptPermission'
   import {rolePermissionListByRoleId, saveRolePermission} from '@/api/rolePermission'
   import {queryRoleUser, removeRoleUser, saveUserRole} from '@/api/userRole'
   import {queryDictItemListByCode} from '@/api/dictItem'
   import {DictCode} from '@/utils/system/dictCode'
   import {DictConstant} from '@/utils/system/dictConstant'
+  import {RoleType} from '@/utils/system/roleConstant'
   import ARow from "ant-design-vue/es/grid/Row";
   import ACol from "ant-design-vue/es/grid/Col";
   import AFormItem from "ant-design-vue/es/form/FormItem";
@@ -112,15 +113,32 @@
 
   export default {
     components: {AFormItem, ACol, ARow, SelectUser, PermissionTree},
+    props: {
+      /**
+       * 当前部门ID
+       */
+      deptIdProp: {
+        type: String,
+        default: ''
+      }
+
+    },
+    watch:{
+      deptIdProp(val){
+        this.deptId = val
+        this.getDeptRoleList(val)
+      }
+    },
     data() {
       return {
+        deptId: this.deptIdProp,
         savePermissionLoading: false,
         distributionUserVisible: false,
         modalConfirmLoading: false,
         // 用户分配
         selectedUserIds: [],
         userPopupShow: false,
-        role: {},
+        deptRole: {},
         userQueryParam: {
           realname: ''
         },
@@ -131,9 +149,9 @@
         userColumns,
         // 分配权限
         allocation: {
-          rolePermissionIds: [],
-          role: {},
-          rolePermissionLoading: true,
+          deptRolePermissionIds: [],
+          deptRole: {},
+          deptRolePermissionLoading: true,
           permissionData: [],
           visible: false
         },
@@ -146,20 +164,21 @@
         columns,
         rowSelection,
         editingKey: '',
-        roleList: [],
-        roleQueryParam: {
-          roleType: '',
+        deptRoleList: [],
+        deptRoleQueryParam: {
           roleName: '',
           roleCode: ''
         },
-        roleListBackUp: [],
+        deptRoleListBackUp: [],
         loading: false,
       }
     },
-    created() {
-      this.getRoleList()
-      this.getPermissionTree()
+    mounted() {
+      this.getDeptRoleList(this.deptIdProp)
+      this.getDeptPermissionTree(this.deptIdProp)
       this.queryUserStatus()
+    },
+    created() {
     },
     methods: {
       /**
@@ -189,19 +208,19 @@
        * 保存分配用户
        */
       saveDistributionUserModal() {
-        saveUserRole(this.role.id, this.selectedUserIds).then(res => {
+        saveUserRole(this.deptRole.id, this.selectedUserIds).then(res => {
           this.distributionUserVisible = false
           this.$message.success(res.message)
-          this.queryUserList(this.role.id)
+          this.queryUserList(this.deptRole.id)
         })
       },
       /**
        * 批量取消角色关联用户
        */
       cancelRoleUserBatch() {
-        removeRoleUser(this.role.id, this.userDataSelectUserIds).then(res => {
+        removeRoleUser(this.deptRole.id, this.userDataSelectUserIds).then(res => {
           this.$message.success(res.message)
-          this.queryUserList(this.role.id)
+          this.queryUserList(this.deptRole.id)
           this.userDataSelectUserIds = []
         })
       },
@@ -218,9 +237,9 @@
       cancelRoleUser(row) {
         const userIds = []
         userIds.push(row.id);
-        removeRoleUser(this.role.id, userIds).then(res => {
+        removeRoleUser(this.deptRole.id, userIds).then(res => {
           this.$message.success(res.message)
-          this.queryUserList(this.role.id)
+          this.queryUserList(this.deptRole.id)
         })
       },
       /**
@@ -248,16 +267,16 @@
        * 查询角色用户事件
        */
       queryRoleUserClick() {
-        this.queryUserList(this.role.id)
+        this.queryUserList(this.deptRole.id)
       },
 
       /**
        *  查询角色关联用户
        */
-      queryUserList(roleId) {
+      queryUserList(deptRoleId) {
         this.userDataLoading = true
         let param = {
-          roleId: roleId
+          deptRoleId: deptRoleId
         }
         if (this.userQueryParam.realname) {
           param.realname = this.userQueryParam.realname
@@ -271,10 +290,10 @@
        * 用户操作
        */
       // 打开用户窗口
-      showPopupUser(role) {
+      showPopupUser(deptRole) {
         this.userPopupShow = true
-        this.role = role
-        this.queryUserList(role.id)
+        this.deptRole = deptRole
+        this.queryUserList(deptRole.id)
       },
       // 关闭用户窗口
       closeUserPopup() {
@@ -291,7 +310,7 @@
       savePermission(permissionIds) {
         console.log(permissionIds)
         this.savePermissionLoading = true
-        saveRolePermission(this.allocation.role.id, permissionIds).then(res => {
+        saveRolePermission(this.allocation.deptRole.roleId, permissionIds).then(res => {
           this.savePermissionLoading = false
           this.$message.success(res.message)
           this.cancelSavePermission()
@@ -301,9 +320,9 @@
       },
       // 点击分配权限
       showPermission(row) {
-        this.allocation.role = row
+        this.allocation.deptRole = row
         this.allocation.visible = true
-        this.getRolePermissionListByRoleId(row.id)
+        this.getRolePermissionListByRoleId(row.roleId)
       },
       getPermissionIds(data) {
         let arr = []
@@ -316,17 +335,19 @@
        * 查询当前角色权限
        */
       getRolePermissionListByRoleId(roleId) {
-        this.allocation.rolePermissionLoading = true
+        this.allocation.deptRolePermissionLoading = true
         rolePermissionListByRoleId(roleId).then(res => {
-          this.allocation.rolePermissionIds = this.getPermissionIds(res.data)
-          this.allocation.rolePermissionLoading = false
+          this.allocation.deptRolePermissionIds = this.getPermissionIds(res.data)
+          this.allocation.deptRolePermissionLoading = false
+        }).catch(res => {
+          this.allocation.deptRolePermissionLoading = false
         })
       },
       /**
-       * 查询所有权限
+       * 查询当前部门所有权限
        */
-      getPermissionTree() {
-        permissionTree().then(res => {
+      getDeptPermissionTree(deptId) {
+        queryDeptPermissionTree(deptId).then(res => {
           this.allocation.permissionData = res.data
         })
       },
@@ -334,12 +355,12 @@
        * 编辑角色
        */
       edit(id) {
-        const newData = [...this.roleList]
+        const newData = [...this.deptRoleList]
         const target = newData.find(item => id === item.id)
         this.editingKey = id
         if (target) {
           target.editable = true
-          this.roleList = newData
+          this.deptRoleList = newData
         }
       },
       /**
@@ -354,75 +375,80 @@
           this.$message.error('请输入角色编码')
           return
         }
-        saveRole(row).then(res => {
+        this.loading = true
+        saveDeptRole(row).then(res => {
+          this.loading = false
           this.$message.success(res.message)
-          this.getRoleList()
+          this.getDeptRoleList(this.deptId)
           this.editingKey = ''
+        }).catch(res => {
+          this.loading = false
         })
-        // const id = row.id
-        // if (id != '') {
-        //   const newData = [...this.roleList]
-        //   const newCacheData = [...this.roleListBackUp]
-        //   const target = newData.find(item => id === item.id)
-        //   const targetCache = newCacheData.find(item => id === item.id)
-        //   if (target && targetCache) {
-        //     delete target.editable
-        //     this.roleList = newData
-        //     Object.assign(targetCache, target)
-        //     this.roleListBackUp = JSON.parse(JSON.stringify(newData))
-        //   }
-        // } else {
-        //   this.getRoleList()
-        // }
 
       },
       cancel(id) {
         if (id != '') {
-          const newData = [...this.roleList];
+          const newData = [...this.deptRoleList];
           const target = newData.find(item => id === item.id);
           if (target) {
-            Object.assign(target, this.roleListBackUp.find(item => id === item.id));
+            Object.assign(target, this.deptRoleListBackUp.find(item => id === item.id));
             delete target.editable;
-            this.roleList = newData;
+            this.deptRoleList = newData;
           }
         } else {
-          this.roleList.splice(0, 1)
+          this.deptRoleList.splice(0, 1)
         }
         this.editingKey = '';
       },
       /**
        * 删除角色
        */
-      remove(id) {
-        deleteRole(id).then(res => {
+      remove(row) {
+        this.loading = true
+        let id = row.id
+        deleteDeptRole(row.deptId, row.roleId).then(res => {
           this.$message.success(res.message)
-          const index = this.roleList.findIndex(item => id == item.id)
-          this.roleList.splice(index, 1)
+          const index = this.deptRoleList.findIndex(item => id == item.id)
+          this.deptRoleList.splice(index, 1)
+          this.loading = false
         }).catch(err => {
+          this.loading = false
         })
       },
       /**
        * 新增角色
        */
       addRole() {
-        const role = {
+        const deptRole = {
           id: '',
+          deptId: this.deptId,
+          roleId: '',
           roleName: '',
+          roleType: RoleType.DEPT_ROLE,
           roleCode: '',
           description: '',
           editable: true
         }
-        this.roleList.unshift(role)
+        this.deptRoleList.unshift(deptRole)
         this.editingKey = 'add'
       },
       /**
-       * 查询角色
+       * 查询角色事件
        */
-      getRoleList() {
+      queryDeptRole(){
+        this.getDeptRoleList(this.deptId)
+      },
+      /**
+       * 查询部门角色
+       */
+      getDeptRoleList(deptId) {
         this.loading = true
-        getRoleList(this.roleQueryParam).then(res => {
-          this.roleList = res.data
-          this.roleListBackUp = JSON.parse(JSON.stringify(res.data))
+        this.deptRoleQueryParam.deptId = deptId
+        getDeptRoleList(this.deptRoleQueryParam).then(res => {
+          this.deptRoleList = res.data
+          this.deptRoleListBackUp = JSON.parse(JSON.stringify(res.data))
+          this.loading = false
+        }).catch(res => {
           this.loading = false
         })
       }
@@ -488,41 +514,25 @@
     {
       title: '角色名称',
       dataIndex: 'roleName',
+      width: '25%',
       scopedSlots: {customRender: 'roleName'}
     },
     {
       title: '角色编码',
       dataIndex: 'roleCode',
+      width: '25%',
       scopedSlots: {customRender: 'roleCode'}
     },
     {
       title: '描述',
       dataIndex: 'description',
+      width: '25%',
       scopedSlots: {customRender: 'description'}
     },
     {
-      title: '创建时间',
-      dataIndex: 'createTime',
-      scopedSlots: {customRender: 'createTime'}
-    },
-    // {
-    //   title: '创建人',
-    //   dataIndex: 'createUser',
-    //   scopedSlots: {customRender: 'createUser'},
-    // },
-    // {
-    //   title: '更新时间',
-    //   dataIndex: 'updateTime',
-    //   scopedSlots: {customRender: 'updateTime'},
-    // },
-    // {
-    //   title: '更新人',
-    //   dataIndex: 'updateUser',
-    //   scopedSlots: {customRender: 'updateUser'},
-    // },
-    {
       title: '操作',
       dataIndex: 'operation',
+      width: '25%',
       scopedSlots: {customRender: 'operation'},
     },
   ]
