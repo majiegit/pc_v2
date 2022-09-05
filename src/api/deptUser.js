@@ -44,3 +44,24 @@ export function deleteDeptUserBatch(ids) {
     method: 'post'
   })
 }
+
+/**
+ * 查询用户角色
+ */
+export function queryUserRoleList(params) {
+  return request({
+    url: System_Path + "/deptUser/queryDeptUserRoleList",
+    method: 'post',
+    params: params
+  })
+}
+/**
+ * 保存部门用户角色
+ */
+export function saveDeptRoleUser(params) {
+  return request({
+    url: System_Path + "/deptUser/saveDeptRoleUser",
+    method: 'post',
+    data: params
+  })
+}

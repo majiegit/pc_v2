@@ -17,11 +17,6 @@
         :row-selection="{ selectedRowKeys: userDataSelectIds, onChange: changeUserDataSelect }"
         :data-source="deptUserData"
       >
-        <!--身份-->
-        <template slot="userIdentity" slot-scope="userIdentity">
-          <a-tag color="orange" v-if="userIdentity == 1">负责人</a-tag>
-          <a-tag color="orange" v-if="userIdentity == 2">员工</a-tag>
-        </template>
         <!--性别-->
         <template slot="sex" slot-scope="sex">
           <a-tag color="orange" v-if="sex == 0">未知</a-tag>
@@ -88,8 +83,8 @@
 </template>
 <script>
   import {getDeptRoleList, saveDeptRole, deleteDeptRole} from '@/api/deptRole'
-  import {queryUserRoleList, removeRoleUser, saveUserRole} from '@/api/userRole'
-  import {queryDeptUserList, deleteDeptUser, saveDeptUser, deleteDeptUserBatch} from '@/api/deptUser'
+  import {removeRoleUser, saveUserRole} from '@/api/userRole'
+  import {queryDeptUserList, deleteDeptUser, saveDeptUser, deleteDeptUserBatch, queryUserRoleList, saveDeptRoleUser} from '@/api/deptUser'
   import ARow from "ant-design-vue/es/grid/Row";
   import ACol from "ant-design-vue/es/grid/Col";
   import AFormItem from "ant-design-vue/es/form/FormItem";
@@ -162,7 +157,8 @@
       getUserRoleList(row) {
         this.deptRoleListLoading = true
         let params = {
-          userId: row.userId
+          userId: row.userId,
+          deptId: this.deptId
         }
         queryUserRoleList(params).then(res => {
           this.userRoleList = res.data
@@ -180,6 +176,7 @@
         }
         getDeptRoleList(param).then(res => {
           this.deptRoleList = []
+          this.userRoleListChecked = []
           for (let i = 0; i < res.data.length; i++) {
             let item = {
               label: res.data[i].roleName,
@@ -201,10 +198,15 @@
        * 保存用户角色
        */
       saveUserRole() {
-        console.log(
-          this.userRoleListChecked
-        )
-
+        let params = {
+          userId: this.deptUser.userId,
+          deptId: this.deptId,
+          roleIds: this.userRoleListChecked
+        }
+        saveDeptRoleUser(params).then(res => {
+          this.$message.success(res.message)
+          this.closeRoleDrawer()
+        })
       },
 
 
@@ -310,12 +312,6 @@
       title: '用户名称',
       dataIndex: 'realname',
       scopedSlots: {customRender: 'realname'}
-    },
-    {
-      align: 'center',
-      title: '身份',
-      dataIndex: 'userIdentity',
-      scopedSlots: {customRender: 'userIdentity'}
     },
     {
       align: 'center',

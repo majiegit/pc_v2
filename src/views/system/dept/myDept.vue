@@ -24,11 +24,11 @@
           <DeptInfo :deptIdProp="selectedDeptId"  v-if="selectedDeptId"/>
           <a-empty description="请先选择一个部门" v-else/>
         </a-tab-pane>
-        <a-tab-pane key="3" tab="部门角色">
+        <a-tab-pane key="2" tab="部门角色">
           <DeptRole :deptIdProp="selectedDeptId"  v-if="selectedDeptId"/>
           <a-empty description="请先选择一个部门" v-else/>
         </a-tab-pane>
-        <a-tab-pane key="2" tab="部门人员">
+        <a-tab-pane key="3" tab="部门人员">
           <DeptUser :deptIdProp="selectedDeptId"  v-if="selectedDeptId"/>
           <a-empty description="请先选择一个部门" v-else/>
         </a-tab-pane>

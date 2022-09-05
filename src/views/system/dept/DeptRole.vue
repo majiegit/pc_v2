@@ -65,7 +65,6 @@
                   </a-popconfirm>
                 </span>
                 <span v-else>
-                  <a class="operation" @click="showPopupUser(record)">用户</a>
                   <a class="operation" @click="showPermission(record)">分配权限</a>
                   <a :disabled="editingKey !== ''" class="operation" @click="edit(record.id)">编辑</a>
                   <a class="operation" style="color: red;">
@@ -133,20 +132,7 @@
       return {
         deptId: this.deptIdProp,
         savePermissionLoading: false,
-        distributionUserVisible: false,
-        modalConfirmLoading: false,
-        // 用户分配
-        selectedUserIds: [],
-        userPopupShow: false,
         deptRole: {},
-        userQueryParam: {
-          realname: ''
-        },
-        userStatusData: [], // 用户状态
-        userData: [],
-        userDataSelectUserIds: [], // 选择用户id
-        userDataLoading: false,
-        userColumns,
         // 分配权限
         allocation: {
           deptRolePermissionIds: [],
@@ -176,129 +162,10 @@
     mounted() {
       this.getDeptRoleList(this.deptIdProp)
       this.getDeptPermissionTree(this.deptIdProp)
-      this.queryUserStatus()
     },
     created() {
     },
     methods: {
-      /**
-       * 分配用户事件
-       */
-      distributionUserClick() {
-        this.selectedUserIds = []
-        for (let i = 0; i < this.userData.length; i++) {
-          this.selectedUserIds.push(this.userData[i].id)
-        }
-        this.distributionUserVisible = true
-      },
-      /**
-       * 取消分配用户分组窗口
-       */
-      cancelDistributionUserModal() {
-        this.distributionUserVisible = false
-      },
-
-      /**
-       * 选中的用户Id
-       */
-      selectUserIds(userIds) {
-        this.selectedUserIds = userIds
-      },
-      /**
-       * 保存分配用户
-       */
-      saveDistributionUserModal() {
-        saveUserRole(this.deptRole.id, this.selectedUserIds).then(res => {
-          this.distributionUserVisible = false
-          this.$message.success(res.message)
-          this.queryUserList(this.deptRole.id)
-        })
-      },
-      /**
-       * 批量取消角色关联用户
-       */
-      cancelRoleUserBatch() {
-        removeRoleUser(this.deptRole.id, this.userDataSelectUserIds).then(res => {
-          this.$message.success(res.message)
-          this.queryUserList(this.deptRole.id)
-          this.userDataSelectUserIds = []
-        })
-      },
-      /**
-       * 选择用户表格改变事件
-       */
-      changeUserDataSelect(selectedUserIds) {
-        this.userDataSelectUserIds = selectedUserIds
-        console.log(this.userDataSelectUserIds)
-      },
-      /**
-       * 取消用户角色关联
-       */
-      cancelRoleUser(row) {
-        const userIds = []
-        userIds.push(row.id);
-        removeRoleUser(this.deptRole.id, userIds).then(res => {
-          this.$message.success(res.message)
-          this.queryUserList(this.deptRole.id)
-        })
-      },
-      /**
-       * 获取用户状态名称
-       * */
-      getStatusName(status) {
-        var arr = this.userStatusData.filter(item => item.value == status)
-        console.log()
-        if (arr.length == 0) {
-          return ''
-        } else {
-          return arr[0].title
-        }
-      },
-      /**
-       *  查询用户状态
-       */
-      queryUserStatus() {
-        this.userDataLoading = true
-        queryDictItemListByCode(DictCode.user.user_status, DictConstant.dict_status_enable).then(res => {
-          this.userStatusData = res.data
-        })
-      },
-      /**
-       * 查询角色用户事件
-       */
-      queryRoleUserClick() {
-        this.queryUserList(this.deptRole.id)
-      },
-
-      /**
-       *  查询角色关联用户
-       */
-      queryUserList(deptRoleId) {
-        this.userDataLoading = true
-        let param = {
-          deptRoleId: deptRoleId
-        }
-        if (this.userQueryParam.realname) {
-          param.realname = this.userQueryParam.realname
-        }
-        queryRoleUser(param).then(res => {
-          this.userData = res.data
-          this.userDataLoading = false
-        })
-      },
-      /**
-       * 用户操作
-       */
-      // 打开用户窗口
-      showPopupUser(deptRole) {
-        this.userPopupShow = true
-        this.deptRole = deptRole
-        this.queryUserList(deptRole.id)
-      },
-      // 关闭用户窗口
-      closeUserPopup() {
-        this.userPopupShow = false
-      },
       /**
        * 分配权限
        */
@@ -323,6 +190,7 @@
         this.allocation.deptRole = row
         this.allocation.visible = true
         this.getRolePermissionListByRoleId(row.roleId)
+        this.getDeptPermissionTree(this.deptId)
       },
       getPermissionIds(data) {
         let arr = []
@@ -460,55 +328,6 @@
       console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
     }
   }
-
-  // 待分配用户数据列
-  const allocatedUserDataTableColumns = [
-    {
-      title: '账号',
-      dataIndex: 'username',
-      scopedSlots: {customRender: 'username'}
-    },
-    {
-      title: '姓名',
-      dataIndex: 'realname',
-      scopedSlots: {customRender: 'realname'}
-    },
-    {
-      title: '性别',
-      dataIndex: 'sex',
-      scopedSlots: {customRender: 'sex'}
-    },
-    {
-      title: '手机号',
-      dataIndex: 'phone',
-      scopedSlots: {customRender: 'realname'}
-    }
-  ]
-
-  // 已分配用户数据列名
-  const userColumns = [
-
-    {
-      title: '账号',
-      dataIndex: 'username',
-      scopedSlots: {customRender: 'username'}
-    },
-    {
-      title: '用户名称',
-      dataIndex: 'realname',
-      scopedSlots: {customRender: 'realname'}
-    },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      scopedSlots: {customRender: 'status'}
-    },
-    {
-      title: '操作',
-      dataIndex: 'operation',
-      scopedSlots: {customRender: 'operation'},
-    }
-  ]
 
   const columns = [
     {

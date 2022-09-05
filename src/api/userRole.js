@@ -34,15 +34,4 @@ export function saveUserRole(roleId, userIds) {
   })
 }
 
-/**
- * 查询用户角色
- */
-export function queryUserRoleList(params) {
-  return request({
-    url: System_Path + "/userRole/queryUserRoleList",
-    method: 'post',
-    params: params
-  })
-}
-
 
