@@ -4,9 +4,9 @@ import {System_Path} from '@/utils/modulePath'
 /**
  * 查询职级字段
  */
-export function queryJobLevelFieldList(params) {
+export function queryRankFieldList(params) {
   return request({
-    url: System_Path + "/jobLevel/getJobLevelFieldList",
+    url: System_Path + "/rank/getRankFieldList",
     method: 'post',
     params: params
   })
@@ -16,9 +16,9 @@ export function queryJobLevelFieldList(params) {
 /**
  * 查询职级列表 - 分页
  */
-export function queryJobLevelPage(params) {
+export function queryRankPage(params) {
   return request({
-    url: System_Path + "/jobLevel/page",
+    url: System_Path + "/rank/page",
     method: 'post',
     params: params
   })
@@ -28,19 +28,20 @@ export function queryJobLevelPage(params) {
 /**
  * 查询职级列表
  */
-export function queryJobLevelList() {
+export function queryRankList(params) {
   return request({
-    url: System_Path + "/jobLevel/list",
-    method: 'post'
+    url: System_Path + "/rank/list",
+    method: 'post',
+    params: params
   })
 }
 
 /**
  * 保存职级
  */
-export function saveJobLevel(data) {
+export function saveRank(data) {
   return request({
-    url: System_Path + "/jobLevel/save",
+    url: System_Path + "/rank/save",
     data: data,
     method: 'post'
   })
@@ -49,10 +50,10 @@ export function saveJobLevel(data) {
 /**
  * 删除职级
  */
-export function deleteJobLevel(jobLevelId) {
+export function deleteRank(rankId) {
   return request({
-    url: System_Path + "/jobLevel/deleteById",
-    params: { jobLevelId: jobLevelId },
+    url: System_Path + "/rank/deleteById",
+    params: { rankId: rankId },
     method: 'post'
   })
 }
@@ -60,9 +61,9 @@ export function deleteJobLevel(jobLevelId) {
 /**
  * 批量删除职级
  */
-export function deleteJobLevelBatch(ids) {
+export function deleteRankBatch(ids) {
   return request({
-    url: System_Path + "/jobLevel/deleteByIds",
+    url: System_Path + "/rank/deleteByIds",
     data: ids,
     method: 'post'
   })

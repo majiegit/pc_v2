@@ -33,7 +33,7 @@
         <a-col :span="24">
           <a-table
             bordered
-            row-key="id"
+            row-key="roleId"
             :columns="columns"
             :data-source="roleList"
             :row-selection="rowSelection"
@@ -60,16 +60,16 @@
               <div class="editable-row-operations">
                 <span v-if="record.editable">
                   <a @click="() => save(record)">保存</a>
-                  <a-popconfirm title="是否取消编辑?" @confirm="() => cancel(record.id)">
+                  <a-popconfirm title="是否取消编辑?" @confirm="() => cancel(record.roleId)">
                     <a class="operation" style="color: red;">取消</a>
                   </a-popconfirm>
                 </span>
                 <span v-else>
                   <a class="operation" @click="showPopupUser(record)">用户</a>
                   <a class="operation" @click="showPermission(record)">分配权限</a>
-                  <a :disabled="editingKey !== ''" class="operation" @click="edit(record.id)">编辑</a>
+                  <a :disabled="editingKey !== ''" class="operation" @click="edit(record.roleId)">编辑</a>
                   <a class="operation" style="color: red;">
-                    <a-popconfirm :disabled="editingKey !== ''" title="是否删除此角色?" @confirm="remove(record.id)">
+                    <a-popconfirm :disabled="editingKey !== ''" title="是否删除此角色?" @confirm="remove(record.roleId)">
                       删除
                     </a-popconfirm>
                   </a>
@@ -149,8 +149,8 @@
       @ok="saveDistributionUserModal"
       @cancel="cancelDistributionUserModal"
     >
-      <selectUser :selectedUserIds="selectedUserIds" :show="distributionUserVisible"
-                  @select="selectUserIds"></selectUser>
+      <SelectUser :selectedUserIds="selectedUserIds" :show="distributionUserVisible"
+                  @select="selectUserIds"/>
     </a-modal>
 
     <!--分配角色权限区域代码-->
@@ -181,7 +181,7 @@
   import AFormItem from "ant-design-vue/es/form/FormItem";
   import SelectUser from '@/views/components/user/SelectUser'
   import PermissionTree from '@/views/components/permission/PermissionTree'
-
+  import {RoleType} from '@/utils/system/roleConstant'
   export default {
     components: {AFormItem, ACol, ARow, SelectUser, PermissionTree},
     data() {
@@ -220,9 +220,9 @@
         editingKey: '',
         roleList: [],
         roleQueryParam: {
-          roleType: '',
-          roleName: '',
-          roleCode: ''
+          roleType: RoleType.ORDINARY_ROLE,
+          roleName: null,
+          roleCode: null
         },
         roleListBackUp: [],
         loading: false,
@@ -261,19 +261,19 @@
        * 保存分配用户
        */
       saveDistributionUserModal() {
-        saveUserRole(this.role.id, this.selectedUserIds).then(res => {
+        saveUserRole(this.role.roleId, this.selectedUserIds).then(res => {
           this.distributionUserVisible = false
           this.$message.success(res.message)
-          this.queryUserList(this.role.id)
+          this.queryUserList(this.role.roleId)
         })
       },
       /**
        * 批量取消角色关联用户
        */
       cancelRoleUserBatch() {
-        removeRoleUser(this.role.id, this.userDataSelectUserIds).then(res => {
+        removeRoleUser(this.role.roleId, this.userDataSelectUserIds).then(res => {
           this.$message.success(res.message)
-          this.queryUserList(this.role.id)
+          this.queryUserList(this.role.roleId)
           this.userDataSelectUserIds = []
         })
       },
@@ -290,9 +290,9 @@
       cancelRoleUser(row) {
         const userIds = []
         userIds.push(row.id);
-        removeRoleUser(this.role.id, userIds).then(res => {
+        removeRoleUser(this.role.roleId, userIds).then(res => {
           this.$message.success(res.message)
-          this.queryUserList(this.role.id)
+          this.queryUserList(this.role.roleId)
         })
       },
       /**
@@ -320,7 +320,7 @@
        * 查询角色用户事件
        */
       queryRoleUserClick() {
-        this.queryUserList(this.role.id)
+        this.queryUserList(this.role.roleId)
       },
 
       /**
@@ -346,7 +346,7 @@
       showPopupUser(role) {
         this.userPopupShow = true
         this.role = role
-        this.queryUserList(role.id)
+        this.queryUserList(role.roleId)
       },
       // 关闭用户窗口
       closeUserPopup() {
@@ -363,7 +363,7 @@
       savePermission(permissionIds) {
         console.log(permissionIds)
         this.savePermissionLoading = true
-        saveRolePermission(this.allocation.role.id, permissionIds).then(res => {
+        saveRolePermission(this.allocation.role.roleId, permissionIds).then(res => {
           this.savePermissionLoading = false
           this.$message.success(res.message)
           this.cancelSavePermission()
@@ -375,7 +375,7 @@
       showPermission(row) {
         this.allocation.role = row
         this.allocation.visible = true
-        this.getRolePermissionListByRoleId(row.id)
+        this.getRolePermissionListByRoleId(row.roleId)
       },
       getPermissionIds(data) {
         let arr = []
@@ -407,7 +407,7 @@
        */
       edit(id) {
         const newData = [...this.roleList]
-        const target = newData.find(item => id === item.id)
+        const target = newData.find(item => id === item.roleId)
         this.editingKey = id
         if (target) {
           target.editable = true
@@ -451,9 +451,9 @@
       cancel(id) {
         if (id != '') {
           const newData = [...this.roleList];
-          const target = newData.find(item => id === item.id);
+          const target = newData.find(item => id === item.roleId);
           if (target) {
-            Object.assign(target, this.roleListBackUp.find(item => id === item.id));
+            Object.assign(target, this.roleListBackUp.find(item => id === item.roleId));
             delete target.editable;
             this.roleList = newData;
           }
@@ -470,7 +470,7 @@
         deleteRole(id).then(res => {
           this.loading = false
           this.$message.success(res.message)
-          const index = this.roleList.findIndex(item => id == item.id)
+          const index = this.roleList.findIndex(item => id == item.roleId)
           this.roleList.splice(index, 1)
         }).catch(err => {
           this.loading = false
@@ -481,9 +481,10 @@
        */
       addRole() {
         const role = {
-          id: '',
+          roleId: '',
           roleName: '',
           roleCode: '',
+          roleType: RoleType.ORDINARY_ROLE,
           description: '',
           editable: true
         }

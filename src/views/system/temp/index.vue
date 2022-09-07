@@ -302,6 +302,7 @@
   //   {
   //     title: '字典名称',
   //     dataIndex: 'dictName',
+  // align: 'center',
   //     scopedSlots: {
   //       customRender: 'dictName'
   //     },
@@ -310,6 +311,7 @@
   //   {
   //     title: '字典编码',
   //     dataIndex: 'dictCode',
+  //      align: 'center',
   //     scopedSlots: {
   //       customRender: 'dictCode'
   //     },

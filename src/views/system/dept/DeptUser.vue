@@ -183,7 +183,7 @@
               value: res.data[i].roleId
             }
             for (let j = 0; j < this.userRoleList.length; j++) {
-              if(res.data[i].roleId === this.userRoleList[j].id){
+              if(res.data[i].roleId === this.userRoleList[j].roleId){
                 this.userRoleListChecked.push(res.data[i].roleId)
               }
             }

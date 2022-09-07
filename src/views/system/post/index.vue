@@ -54,10 +54,11 @@
           :row-selection="{ selectedRowKeys: selectedDataIds, onChange: changeTableSelect }"
           @change="changeTablePage"
         >
-            <span slot="postType" slot-scope="postType">
-                <a-tag color="orange" v-if="postType == 0">数组</a-tag>
-                <a-tag color="green" v-if="postType == 1">树形</a-tag>
-            </span>
+          <!--状态-->
+          <template slot="status" slot-scope="status">
+            <a-badge status="success" v-if="status == 1" text="启用"/>
+            <a-badge status="error" v-if="status == 0" text="禁用"/>
+          </template>
           <template slot="operation" slot-scope="text,record">
             <a-space>
               <a href="javascript:;" @click="updatePost(record)">编辑</a>
@@ -90,6 +91,9 @@
           <a-form-model-item label="岗位编码" prop="postCode">
             <a-input v-model="postForm.postCode"/>
           </a-form-model-item>
+          <a-form-model-item label="状态" prop="status">
+            <a-radio-group v-model="postForm.status" :options="EnableDisableOptions"/>
+          </a-form-model-item>
         </a-form-model>
       </a-modal>
     </a-spin>
@@ -98,7 +102,7 @@
 
 <script>
   import {queryPostPage, queryPostFieldList, deletePost, deletePostBatch, savePost} from '@/api/post'
-
+  import {EnableDisableOptions} from '@/utils/staticDataUtils'
   export default {
     name: "post",
     data() {
@@ -119,10 +123,13 @@
           hideOnSinglePage: true
         },
         // 新增、修改时候Form表单
-        postForm: {},
+        postForm: {
+          status: 1
+        },
         postTableColumns,
         postColumns: [],
         postFormRules,
+        EnableDisableOptions,
         // 弹出框相关参数
         modalTitle: '',
         modalVisible: false,
@@ -179,7 +186,9 @@
       cancelPostModal() {
         this.modalVisible = false
         this.$refs['postFormRef'].clearValidate()
-        this.postForm = {}
+        this.postForm = {
+          status: 1
+        }
       },
       /**
        * 保存岗位
@@ -255,42 +264,7 @@
           this.$message.success(res.message)
           this.getPostData()
         })
-      },
-      // /**
-      //  * 查询用户显示字段
-      //  */
-      // getPostFieldList() {
-      //   queryPostFieldList().then(res => {
-      //     this.postColumns = res.data
-      //     this.getTablePostColumns(res.data)
-      //     this.getPostData()
-      //   })
-      // },
-      // /**
-      //  * 处理表格显示字段
-      //  */
-      // getTablePostColumns(data) {
-      //   let arr = []
-      //   data.forEach(field => {
-      //     var obj = {
-      //       title: field.name,
-      //       dataIndex: field.field,
-      //       scopedSlots: {
-      //         customRender: field.field
-      //       },
-      //       ellipsis: true
-      //     }
-      //     arr.push(obj)
-      //   })
-      //   // 添加操作列
-      //   let operation = {
-      //     title: '操作',
-      //     dataIndex: 'operation',
-      //     scopedSlots: {customRender: 'operation'},
-      //   }
-      //   arr.push(operation)
-      //   this.postTableColumns = arr
-      // }
+      }
     }
   }
   const postFormRules = {
@@ -302,6 +276,7 @@
 
     {
       title: '岗位名称',
+      align: 'center',
       dataIndex: 'postName',
       scopedSlots: {
         customRender: 'postName'
@@ -311,22 +286,42 @@
     {
       title: '岗位编码',
       dataIndex: 'postCode',
+      align: 'center',
       scopedSlots: {
         customRender: 'postCode'
       },
       ellipsis: true
     },
     {
+      title: '状态',
+      dataIndex: 'status',
+      align: 'center',
+      scopedSlots: {
+        customRender: 'status'
+      },
+      ellipsis: true
+    },
+    {
       title: '创建时间',
       dataIndex: 'createTime',
+      align: 'center',
       scopedSlots: {
         customRender: 'createTime'
+      },
+      ellipsis: true
+    }, {
+      title: '更新时间',
+      dataIndex: 'updateTime',
+      align: 'center',
+      scopedSlots: {
+        customRender: 'updateTime'
       },
       ellipsis: true
     },
     {
       title: '操作',
       dataIndex: 'operation',
+      align: 'center',
       scopedSlots: {customRender: 'operation'}
     }
   ]

@@ -55,6 +55,12 @@
           :row-selection="{ selectedRowKeys: selectedDataIds, onChange: changeTableSelect }"
           @change="changeTablePage"
         >
+          <!--状态-->
+          <template slot="status" slot-scope="status">
+            <a-badge status="success" v-if="status == 1" text="启用"/>
+            <a-badge status="error" v-if="status == 0" text="禁用"/>
+          </template>
+          <!--操作-->
           <template slot="operation" slot-scope="text,record">
             <a-space>
               <a href="javascript:;" @click="updateJob(record)">编辑</a>
@@ -87,12 +93,15 @@
           <a-form-model-item label="职务编码" prop="jobCode">
             <a-input v-model="jobForm.jobCode"/>
           </a-form-model-item>
-          <a-form-model-item label="职级" prop="jobLevelId">
-            <a-select v-model="jobForm.jobLevelId" placeholder="请选择职级">
-              <a-select-option v-for="(item,index) in jobLevelData" :key="index" :value="item.jobLevelId">
-                {{item.jobLevelName}}
+          <a-form-model-item label="职级" prop="rankId">
+            <a-select v-model="jobForm.rankId" placeholder="请选择职级">
+              <a-select-option v-for="(item,index) in rankData" :key="index" :value="item.rankId">
+                {{item.rankName}}
               </a-select-option>
             </a-select>
+          </a-form-model-item>
+          <a-form-model-item label="状态" prop="status">
+            <a-radio-group v-model="jobForm.status" :options="EnableDisableOptions"/>
           </a-form-model-item>
         </a-form-model>
       </a-modal>
@@ -102,13 +111,13 @@
 
 <script>
   import {queryJobPage, queryJobFieldList, deleteJob, deleteJobBatch, saveJob} from '@/api/job'
-  import {queryJobLevelList} from '@/api/jobLevel'
-
+  import {queryRankList} from '@/api/rank'
+  import {EnableDisableOptions} from '@/utils/staticDataUtils'
   export default {
     name: "job",
     data() {
       return {
-        jobLevelData: [],
+        rankData: [],
         jobData: [],
         selectedDataIds: [],
         loading: true,
@@ -125,10 +134,13 @@
           hideOnSinglePage: true
         },
         // 新增、修改时候Form表单
-        jobForm: {},
+        jobForm: {
+          status: 1
+        },
         jobTableColumns,
         jobColumns: [],
         jobFormRules,
+        EnableDisableOptions,
         // 弹出框相关参数
         modalTitle: '',
         modalVisible: false,
@@ -139,15 +151,15 @@
     },
     mounted() {
       this.getJobData()
-      this.getJobLevelData()
+      this.getRankData()
     },
     methods: {
       /**
        * 查询职级数据
        */
-      getJobLevelData(){
-        queryJobLevelList().then( res => {
-          this.jobLevelData = res.data
+      getRankData(){
+        queryRankList().then( res => {
+          this.rankData = res.data
         })
       },
       /**
@@ -195,7 +207,9 @@
       cancelJobModal() {
         this.modalVisible = false
         this.$refs['jobFormRef'].clearValidate()
-        this.jobForm = {}
+        this.jobForm = {
+          status: 1
+        }
       },
       /**
        * 保存职务
@@ -319,6 +333,7 @@
     {
       title: '职务名称',
       dataIndex: 'jobName',
+      align: 'center',
       scopedSlots: {
         customRender: 'jobName'
       },
@@ -326,6 +341,7 @@
     },
     {
       title: '职务编码',
+      align: 'center',
       dataIndex: 'jobCode',
       scopedSlots: {
         customRender: 'jobCode'
@@ -334,21 +350,41 @@
     },
     {
       title: '职级',
-      dataIndex: 'jobLevelName',
+      align: 'center',
+      dataIndex: 'rankName',
       scopedSlots: {
-        customRender: 'jobLevelName'
+        customRender: 'rankName'
+      },
+      ellipsis: true
+    },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      align: 'center',
+      scopedSlots: {
+        customRender: 'status'
       },
       ellipsis: true
     },
     {
       title: '创建时间',
       dataIndex: 'createTime',
+      align: 'center',
       scopedSlots: {
         customRender: 'createTime'
       },
       ellipsis: true
+    }, {
+      title: '更新时间',
+      dataIndex: 'updateTime',
+      align: 'center',
+      scopedSlots: {
+        customRender: 'updateTime'
+      },
+      ellipsis: true
     },
     {
+      align: 'center',
       title: '操作',
       dataIndex: 'operation',
       scopedSlots: {customRender: 'operation'}

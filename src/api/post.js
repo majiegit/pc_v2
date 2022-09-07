@@ -28,10 +28,11 @@ export function queryPostPage(params) {
 /**
  * 查询岗位列表
  */
-export function queryPostList() {
+export function queryPostList(params) {
   return request({
     url: System_Path + "/post/list",
-    method: 'post'
+    method: 'post',
+    params: params
   })
 }
 

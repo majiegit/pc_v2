@@ -9,3 +9,27 @@ export const IsNoData = [
     value: 0
   }
 ]
+
+// 启用、禁用选项
+export const EnableDisableOptions = [
+  {
+    value: 1,
+    label: '启用'
+  },
+  {
+    value: 0,
+    label: '禁用'
+  }
+]
+
+// 正常、冻结选项
+export const normalFrozenOptions = [
+  {
+    value: 1,
+    label: '正常'
+  },
+  {
+    value: 0,
+    label: '冻结'
+  }
+]

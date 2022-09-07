@@ -8,7 +8,7 @@
               <a-row :gutter="48">
                 <a-col :md="6" :sm="24">
                   <a-form-item label="姓名">
-                    <a-input v-model="allocated.queryParam.realname" placeholder="请输入姓名"/>
+                    <a-input v-model="allocated.queryParam.realName" placeholder="请输入姓名"/>
                   </a-form-item>
                 </a-col>
                 <a-col :md="5" :sm="24">
@@ -42,7 +42,7 @@
 </template>
 
 <script>
-  import {queryUserListPageByParam} from '@/api/user'
+  import {queryUserListPage} from '@/api/user'
 
   export default {
     name: "SelectUser",
@@ -138,7 +138,7 @@
         if (this.allocated.queryParam.realName) {
           param.realName = this.allocated.queryParam.realName
         }
-        queryUserListPageByParam(param).then(res => {
+        queryUserListPage(param).then(res => {
           this.allocated.tableLoading = false
           this.allocated.userList = res.data.records  // 用户数据
           this.allocated.page.current = res.data.current
@@ -159,8 +159,8 @@
     },
     {
       title: '姓名',
-      dataIndex: 'realname',
-      scopedSlots: {customRender: 'realname'}
+      dataIndex: 'realName',
+      scopedSlots: {customRender: 'realName'}
     },
     {
       title: '性别',
@@ -170,7 +170,7 @@
     {
       title: '手机号',
       dataIndex: 'phone',
-      scopedSlots: {customRender: 'realname'}
+      scopedSlots: {customRender: 'realName'}
     }
   ]
 </script>

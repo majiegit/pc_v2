@@ -1,8 +1,8 @@
 <!--
 声明： 当前vue文件 为开发职级文件, 包含增删改查
 替换步骤：1、职级 -> 模块名
-          2、JobLevel -> 模块名  eg: Temp
-          3、jobLevel -> 模块名  eg: temp
+          2、Rank -> 模块名  eg: Temp
+          3、rank -> 模块名  eg: temp
 -->
 
 <template>
@@ -15,18 +15,18 @@
             <a-row :gutter="48">
               <a-col :md="6" :sm="24">
                 <a-form-item label="职级名称">
-                  <a-input v-model="jobLevelQueryParam.jobLevelName" placeholder="请输入职级名称"/>
+                  <a-input v-model="rankQueryParam.rankName" placeholder="请输入职级名称"/>
                 </a-form-item>
               </a-col>
               <a-col :md="6" :sm="24">
                 <a-form-item label="职级编码">
-                  <a-input v-model="jobLevelQueryParam.jobLevelCode" placeholder="请输入职级编码"/>
+                  <a-input v-model="rankQueryParam.rankCode" placeholder="请输入职级编码"/>
                 </a-form-item>
               </a-col>
               <a-col :md="5" :sm="24">
                 <a-space>
-                  <a-button type="primary" @click="queryJobLevelDataByParam" icon="search">查询</a-button>
-                  <a-button @click="resetJobLevelQueryParam">重置</a-button>
+                  <a-button type="primary" @click="queryRankDataByParam" icon="search">查询</a-button>
+                  <a-button @click="resetRankQueryParam">重置</a-button>
                 </a-space>
               </a-col>
             </a-row>
@@ -37,8 +37,8 @@
       <!--操作按钮区域-->
       <a-col :span="24">
         <a-space>
-          <a-button type="primary" icon="plus" @click="openJobLevelModal">新增职级</a-button>
-          <a-button @click="removeBatchJobLevel" type="danger" icon="delete" v-if="selectedDataIds.length > 0">批量删除
+          <a-button type="primary" icon="plus" @click="openRankModal">新增职级</a-button>
+          <a-button @click="removeBatchRank" type="danger" icon="delete" v-if="selectedDataIds.length > 0">批量删除
           </a-button>
         </a-space>
       </a-col>
@@ -48,20 +48,26 @@
       <a-col span="24">
         <a-table
           align="center"
-          row-key="jobLevelId"
-          :columns="jobLevelTableColumns"
+          row-key="rankId"
+          :columns="rankTableColumns"
           :pagination="page"
-          :data-source="jobLevelData"
+          :data-source="rankData"
           :row-selection="{ selectedRowKeys: selectedDataIds, onChange: changeTableSelect }"
           @change="changeTablePage"
         >
+          <!--状态-->
+          <template slot="status" slot-scope="status">
+            <a-badge status="success" v-if="status == 1" text="启用"/>
+            <a-badge status="error" v-if="status == 0" text="禁用"/>
+          </template>
+          <!--操作-->
           <template slot="operation" slot-scope="text,record">
             <a-space>
-              <a href="javascript:;" @click="updateJobLevel(record)">编辑</a>
+              <a href="javascript:;" @click="updateRank(record)">编辑</a>
               <a href="javascript:;" style="color: red;">
                 <a-popconfirm
                   title="确定要删除此职级吗?"
-                  @confirm="() => removeJobLevel(record)"
+                  @confirm="() => removeRank(record)"
                 >删除
                 </a-popconfirm>
               </a>
@@ -75,17 +81,20 @@
         :title="modalTitle"
         :visible="modalVisible"
         :confirm-loading="modalConfirmLoading"
-        @ok="saveJobLevelModal"
-        @cancel="cancelJobLevelModal"
+        @ok="saveRankModal"
+        @cancel="cancelRankModal"
       >
-        <a-form-model :model="jobLevelForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 16 }" colon labelAlign="left"
-                      ref="jobLevelFormRef"
-                      :rules="jobLevelFormRules">
-          <a-form-model-item label="职级名称" prop="jobLevelName">
-            <a-input v-model="jobLevelForm.jobLevelName"/>
+        <a-form-model :model="rankForm" :label-col="{ span: 5 }" :wrapper-col="{ span: 16 }" colon labelAlign="right"
+                      ref="rankFormRef"
+                      :rules="rankFormRules">
+          <a-form-model-item label="职级名称" prop="rankName">
+            <a-input v-model="rankForm.rankName"/>
           </a-form-model-item>
-          <a-form-model-item label="职级编码" prop="jobLevelCode">
-            <a-input v-model="jobLevelForm.jobLevelCode"/>
+          <a-form-model-item label="职级编码" prop="rankCode">
+            <a-input v-model="rankForm.rankCode"/>
+          </a-form-model-item>
+          <a-form-model-item label="状态" prop="status">
+            <a-radio-group v-model="rankForm.status" :options="EnableDisableOptions"/>
           </a-form-model-item>
         </a-form-model>
       </a-modal>
@@ -94,16 +103,17 @@
 </template>
 
 <script>
-  import {queryJobLevelPage, queryJobLevelFieldList, deleteJobLevel, deleteJobLevelBatch, saveJobLevel} from '@/api/jobLevel'
+  import {queryRankPage, queryRankFieldList, deleteRank, deleteRankBatch, saveRank} from '@/api/rank'
+  import {EnableDisableOptions} from '@/utils/staticDataUtils'
 
   export default {
-    name: "jobLevel",
+    name: "rank",
     data() {
       return {
-        jobLevelData: [],
+        rankData: [],
         selectedDataIds: [],
         loading: true,
-        jobLevelQueryParam: {},
+        rankQueryParam: {},
         // 分页对象
         page: {
           current: 1,
@@ -116,10 +126,13 @@
           hideOnSinglePage: true
         },
         // 新增、修改时候Form表单
-        jobLevelForm: {},
-        jobLevelTableColumns,
-        jobLevelColumns: [],
-        jobLevelFormRules,
+        rankForm: {
+          status: 1,
+        },
+        rankTableColumns,
+        rankColumns: [],
+        rankFormRules,
+        EnableDisableOptions,
         // 弹出框相关参数
         modalTitle: '',
         modalVisible: false,
@@ -129,42 +142,41 @@
     created() {
     },
     mounted() {
-      this.getJobLevelData()
+      this.getRankData()
     },
     methods: {
       /**
        * 查询数据点击事件
        */
-      queryJobLevelDataByParam() {
-        console.log(this.jobLevelQueryParam)
-        this.getJobLevelData()
+      queryRankDataByParam() {
+        console.log(this.rankQueryParam)
+        this.getRankData()
       },
       /**
        * 重置查询条件
        */
-      resetJobLevelQueryParam() {
-        this.jobLevelQueryParam = {}
+      resetRankQueryParam() {
+        this.rankQueryParam = {}
       },
       /**
        * 查询数据
        */
-      getJobLevelData() {
+      getRankData() {
         this.loading = true
         let param = {
           current: this.page.current,
           size: this.page.pageSize,
-          groupId: this.jobLevelGroupId,
-          jobLevelName: this.jobLevelQueryParam.jobLevelName,
-          jobLevelCode: this.jobLevelQueryParam.jobLevelCode,
+          rankName: this.rankQueryParam.rankName,
+          rankCode: this.rankQueryParam.rankCode,
         }
         Object.keys(param).forEach(item => {
           if (param[item] === null || param[item] === '' || param[item] === undefined) {
             delete param[item]
           }
         })
-        queryJobLevelPage(param).then(res => {
+        queryRankPage(param).then(res => {
           this.loading = false
-          this.jobLevelData = res.data.records  // 用户数据
+          this.rankData = res.data.records  // 用户数据
           this.page.current = res.data.current
           this.page.pageSize = res.data.size
           this.page.total = res.data.total
@@ -174,26 +186,28 @@
       /**
        * 取消职级窗口
        */
-      cancelJobLevelModal() {
+      cancelRankModal() {
         this.modalVisible = false
-        this.$refs['jobLevelFormRef'].clearValidate()
-        this.jobLevelForm = {}
+        this.$refs['rankFormRef'].clearValidate()
+        this.rankForm = {
+          status: 1
+        }
       },
       /**
        * 保存职级
        */
-      saveJobLevelModal() {
-        console.log(this.jobLevelForm)
-        this.$refs.jobLevelFormRef.validate(valid => {
+      saveRankModal() {
+        console.log(this.rankForm)
+        this.$refs.rankFormRef.validate(valid => {
           if (!valid) {
             return false
           } else {
             this.modalConfirmLoading = true
-            saveJobLevel(this.jobLevelForm).then(res => {
+            saveRank(this.rankForm).then(res => {
               this.modalConfirmLoading = false
               this.$message.success(res.message)
-              this.cancelJobLevelModal()
-              this.getJobLevelData()
+              this.cancelRankModal()
+              this.getRankData()
             }).catch(res => {
               this.modalConfirmLoading = false
             })
@@ -203,18 +217,18 @@
       /**
        * 打开职级窗口
        */
-      openJobLevelModal() {
+      openRankModal() {
         this.modalVisible = true
         this.modalTitle = '添加职级'
       },
       /**
        * 修改职级
        */
-      updateJobLevel(row) {
+      updateRank(row) {
         let form = JSON.parse(JSON.stringify(row))
         this.modalVisible = true
         this.modalTitle = '修改职级'
-        this.jobLevelForm = form
+        this.rankForm = form
       },
       /**
        * 表格选择事件
@@ -229,67 +243,88 @@
       changeTablePage(val) {
         this.page.current = val.current
         this.page.pageSize = val.pageSize
-        this.getJobLevelData()
+        this.getRankData()
       },
       /***
        * 批量删除
        */
-      removeBatchJobLevel() {
+      removeBatchRank() {
         this.loading = true
-        deleteJobLevelBatch(this.selectedDataIds).then(res => {
+        deleteRankBatch(this.selectedDataIds).then(res => {
           this.loading = false
           this.$message.success(res.message)
           this.selectedDataIds = []
-          this.getJobLevelData()
+          this.getRankData()
         })
       },
       /**
        * 删除职级
        */
-      removeJobLevel(row) {
+      removeRank(row) {
         this.loading = true
-        deleteJobLevel(row.jobLevelId).then(res => {
+        deleteRank(row.rankId).then(res => {
           this.loading = false
           this.$message.success(res.message)
-          this.getJobLevelData()
+          this.getRankData()
         })
       }
     }
   }
-  const jobLevelFormRules = {
-    jobLevelName: [{required: true, message: '请输入职级名称', trigger: 'blur'}],
-    jobLevelCode: [{required: true, message: '请输入职级编码', trigger: 'blur'}]
+  const rankFormRules = {
+    rankName: [{required: true, message: '请输入职级名称', trigger: 'blur'}],
+    rankCode: [{required: true, message: '请输入职级编码', trigger: 'blur'}]
   }
 
-  const jobLevelTableColumns = [
+  const rankTableColumns = [
 
     {
       title: '职级名称',
-      dataIndex: 'jobLevelName',
+      dataIndex: 'rankName',
+      align: 'center',
       scopedSlots: {
-        customRender: 'jobLevelName'
+        customRender: 'rankName'
       },
       ellipsis: true
     },
     {
       title: '职级编码',
-      dataIndex: 'jobLevelCode',
+      dataIndex: 'rankCode',
+      align: 'center',
       scopedSlots: {
-        customRender: 'jobLevelCode'
+        customRender: 'rankCode'
+      },
+      ellipsis: true
+    },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      align: 'center',
+      scopedSlots: {
+        customRender: 'status'
       },
       ellipsis: true
     },
     {
       title: '创建时间',
       dataIndex: 'createTime',
+      align: 'center',
       scopedSlots: {
         customRender: 'createTime'
+      },
+      ellipsis: true
+    }, {
+      title: '更新时间',
+      dataIndex: 'updateTime',
+      align: 'center',
+      scopedSlots: {
+        customRender: 'updateTime'
       },
       ellipsis: true
     },
     {
       title: '操作',
       dataIndex: 'operation',
+      align: 'center',
       scopedSlots: {customRender: 'operation'}
     }
   ]

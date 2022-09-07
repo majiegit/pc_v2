@@ -18,8 +18,8 @@
         :data-source="dictItemData"
       >
               <span slot="status" slot-scope="status">
-                  <a-tag color="green" v-if="status == dictConstant.dict_status_enable">启用</a-tag>
-                  <a-tag color="orange" v-if="status == dictConstant.dict_status_disabled">禁用</a-tag>
+                <a-badge status="success" v-if="status == dictConstant.dict_status_enable" text="启用"></a-badge>
+                <a-badge status="error" v-if="status == dictConstant.dict_status_disabled" text="禁用"></a-badge>
               </span>
         <template slot="operation" slot-scope="text,record">
           <a-space>
