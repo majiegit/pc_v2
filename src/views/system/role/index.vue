@@ -108,6 +108,7 @@
         <!--操作按钮区域-->
         <a-space>
           <a-button type="primary" icon="plus" @click="distributionUserClick">分配用户</a-button>
+          <a-button type="primary" icon="plus" @click="addUserEdit">添加用户</a-button>
           <a-button icon="delete" v-if="userDataSelectUserIds.length > 0" @click="cancelRoleUserBatch">取消关联</a-button>
         </a-space>
       </a-col>
@@ -126,7 +127,7 @@
           </template>
           <template slot="operation" slot-scope="text,record">
             <a-space>
-              <a href="javascript:;">编辑</a>
+              <a href="javascript:;" @click="updateUserEdit(record)">编辑</a>
               <a href="javascript:;" style="color: red;">
                 <a-popconfirm
                   title="确定要取消关联吗?"
@@ -166,6 +167,17 @@
                       :loading="allocation.rolePermissionLoading"
                       :saveLoading="savePermissionLoading" @save="savePermission"/>
     </a-drawer>
+
+    <!--用户编辑、添加窗口-->
+    <a-drawer
+      :title="editStatus == 'add' ? '添加用户' : '编辑用户'"
+      placement="right"
+      width="500"
+      :visible="userEditVisible"
+      @close="closeUserEdit"
+    >
+      <UserEdit :userIdProp="userId" v-if="editStatus" :operation="editStatus" @saveOk="saveOk"/>
+    </a-drawer>
   </a-row>
 </template>
 <script>
@@ -182,10 +194,16 @@
   import SelectUser from '@/views/components/user/SelectUser'
   import PermissionTree from '@/views/components/permission/PermissionTree'
   import {RoleType} from '@/utils/system/roleConstant'
+  import UserEdit from '@/views/system/user/UserEdit'
   export default {
-    components: {AFormItem, ACol, ARow, SelectUser, PermissionTree},
+    components: {AFormItem, ACol, ARow, SelectUser, PermissionTree, UserEdit},
     data() {
       return {
+        // 用户编辑
+        editStatus: '',
+        userId: '',
+        userEditVisible: false,
+        // 保存权限
         savePermissionLoading: false,
         distributionUserVisible: false,
         modalConfirmLoading: false,
@@ -234,6 +252,38 @@
       this.queryUserStatus()
     },
     methods: {
+      /**
+       * 保存成功
+       */
+      saveOk() {
+        this.userEditVisible = false
+        this.userId = null
+        this.editStatus = ''
+        this.getUserPageList()
+      },
+      /**
+       * 修改用户
+       */
+      updateUserEdit(row) {
+        this.userEditVisible = true
+        this.userId = row.id
+        this.editStatus = 'edit'
+      },
+      /**
+       * 添加用户
+       */
+      addUserEdit() {
+        this.userEditVisible = true
+        this.userId = null
+        this.editStatus = 'add'
+      },
+      /**
+       * 关闭用户编辑窗口
+       */
+      closeUserEdit() {
+        this.userEditVisible = false
+      },
+
       /**
        * 分配用户事件
        */

@@ -35,7 +35,19 @@
           :row-selection="{ selectedRowKeys: selectedUserIds, onChange: changeUserTableSelect }"
           @change="changeUserTablePage"
           :data-source="allocated.userList"
-        />
+        >
+          <!--状态-->
+          <template slot="status" slot-scope="status">
+            <a-badge status="success" v-if="status == 1" text="正常"/>
+            <a-badge status="error" v-if="status == 0" text="冻结"/>
+          </template>
+          <!--性别-->
+          <template slot="sex" slot-scope="sex">
+            <span v-if="sex == 1">男</span>
+            <span v-else-if="sex == 2">女</span>
+            <span v-else>未知</span>
+          </template>
+        </a-table>
       </a-col>
     </a-row>
   </div>
@@ -155,22 +167,32 @@
     {
       title: '账号',
       dataIndex: 'username',
+      align: 'center',
       scopedSlots: {customRender: 'username'}
     },
     {
       title: '姓名',
+      align: 'center',
       dataIndex: 'realName',
       scopedSlots: {customRender: 'realName'}
     },
     {
       title: '性别',
+      align: 'center',
       dataIndex: 'sex',
       scopedSlots: {customRender: 'sex'}
     },
     {
       title: '手机号',
+      align: 'center',
       dataIndex: 'phone',
       scopedSlots: {customRender: 'realName'}
+    },
+    {
+      title: '状态',
+      align: 'center',
+      dataIndex: 'status',
+      scopedSlots: {customRender: 'status'}
     }
   ]
 </script>

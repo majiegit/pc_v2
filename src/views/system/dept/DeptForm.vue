@@ -27,7 +27,7 @@
             <a-select v-model="deptForm.type" :options="deptTypeData" placeholder="请选择部门类型"/>
           </a-form-model-item>
           <a-form-model-item label="成立日期" prop="foundDate">
-            <a-date-picker @change="changefoundDate" placeholder="请选择成立时间" v-model="deptForm.foundDate"/>
+            <a-date-picker @change="changefoundDate" placeholder="请选择成立时间" :value="deptForm.foundDate ? moment(deptForm.foundDate, 'YYYY-MM-DD') : deptForm.foundDate"/>
           </a-form-model-item>
           <a-form-model-item label="地址" prop="address">
             <a-input v-model="deptForm.address"/>
@@ -62,7 +62,10 @@
   import {queryDictItemListByCode} from '@/api/dictItem'
   import {DictCode} from '@/utils/system/dictCode'
   import {DictConstant} from '@/utils/system/dictConstant'
-
+  //设置中文
+  import moment from 'moment';
+  import 'moment/locale/zh-cn'
+  moment.locale('zh-cn');
   export default {
     name: "DeptInfo",
     props: {
@@ -91,7 +94,8 @@
           status: 1
         },
         deptFormRules,
-        deptTypeData: []    // 部门类型
+        deptTypeData: [],    // 部门类型
+        moment
       }
     },
     watch: {

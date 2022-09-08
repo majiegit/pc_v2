@@ -4,19 +4,20 @@
       <a-spin :spinning="userInfoLoading">
         <a-form-model :model="userForm.user" :label-col="{ span: 5 }" :wrapper-col="{ span: 16 }" colon
                       labelAlign="right"
-                      ref="userForm"
+                      ref="userFormRef"
                       :rules="userFormRules">
-          <a-form-model-item label="用户账号" prop="username">
-            <a-input v-model="userForm.user.username"/>
-          </a-form-model-item>
-          <a-form-model-item label="密码" prop="password" v-if="operation == 'add'">
-            <a-input-password v-model="userForm.user.password"/>
-          </a-form-model-item>
-          <a-form-model-item label="确认密码" prop="okPassword" v-if="operation == 'add'">
-            <a-input-password v-model="userForm.user.okPassword"/>
-          </a-form-model-item>
           <a-form-model-item label="用户姓名" prop="realname">
-            <a-input v-model="userForm.user.realname"/>
+            <a-input v-model="userForm.user.realname" placeholder="请输入用户姓名"/>
+          </a-form-model-item>
+          <a-form-model-item label="用户账号" prop="username">
+            <a-input v-model="userForm.user.username" :disabled="operation === 'edit'" :maxLength="20" placeholder="请输入用户账号"/>
+          </a-form-model-item>
+          <a-form-model-item label="密码" prop="password" v-if="operation === 'add'">
+            <a-input-password v-model="userForm.user.password" :maxLength="20" placeholder="请输入用户密码"/>
+          </a-form-model-item>
+          <a-form-model-item label="确认密码" prop="okPassword" v-if="operation === 'add'"
+                             :rules="{required: true, validator: okPasswordCheck, trigger: 'blur'}">
+            <a-input-password v-model="userForm.user.okPassword" :maxLength="20" placeholder="请再次输入用户密码"/>
           </a-form-model-item>
           <a-form-model-item label="头像" prop="avatar">
             <a-upload
@@ -37,53 +38,53 @@
             </a-upload>
           </a-form-model-item>
           <a-form-model-item label="工号" prop="workNo">
-            <a-input v-model="userForm.user.workNo"/>
+            <a-input v-model="userForm.user.workNo" placeholder="请输入工号" :maxLength="20"/>
+          </a-form-model-item>
+          <a-form-model-item label="手机号" prop="phone">
+            <a-input v-model="userForm.user.phone" type="number"  placeholder="请输入手机号"/>
+          </a-form-model-item>
+          <a-form-model-item label="邮箱" prop="email">
+            <a-input v-model="userForm.user.email" placeholder="请输入邮箱"/>
           </a-form-model-item>
           <a-form-model-item label="性别" prop="sex">
-            <a-select v-model="userForm.user.sex" :options="sexOptions" allowClear>
+            <a-select v-model="userForm.user.sex" :options="sexOptions" allowClear placeholder="请选择性别">
             </a-select>
           </a-form-model-item>
           <a-form-model-item label="生日" prop="birthday">
             <a-date-picker @change="birthdayChange" placeholder="请选择出生日期" allowClear
                            :value="userForm.user.birthday ? moment(userForm.user.birthday, 'YYYY-MM-DD') : userForm.user.birthday"/>
           </a-form-model-item>
-          <a-form-model-item label="手机号" prop="phone">
-            <a-input v-model="userForm.user.phone" type="number"/>
-          </a-form-model-item>
-          <a-form-model-item label="邮箱" prop="email">
-            <a-input v-model="userForm.user.email"/>
-          </a-form-model-item>
-          <a-form-model-item label="状态" prop="status">
-            <a-radio-group v-model="userForm.user.status" :options="normalFrozenOptions"/>
-          </a-form-model-item>
           <a-form-model-item label="岗位" prop="postId">
-            <a-select v-model="userForm.postIds" allowClear mode="multiple">
-              <a-icon slot="suffixIcon" type="smile"/>
+            <a-select v-model="userForm.postIds" allowClear mode="multiple"  placeholder="请选择岗位">
               <a-select-option v-for="(item,index) in postList" :key="index" :value="item.postId">
                 {{item.postName}}
               </a-select-option>
             </a-select>
           </a-form-model-item>
           <a-form-model-item label="职务" prop="jobId">
-            <a-select v-model="userForm.jobIds" allowClear mode="multiple">
+            <a-select v-model="userForm.jobIds" allowClear mode="multiple"  placeholder="请选择职务">
               <a-select-option v-for="(item,index) in jobList" :key="index" :value="item.jobId">
                 {{item.jobName}}
               </a-select-option>
             </a-select>
           </a-form-model-item>
           <a-form-model-item label="职级" prop="rankId">
-            <a-select v-model="userForm.rankIds" allowClear mode="multiple">
+            <a-select v-model="userForm.rankIds" allowClear mode="multiple" placeholder="请选择职级">
               <a-select-option v-for="(item,index) in rankList" :key="index" :value="item.rankId">
                 {{item.rankName}}
               </a-select-option>
             </a-select>
           </a-form-model-item>
           <a-form-model-item label="角色" prop="roleId">
-            <a-select v-model="userForm.roleIds" allowClear mode="multiple">
+            <a-select v-model="userForm.roleIds" allowClear mode="multiple" placeholder="请选择角色">
+              <a-icon slot="suffixIcon" type="smile"/>
               <a-select-option v-for="(item,index) in roleList" :key="index" :value="item.roleId">
                 {{item.roleName}}
               </a-select-option>
             </a-select>
+          </a-form-model-item>
+          <a-form-model-item label="状态" prop="status">
+            <a-radio-group v-model="userForm.user.status" :options="normalFrozenOptions"/>
           </a-form-model-item>
         </a-form-model>
       </a-spin>
@@ -282,11 +283,17 @@
        * 保存用户
        */
       saveUser() {
-        if (this.operation == 'add') {
-          this.addUser()
-        } else {
-          this.updateUser()
-        }
+        this.$refs.userFormRef.validate(valid => {
+          if (!valid) {
+            return false
+          } else {
+            if (this.operation == 'add') {
+              this.addUser()
+            } else {
+              this.updateUser()
+            }
+          }
+        })
       },
       /**
        * 新增用户
@@ -336,6 +343,24 @@
           })
         }
       },
+      // 确认密码输入俩次密码是否一致
+      okPasswordCheck(rule, value, callback) {
+        if (!value) {
+          callback('请再次输入确认密码')
+        }
+        if (!this.userForm.user.password) {
+          callback('请先输入用户密码')
+        }
+        let password = /^[A-Za-z0-9]+$/
+        if (value && !password.test(value)) {
+          callback(new Error('请输入英文或数字'))
+        }
+        if (value && value !== this.userForm.user.password) {
+          callback('两次密码输入不一致!')
+        } else {
+          callback()
+        }
+      },
     }
   }
   // 性别选项
@@ -354,15 +379,89 @@
     }
   ]
   const userFormRules = {
-    realname: [{required: true, message: '请输入用户姓名', trigger: 'blur'}],
-    username: [{required: true, message: '请输入用户账号', trigger: 'blur'}],
-    password: [{required: true, message: '请输入用户密码', trigger: 'blur'}],
-    okPassword: [
-      {required: true, message: '请输入确认密码', trigger: 'blur'},
-      // {required: true, message: '俩次密码输入不一致', validator: () => {}}
+    realname: [
+      {
+        required: true,
+        message: '请输入用户姓名',
+        trigger: 'blur'
+      }
     ],
-    code: [{required: true, message: '请输入用户编码', trigger: 'blur'}],
-    phone: [{required: false, message: '手机号码格式错误', max: 11}],
+    username: [
+      {
+        required: true,
+        validator: (rule, value, callback) => {
+          if (!value) {
+            callback(new Error('请输入用户账号'))
+          }
+          var username = /^[A-Za-z0-9]+$/
+          if (value && !username.test(value)) {
+            callback(new Error('请输入英文或数字'))
+          } else {
+            callback()
+          }
+        },
+        trigger: 'blur'
+      }
+    ],
+    password: [
+      {
+        required: true,
+        validator: (rule, value, callback) => {
+          if(!value){
+            callback(new Error('请输入用户密码'))
+          }
+          var password = /^[A-Za-z0-9]+$/
+          if (value && !password.test(value)) {
+            callback(new Error('请输入英文或数字'))
+          } else {
+            callback()
+          }
+        },
+        trigger: 'blur'
+      }
+    ],
+    workNo: [
+      {
+        required: false,
+        validator: (rule, value, callback) => {
+          var password = /^[A-Za-z0-9]+$/
+          if (value && !password.test(value)) {
+            callback(new Error('请输入英文或数字'))
+          } else {
+            callback()
+          }
+        },
+        trigger: 'blur'
+      }
+    ],
+    phone: [
+      {
+        required: false,
+        validator: (rule, value, callback) => {
+          var phone = /0?(13|14|15|17|18)[0-9]{9}/
+          if (value && !phone.test(value)) {
+            callback(new Error('手机号格式不正确'))
+          } else {
+            callback()
+          }
+        },
+        trigger: 'blur'
+      }
+    ],
+    email: [
+      {
+        required: false,
+        validator: (rule, value, callback) => {
+          var email = /\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}/
+          if (value && !email.test(value)) {
+            callback(new Error('邮箱格式不正确'))
+          } else {
+            callback()
+          }
+        },
+        trigger: 'change'
+      },
+    ],
     type: [{required: true, message: '请选择用户类型', trigger: 'blur'}],
     status: [{required: false, message: '请选择用户状态', trigger: 'blur'}]
   }

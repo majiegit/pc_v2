@@ -4,7 +4,7 @@
       <!--操作按钮区域-->
       <a-space>
         <a-button type="primary" icon="plus" @click="selectPrincipal">分配用户</a-button>
-        <a-button type="primary" icon="plus">新增用户</a-button>
+        <a-button type="primary" icon="plus" @click="addUserEdit">新增用户</a-button>
         <a-button icon="delete" v-if="userDataSelectIds.length > 0" @click="cancelDeptUserBatch">批量删除</a-button>
       </a-space>
     </a-col>
@@ -25,7 +25,7 @@
         </template>
         <template slot="operation" slot-scope="text,record">
           <a-space>
-            <a href="javascript:;">编辑</a>
+            <a href="javascript:;" @click="updateUserEdit(record)">编辑</a>
             <a href="javascript:;" @click="openRoleDrawer(record)">授权</a>
             <a href="javascript:;" style="color: red;">
               <a-popconfirm
@@ -76,9 +76,20 @@
       @ok="okPrincipalModal"
       @cancel="cancelPrincipalModal"
     >
-      <select-user :selectedUserIds="selectedUserIds" :show="principalVisible"
-                   @select="selectUserIds"></select-user>
+      <SelectUser :selectedUserIds="selectedUserIds" :show="principalVisible"
+                   @select="selectUserIds"></SelectUser>
     </a-modal>
+
+    <!--用户编辑、添加窗口-->
+    <a-drawer
+      :title="editStatus == 'add' ? '添加用户' : '编辑用户'"
+      placement="right"
+      width="500"
+      :visible="userEditVisible"
+      @close="closeUserEdit"
+    >
+      <UserEdit :userIdProp="userId" v-if="editStatus" :operation="editStatus" @saveOk="saveOk"/>
+    </a-drawer>
   </a-row>
 </template>
 <script>
@@ -90,9 +101,9 @@
   import AFormItem from "ant-design-vue/es/form/FormItem";
   import SelectUser from '@/views/components/user/SelectUser'
   import PermissionTree from '@/views/components/permission/PermissionTree'
-
+  import UserEdit from '@/views/system/user/UserEdit'
   export default {
-    components: {AFormItem, ACol, ARow, SelectUser, PermissionTree},
+    components: {AFormItem, ACol, ARow, SelectUser, PermissionTree, UserEdit},
     props: {
       /**
        * 当前部门ID
@@ -111,6 +122,9 @@
     },
     data() {
       return {
+        editStatus: 'add',
+        userId: null,
+        userEditVisible: false,
         deptId: this.deptIdProp,
         // 部门用户
         userDataSelectIds: [],
@@ -137,6 +151,37 @@
     created() {
     },
     methods: {
+      /**
+       * 保存成功
+       */
+      saveOk() {
+        this.userEditVisible = false
+        this.userId = null
+        this.editStatus = ''
+        this.queryDeptUserData(this.deptId)
+      },
+      /**
+       * 修改用户
+       */
+      updateUserEdit(row) {
+        this.userEditVisible = true
+        this.userId = row.userId
+        this.editStatus = 'edit'
+      },
+      /**
+       * 添加用户
+       */
+      addUserEdit() {
+        this.userEditVisible = true
+        this.userId = null
+        this.editStatus = 'add'
+      },
+      /**
+       * 关闭用户编辑窗口
+       */
+      closeUserEdit() {
+        this.userEditVisible = false
+      },
       /**
        * 关闭角色窗口
        */

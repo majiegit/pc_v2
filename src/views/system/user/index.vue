@@ -71,7 +71,7 @@
       </a-col>
     </a-spin>
 
-    <!--分配角色权限区域代码-->
+    <!--用户编辑、添加窗口-->
     <a-drawer
       :title="editStatus == 'add' ? '添加用户' : '编辑用户'"
       placement="right"
