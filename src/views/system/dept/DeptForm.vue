@@ -27,7 +27,8 @@
             <a-select v-model="deptForm.type" :options="deptTypeData" placeholder="请选择部门类型"/>
           </a-form-model-item>
           <a-form-model-item label="成立日期" prop="foundDate">
-            <a-date-picker @change="changefoundDate" placeholder="请选择成立时间" :value="deptForm.foundDate ? moment(deptForm.foundDate, 'YYYY-MM-DD') : deptForm.foundDate"/>
+            <a-date-picker @change="changefoundDate" allowClear
+                           placeholder="请选择成立时间" :v-model="deptForm.foundDate ? moment(deptForm.foundDate, 'YYYY-MM-DD') : deptForm.foundDate"/>
           </a-form-model-item>
           <a-form-model-item label="地址" prop="address">
             <a-input v-model="deptForm.address"/>
@@ -58,7 +59,7 @@
 </template>
 
 <script>
-  import {getDeptById, saveDept} from '@/api/dept'
+  import {getDeptById, saveDept, queryDeptTree} from '@/api/dept'
   import {queryDictItemListByCode} from '@/api/dictItem'
   import {DictCode} from '@/utils/system/dictCode'
   import {DictConstant} from '@/utils/system/dictConstant'
@@ -75,12 +76,6 @@
       deptIdProp: {
         type: String,
         default: ''
-      },
-      deptDataProp: {
-        type: Array,
-        default: () => {
-          return []
-        }
       }
 
     },
@@ -89,7 +84,7 @@
         saveDeptLoading: false, // 保存按钮Loading
         deptInfoLoading: false,
         deptId: this.deptIdProp,
-        deptData: this.deptDataProp, // 所有部门数据
+        deptData: [], // 所有部门数据
         deptForm: {
           status: 1
         },
@@ -102,6 +97,7 @@
       deptIdProp(val) {
         this.deptId = val
         this.getDeptInfo(val)
+        this.getDeptData()
         this.getDeptTypeData()
       }
     },
@@ -110,8 +106,17 @@
         this.getDeptInfo(this.deptIdProp)
       }
       this.getDeptTypeData()
+      this.getDeptData()
     },
     methods: {
+      /**
+       * 查询部门数据
+       */
+      getDeptData() {
+        queryDeptTree().then(res => {
+          this.deptData = res.data  // 用户数据
+        })
+      },
       /**
        * 查询部门类型 => 数据字典
        */
@@ -133,20 +138,13 @@
             saveDept(this.deptForm).then(res => {
               this.$message.success(res.message)
               this.saveDeptLoading = false
+              this.getDeptData()
               this.$emit("saveDeptSuccess")
             }).catch(res => {
               this.saveDeptLoading = false
             })
           }
         })
-      },
-      /**
-       * 部门数据表单 初始化
-       */
-      deptFormInit() {
-        this.deptForm = {
-          status: 1
-        }
       },
       /**
        * 成立时间
@@ -158,7 +156,9 @@
        * 添加部门数据
        */
       addDeptForm() {
-        this.deptFormInit()
+        this.deptForm = {
+          status: 1
+        }
         if (this.deptId) {
           this.deptForm.pid = this.deptId
         }
@@ -167,7 +167,9 @@
        * 重置部门表单数据
        */
       resetDeptForm() {
-        this.deptFormInit()
+        this.deptForm = {
+          status: 1
+        }
         if (this.deptId) {
           this.deptForm.id = this.deptId
         }
@@ -176,6 +178,7 @@
        * 查询部门数据
        */
       getDeptInfo(deptId) {
+        this.$refs['deptFormRef'].clearValidate()
         this.deptInfoLoading = true
         getDeptById(deptId).then(res => {
           this.deptForm = res.data
@@ -190,7 +193,7 @@
   const deptFormRules = {
     name: [{required: true, message: '请输入部门名称', trigger: 'blur'}],
     code: [{required: true, message: '请输入部门编码', trigger: 'blur'}],
-    foundDate: [{required: true, message: '请输入部门成立时间', trigger: 'blur'}],
+    // foundDate: [{required: true, message: '请输入部门成立时间', trigger: 'blur'}],
     type: [{required: true, message: '请选择部门类型', trigger: 'blur'}],
     status: [{required: false, message: '请选择部门状态', trigger: 'blur'}]
   }

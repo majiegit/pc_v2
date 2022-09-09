@@ -67,7 +67,7 @@
     <a-col :md="12" :sm="24">
       <a-tabs :activeKey="defaultActiveKey" @change="changeTab">
         <a-tab-pane key="1" tab="基本信息">
-          <DeptForm :deptIdProp="selectedDeptId" :deptDataProp="deptData" v-if="deptEditStatus" ref="deptForm" @saveDeptSuccess="saveDeptSuccess"/>
+          <DeptForm :deptIdProp="selectedDeptId" v-if="deptEditStatus" ref="deptForm" @saveDeptSuccess="saveDeptSuccess"/>
           <a-empty description="请先选择一个部门" v-else/>
         </a-tab-pane>
         <a-tab-pane key="2" tab="部门权限">

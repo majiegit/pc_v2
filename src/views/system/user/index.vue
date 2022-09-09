@@ -53,10 +53,10 @@
             <span v-else-if="sex == 2">女</span>
             <span v-else>未知</span>
           </template>
-          <!--头像-->
-          <template slot="avatar" slot-scope="avatar">
-            <img :src=" host + avatar" v-if="avatar" style="width: 50px;"/>
-          </template>
+          <!--&lt;!&ndash;头像&ndash;&gt;-->
+          <!--<template slot="avatar" slot-scope="avatar">-->
+            <!--<img :src=" host + avatar" v-if="avatar" style="width:20px;"/>-->
+          <!--</template>-->
           <template slot="operation" slot-scope="text,record">
             <a href="javascript:;" class="operation" @click="updateUserEdit(record)">编辑</a>
             <a href="javascript:;" class="operation" style="color: red;">
@@ -193,7 +193,7 @@
        */
       getTableUserColumns() {
         // 排除显示字段
-        let userColumnsFilters = ['id', 'password', 'relTenantIds', 'userIdentity', 'thirdId', 'thirdType', 'telephone', 'createUser', 'createTime', 'updateUser', 'updateTime']
+        let userColumnsFilters = ['id', 'password', 'avatar','relTenantIds', 'userIdentity', 'thirdId', 'thirdType', 'telephone', 'createUser', 'createTime', 'updateUser', 'updateTime']
         let arr = []
         this.userColumns.forEach(field => {
           if (!userColumnsFilters.includes(field.field)) {
