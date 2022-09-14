@@ -1,6 +1,10 @@
 import request from '@/utils/request'
-import { Auth_Path,System_Path } from '@/utils/modulePath'
+import {Auth_Path, System_Path} from '@/utils/modulePath'
 
+/**
+ * 登录
+ * @param parameter
+ */
 export function login(parameter) {
   return request({
     url: Auth_Path + "/auth/login",
@@ -9,7 +13,9 @@ export function login(parameter) {
   })
 }
 
-
+/**
+ * 查询用户信息
+ */
 export function getInfo() {
   return request({
     url: System_Path + '/user/userPermissionMenuByToken',
@@ -17,7 +23,9 @@ export function getInfo() {
   })
 }
 
-
+/**
+ * 退出
+ */
 export function logout() {
   return request({
     url: Auth_Path + "/auth/logout",
@@ -25,5 +33,39 @@ export function logout() {
     headers: {
       'Content-Type': 'application/json;charset=UTF-8'
     }
+  })
+}
+
+/**
+ * 获取图文验证码
+ */
+export function getVerificationCode() {
+  return request({
+    url: Auth_Path + "/auth/getVerificationCode",
+    method: 'post'
+  })
+}
+
+/**
+ * 获取手机验证码
+ * @param phone
+ */
+export function getPhoneVerificationCode(phone) {
+  return request({
+    url: Auth_Path + "/auth/getPhoneVerificationCode",
+    method: 'post',
+    params: {phone: phone}
+  })
+}
+
+/**
+ * 注册
+ * @param data
+ */
+export function saveRegister(data) {
+  return request({
+    url: Auth_Path + "/auth/register",
+    method: 'post',
+    data: data
   })
 }

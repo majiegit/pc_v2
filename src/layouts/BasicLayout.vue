@@ -31,25 +31,28 @@
     <template v-slot:headerContentRender>
       <div>
         <a-tooltip title="刷新页面">
-          <a-icon type="reload" style="font-size: 18px;cursor: pointer;" @click="() => { $message.info('只是一个DEMO') }" />
+          <a-icon type="reload" style="font-size: 18px;cursor: pointer;" @click="refresh"/>
         </a-tooltip>
       </div>
     </template>
 
+    <!-- 主题设置-->
     <setting-drawer :settings="settings" @change="handleSettingChange">
       <div style="margin: 12px 0;">
         This is SettingDrawer custom footer content.
       </div>
     </setting-drawer>
+
     <template v-slot:rightContentRender>
       <right-content :top-menu="settings.layout === 'topmenu'" :is-mobile="isMobile" :theme="settings.theme" />
     </template>
-    <!-- custom footer / 自定义Footer -->
+     <!--custom footer / 自定义Footer-->
     <!--<template v-slot:footerRender>-->
       <!--<global-footer />-->
     <!--</template>-->
     <router-view />
   </pro-layout>
+
 </template>
 
 <script>
@@ -142,6 +145,9 @@ export default {
     }
   },
   methods: {
+    refresh(){
+      window.location.reload()
+    },
     i18nRender,
     handleMediaQuery (val) {
       this.query = val

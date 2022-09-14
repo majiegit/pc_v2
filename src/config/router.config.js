@@ -1,4 +1,5 @@
 import {UserLayout, BasicLayout, BlankLayout, PageView, RouteView} from '@/layouts'
+
 /**
  *
  * 动态路由 根据模块定义
@@ -22,6 +23,10 @@ export const notFoundRouter = {
  * @type { *[] }
  */
 export const constantRouterMap = [
+
+  /**
+   * 登录注册
+   */
   {
     path: '/',
     component: UserLayout,
@@ -29,14 +34,63 @@ export const constantRouterMap = [
     hidden: true,
     children: [
       {
-        path: 'login',
         name: 'login',
-        component: () => import(/* webpackChunkName: "user" */ '@/views/login/Login')
+        path: '/login',
+        component: () => import('@/views/user/Login')
+      },
+      {
+        name: 'register',
+        path: '/register',
+        component: () => import('@/views/user/Register')
+      },
+      {
+        name: 'registerResult',
+        path: '/registerResult',
+        component: () => import('@/views/user/RegisterResult')
+      },
+    ]
+  },
+  /**
+   * 主页
+   */
+  // dashboard
+  {
+    path: '/dashboard',
+    component: BasicLayout,
+    redirect: '/dashboard/index',
+    children: [
+      {
+        path: '/dashboard/index',
+        name: 'dashboard',
+        component: () => import('@/views/dashboard/index')
+      }
+    ]
+  },
+  /**
+   * 个人设置
+   */
+  // account
+  {
+    path: '/account',
+    component: BasicLayout,
+    redirect: '/account/center',
+    name: 'account',
+    meta: {title: 'menu.account', icon: 'user', keepAlive: true},
+    children: [
+      {
+        path: '/account/center',
+        name: 'center',
+        component: () => import('@/views/account/center/index')
+      },
+      {
+        path: '/account/settings',
+        name: 'settings',
+        component: () => import('@/views/account/settings/index')
       }
     ]
   },
   {
     path: '/404',
-    component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404')
+    component: () => import('@/views/exception/404')
   }
 ]

@@ -64,8 +64,8 @@
           @change="changeTablePage"
         >
             <span slot="isFilter" slot-scope="isFilter">
-                <a-tag color="green" v-if="isFilter == 0">否</a-tag>
-                <a-tag color="orange" v-if="isFilter == 1">是</a-tag>
+                <a-tag color="orange" v-if="isFilter == 0">否</a-tag>
+                <a-tag color="green" v-if="isFilter == 1">是</a-tag>
             </span>
           <template slot="operation" slot-scope="text,record">
             <a-space>

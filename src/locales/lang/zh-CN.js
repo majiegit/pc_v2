@@ -20,8 +20,8 @@ export default {
   message: '-',
 
   'layouts.usermenu.dialog.title': '信息',
-  'layouts.usermenu.dialog.content': '您确定要注销吗？',
-  'layouts.userLayout.title': 'Ant Design 是西湖区最具影响力的 Web 设计规范',
+  'layouts.usermenu.dialog.content': '您确定要退出系统吗？',
+  'layouts.userLayout.title': 'Jay 是中国最具影响力的 企业级低代码平台！~',
   ...components,
   ...global,
   ...menu,

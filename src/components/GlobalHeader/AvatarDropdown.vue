@@ -1,5 +1,5 @@
 <template>
-  <a-dropdown v-if="currentUser && currentUser.name" placement="bottomRight">
+  <a-dropdown v-if="currentUser" placement="bottomRight">
     <span class="ant-pro-account-avatar">
       <a-avatar size="small" src="https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png" class="antd-pro-global-header-index-avatar" />
       <span>{{ currentUser.name }}</span>
@@ -14,10 +14,14 @@
           <a-icon type="setting" />
           {{ $t('menu.account.settings') }}
         </a-menu-item>
+        <a-menu-item v-if="menu" key="password" @click="handleToPassword">
+          <a-icon type="edit" />
+          {{ $t('menu.account.password') }}
+        </a-menu-item>
         <a-menu-divider v-if="menu" />
         <a-menu-item key="logout" @click="handleLogout">
-          <a-icon type="logout" />
-          {{ $t('menu.account.logout') }}
+          <a-icon type="poweroff" />
+          {{ $t('menu.account.system.exit') }}
         </a-menu-item>
       </a-menu>
     </template>
@@ -43,6 +47,8 @@ export default {
     }
   },
   methods: {
+    handleToPassword() {
+    },
     handleToCenter () {
       this.$router.push({ path: '/account/center' })
     },

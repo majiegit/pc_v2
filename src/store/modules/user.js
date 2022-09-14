@@ -1,6 +1,6 @@
 import storage from 'store'
 import { login, getInfo, logout } from '@/api/login'
-import { ACCESS_TOKEN,REFRESH_TOKEN } from '@/store/mutation-types'
+import { ACCESS_TOKEN,REFRESH_TOKEN,USERINFO } from '@/store/mutation-types'
 import { welcome } from '@/utils/util'
 
 const user = {
@@ -83,6 +83,7 @@ const user = {
           commit('SET_ROLES', [])
           storage.remove(ACCESS_TOKEN)
           storage.remove(REFRESH_TOKEN)
+          storage.remove(USERINFO)
           resolve()
         }).catch(() => {
           resolve()
