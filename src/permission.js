@@ -5,7 +5,7 @@ import NProgress from 'nprogress' // progress bar
 import '@/components/NProgress/nprogress.less' // progress bar custom style
 import notification from 'ant-design-vue/es/notification'
 import { setDocumentTitle, domTitle } from '@/utils/domUtil'
-import { ACCESS_TOKEN,USERINFO } from '@/store/mutation-types'
+import { ACCESS_TOKEN,USERINFO,TOKEN_TIME_EXP } from '@/store/mutation-types'
 import { i18nRender } from '@/locales'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
@@ -25,12 +25,15 @@ router.beforeEach((to, from, next) => {
       NProgress.done()
     } else {
       // check login user.roles is null
-      if (storage.get(USERINFO) == undefined) {
+      // storage.get(USERINFO)
+      console.log(store.getters.roles)
+      console.log(store.getters.userInfo)
+      if (store.getters.userInfo.username === undefined) {
         store
           .dispatch('GetInfo')
           .then(res => {
             const result = res.data
-            storage.set(USERINFO, result)
+            storage.set(USERINFO, result,TOKEN_TIME_EXP)
             // generate dynamic router
             store.dispatch('GenerateRoutes', { result }).then(() => {
               // 根据roles权限生成可访问的路由表
@@ -47,14 +50,15 @@ router.beforeEach((to, from, next) => {
               }
             })
           }).catch(() => {
+            console.log(222)
             // notification.error({
             //   message: '错误',
             //   description: '请求用户信息失败，请重试'
             // })
             // 失败时，获取用户信息失败时，调用登出，来清空历史保留信息
-            store.dispatch('Logout').then(() => {
-              next({ path: loginRoutePath, query: { redirect: to.fullPath } })
-            })
+            // store.dispatch('Logout').then(() => {
+            //   next({ path: loginRoutePath, query: { redirect: to.fullPath } })
+            // })
           })
       } else {
         // 有用户权限信息，直接进入

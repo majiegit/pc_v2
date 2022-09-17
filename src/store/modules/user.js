@@ -1,6 +1,6 @@
 import storage from 'store'
 import { login, getInfo, logout } from '@/api/login'
-import { ACCESS_TOKEN,REFRESH_TOKEN,USERINFO } from '@/store/mutation-types'
+import { ACCESS_TOKEN,REFRESH_TOKEN,USERINFO,TOKEN_TIME_EXP } from '@/store/mutation-types'
 import { welcome } from '@/utils/util'
 
 const user = {
@@ -39,14 +39,15 @@ const user = {
       return new Promise((resolve, reject) => {
         login(userInfo).then(response => {
           const result = response.data
-          if(response.code == 200){
-            storage.set(ACCESS_TOKEN, result.accessToken, 7 * 24 * 60 * 60 * 1000)
-            storage.set(REFRESH_TOKEN, result.refreshToken, 7 * 24 * 60 * 60 * 1000)
+          console.log(result)
+          // if(response.code == 200){
+            storage.set(ACCESS_TOKEN, result.accessToken, TOKEN_TIME_EXP)
+            storage.set(REFRESH_TOKEN, result.refreshToken, TOKEN_TIME_EXP)
             commit('SET_TOKEN', result.accessToken, result.refreshToken)
             resolve()
-          }else {
-            reject(response)
-          }
+          // }else {
+          //   reject(response)
+          // }
         }).catch(error => {
           reject(error)
         })
@@ -81,6 +82,7 @@ const user = {
         logout(state.accessToken).then(() => {
           commit('SET_TOKEN', '', '')
           commit('SET_ROLES', [])
+          commit('SET_INFO', {})
           storage.remove(ACCESS_TOKEN)
           storage.remove(REFRESH_TOKEN)
           storage.remove(USERINFO)

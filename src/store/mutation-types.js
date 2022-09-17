@@ -1,5 +1,6 @@
 export const ACCESS_TOKEN = 'Jay-Access-Auth'
 export const REFRESH_TOKEN = 'Jay-Refresh-Auth'
+export const TOKEN_TIME_EXP = 1000
 export const USERINFO = 'userInfo'
 
 export const SIDEBAR_TYPE = 'sidebar_type'

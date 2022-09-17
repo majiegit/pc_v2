@@ -4,7 +4,7 @@ import storage from 'store'
 import notification from 'ant-design-vue/es/notification'
 import message from 'ant-design-vue/es/message'
 import {VueAxios} from './axios'
-import {ACCESS_TOKEN, REFRESH_TOKEN} from '@/store/mutation-types'
+import {ACCESS_TOKEN, REFRESH_TOKEN, TOKEN_TIME_EXP} from '@/store/mutation-types'
 
 // 创建 axios 实例
 const request = axios.create({
@@ -12,32 +12,6 @@ const request = axios.create({
   baseURL: process.env.VUE_APP_API_BASE_URL,
   timeout: 600000 // 请求超时时间
 })
-
-// 异常拦截处理器
-const errorHandler = (error) => {
-  if (error.response) {
-    const data = error.response.data
-    if (error.response.status === 403) {
-      notification.error({
-        message: 'Forbidden',
-        description: data.message
-      })
-    }
-    if (error.response.status === 401 && !(data.result && data.result.isLogin)) {
-      notification.error({
-        message: 'Unauthorized',
-        description: 'Authorization verification failed'
-      })
-    }
-    if (error.response.status === 500) {
-      notification.error({
-        message: '网络异常',
-        description: '网络异常，请检查网络'
-      })
-    }
-  }
-  return Promise.reject(error)
-}
 
 
 // request 拦截器
@@ -55,43 +29,71 @@ request.interceptors.request.use(config => {
   return config
 })
 
-// response interceptor
-request.interceptors.response.use((response) => {
-  // 动态刷新 Token
-  // 认证 AccessToken
-  let accessToken = response.headers[ACCESS_TOKEN.toLowerCase()]
-  if (accessToken) {
-    storage.set(ACCESS_TOKEN, accessToken, 7 * 24 * 60 * 60 * 1000)
-    store.state.accessToken = accessToken
-  }
-  // 刷新 RefreshToken
-  let refreshToken = response.headers[REFRESH_TOKEN.toLowerCase()]
-  if (refreshToken) {
-    storage.set(REFRESH_TOKEN, refreshToken, 7 * 24 * 60 * 60 * 1000)
-    store.state.refreshToken = refreshToken
-  }
+// response 拦截器
+request.interceptors.response.use(
+  response => {
+    // 动态刷新 Token
+    // 认证 AccessToken
+    let accessToken = response.headers[ACCESS_TOKEN.toLowerCase()]
+    if (accessToken) {
+      storage.set(ACCESS_TOKEN, accessToken, TOKEN_TIME_EXP)
+      store.state.accessToken = accessToken
+    }
+    // 刷新 RefreshToken
+    let refreshToken = response.headers[REFRESH_TOKEN.toLowerCase()]
+    if (refreshToken) {
+      storage.set(REFRESH_TOKEN, refreshToken, TOKEN_TIME_EXP)
+      store.state.refreshToken = refreshToken
+    }
 
-  // 响应数据处理
-  let res = response.data
-  // 请求数据成功, 直接 return
-  // console.log(response)
-  if (res.code === 200) {
-    return res
-  } else if (res.code === 401) {
-    // 如果身份失效，调用注销接口
-    notification.error({
-      message: '身份已失效',
-      description: res.message
-    })
-    store.dispatch('Logout').then(() => {
-      setTimeout(() => {
-        window.location.reload()
-      }, 1500)
-    })
-  } else {
-    message.error(res.message)
-  }
-}, errorHandler)
+    // 响应数据处理
+    let res = response.data
+    // 请求数据成功, 直接 return
+    // console.log(response)
+    if (res.code === 200) {
+      return res
+    } else if (res.code === 401) {
+      // 如果身份失效，调用注销接口
+      notification.error({
+        message: '身份已失效',
+        description: res.message
+      })
+      store.dispatch('Logout').then(() => {
+        debugger
+        setTimeout(() => {
+          window.location.reload()
+        }, 1500)
+      })
+      // debugger
+    } else {
+      message.error(res.message)  // 弹出错误消息
+      // return Promise.reject(res) // 返回 直接进入catch
+    }
+  },
+  error => {
+    if (error.response) {
+      const data = error.response.data
+      if (error.response.status === 403) {
+        notification.error({
+          message: 'Forbidden',
+          description: data.message
+        })
+      }
+      if (error.response.status === 401 && !(data.result && data.result.isLogin)) {
+        notification.error({
+          message: 'Unauthorized',
+          description: 'Authorization verification failed'
+        })
+      }
+      if (error.response.status === 500) {
+        notification.error({
+          message: '网络异常',
+          description: '网络异常，请检查网络'
+        })
+      }
+    }
+    return Promise.reject(error)
+  })
 
 const installer = {
   vm: {},

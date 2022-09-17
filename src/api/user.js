@@ -84,10 +84,10 @@ export function uploadAvatar(data) {
 /**
  * 修改密码 - 根据用户ID
  */
-export function updatePassword(userId) {
+export function updatePassword(data) {
   return request({
     url: userApi.UpdatePassword,
     method: 'post',
-    params: {userId: userId}
+    data: data
   })
 }
