@@ -33,3 +33,15 @@ export const normalFrozenOptions = [
     label: '冻结'
   }
 ]
+
+// 移动、PC选项
+export const mobilePcOptions = [
+  {
+    value: 1,
+    label: '移动端'
+  },
+  {
+    value: 0,
+    label: 'PC端'
+  }
+]

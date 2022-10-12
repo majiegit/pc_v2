@@ -1,14 +1,14 @@
 import request from '@/utils/request'
-import {System_Path} from '@/utils/modulePath'
+import {Admin_Path} from '@/utils/modulePath'
 
 const userApi = {
-  UserListPage: System_Path + '/user/page',
-  UserFieldList: System_Path + '/user/getUserFieldList',
-  AddUser: System_Path + '/user/add',
-  UpdateUser: System_Path + '/user/update',
-  GetUser: System_Path + '/user/get',
-  UploadAvatar: System_Path + '/user/upload/avatar',
-  UpdatePassword: System_Path + '/user/update/password'
+  UserListPage: Admin_Path + '/user/page',
+  UserFieldList: Admin_Path + '/user/getUserFieldList',
+  AddUser: Admin_Path + '/user/add',
+  UpdateUser: Admin_Path + '/user/update',
+  GetUser: Admin_Path + '/user/get',
+  UploadAvatar: Admin_Path + '/user/upload/avatar',
+  UpdatePassword: Admin_Path + '/user/update/password'
 }
 
 /**

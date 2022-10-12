@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-import {Auth_Path, System_Path} from '@/utils/modulePath'
+import {Admin_Path} from '@/utils/modulePath'
 
 /**
  * 登录
@@ -7,7 +7,7 @@ import {Auth_Path, System_Path} from '@/utils/modulePath'
  */
 export function login(parameter) {
   return request({
-    url: Auth_Path + "/auth/login",
+    url: Admin_Path + "/auth/login",
     method: 'post',
     params: parameter
   })
@@ -18,7 +18,7 @@ export function login(parameter) {
  */
 export function getInfo() {
   return request({
-    url: System_Path + '/user/userPermissionMenuByToken',
+    url: Admin_Path + '/user/userPermissionMenuByToken',
     method: 'post'
   })
 }
@@ -28,7 +28,7 @@ export function getInfo() {
  */
 export function logout() {
   return request({
-    url: Auth_Path + "/auth/logout",
+    url: Admin_Path + "/auth/logout",
     method: 'post',
     headers: {
       'Content-Type': 'application/json;charset=UTF-8'
@@ -41,7 +41,7 @@ export function logout() {
  */
 export function getVerificationCode() {
   return request({
-    url: Auth_Path + "/auth/getVerificationCode",
+    url: Admin_Path + "/auth/getVerificationCode",
     method: 'post'
   })
 }
@@ -52,7 +52,7 @@ export function getVerificationCode() {
  */
 export function getPhoneVerificationCode(phone) {
   return request({
-    url: Auth_Path + "/auth/getPhoneVerificationCode",
+    url: Admin_Path + "/auth/getPhoneVerificationCode",
     method: 'post',
     params: {phone: phone}
   })
@@ -64,7 +64,7 @@ export function getPhoneVerificationCode(phone) {
  */
 export function saveRegister(data) {
   return request({
-    url: Auth_Path + "/auth/register",
+    url: Admin_Path + "/auth/register",
     method: 'post',
     data: data
   })
