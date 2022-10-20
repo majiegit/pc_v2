@@ -27,7 +27,7 @@
 </template>
 
 <script>
-  import {updatePassword} from '@/api/user'
+  // import {updatePassword} from '@/api/user'
 
   export default {
     name: "AlterPassword",

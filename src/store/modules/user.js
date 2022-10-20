@@ -1,7 +1,7 @@
 import storage from 'store'
-import { login, getInfo, logout } from '@/api/login'
-import { ACCESS_TOKEN,REFRESH_TOKEN,USERINFO,TOKEN_TIME_EXP } from '@/store/mutation-types'
-import { welcome } from '@/utils/util'
+import {login, getInfo, logout} from '@/api/login'
+import {HRSH_PC_ACCESS_TOKEN, HRSH_PC_REFRESH_TOKEN, HRSH_PC_USERINFO, TOKEN_TIME_EXP} from '@/store/mutation-types'
+import {welcome} from '@/utils/util'
 
 const user = {
   state: {
@@ -18,7 +18,7 @@ const user = {
       state.accessToken = accessToken
       state.rfreshToken = rfreshToken
     },
-    SET_NAME: (state, { name, welcome }) => {
+    SET_NAME: (state, {name, welcome}) => {
       state.name = name
       state.welcome = welcome
     },
@@ -35,16 +35,16 @@ const user = {
 
   actions: {
     // 登录
-    Login ({ commit }, userInfo) {
+    Login({commit}, userInfo) {
       return new Promise((resolve, reject) => {
         login(userInfo).then(response => {
           const result = response.data
           console.log(result)
           // if(response.code == 200){
-            storage.set(ACCESS_TOKEN, result.accessToken, TOKEN_TIME_EXP)
-            storage.set(REFRESH_TOKEN, result.refreshToken, TOKEN_TIME_EXP)
-            commit('SET_TOKEN', result.accessToken, result.refreshToken)
-            resolve()
+          storage.set(HRSH_PC_ACCESS_TOKEN, result.accessToken, TOKEN_TIME_EXP)
+          storage.set(HRSH_PC_REFRESH_TOKEN, result.refreshToken, TOKEN_TIME_EXP)
+          commit('SET_TOKEN', result.accessToken, result.refreshToken)
+          resolve()
           // }else {
           //   reject(response)
           // }
@@ -55,20 +55,18 @@ const user = {
     },
 
     // 获取用户信息
-    GetInfo ({ commit }) {
+    GetInfo({commit}) {
       return new Promise((resolve, reject) => {
         getInfo().then(response => {
-          // console.log(2222,response)
           const result = response.data
-          if(result){
-            commit('SET_ROLES', result.roles)
-            commit('SET_INFO', result.userInfo)
-          }else {
+          if (result) {
+            commit('SET_ROLES', [])
+            commit('SET_INFO', result)
+          } else {
             reject(new Error('getInfo: roles must be a non-null array !'))
           }
-          commit('SET_NAME', { name: result.userInfo.realname, welcome: welcome() })
-          commit('SET_AVATAR', result.userInfo.avatar)
-
+          commit('SET_NAME', {name: result.name, welcome: welcome()})
+          commit('SET_AVATAR', result.photo)
           resolve(response)
         }).catch(error => {
           reject(error)
@@ -77,20 +75,15 @@ const user = {
     },
 
     // 登出
-    Logout ({ commit, state }) {
+    Logout({commit, state}) {
       return new Promise((resolve) => {
-        logout(state.accessToken).then(() => {
-          commit('SET_TOKEN', '', '')
-          commit('SET_ROLES', [])
-          commit('SET_INFO', {})
-          storage.remove(ACCESS_TOKEN)
-          storage.remove(REFRESH_TOKEN)
-          storage.remove(USERINFO)
-          resolve()
-        }).catch(() => {
-          resolve()
-        }).finally(() => {
-        })
+        commit('SET_TOKEN', '', '')
+        commit('SET_ROLES', [])
+        commit('SET_INFO', {})
+        storage.remove(HRSH_PC_ACCESS_TOKEN)
+        storage.remove(HRSH_PC_REFRESH_TOKEN)
+        storage.remove(HRSH_PC_USERINFO)
+        resolve()
       })
     }
 

@@ -1,7 +1,11 @@
-export const ACCESS_TOKEN = 'Jay-Access-Auth'
-export const REFRESH_TOKEN = 'Jay-Refresh-Auth'
+export const ACCESS_TOKEN = 'Hrsh-Access-Auth'
+export const REFRESH_TOKEN = 'Hrsh-Refresh-Auth'
+
+export const HRSH_PC_ACCESS_TOKEN = 'Hrsh-Pc-Access-Auth'
+export const HRSH_PC_REFRESH_TOKEN = 'Hrsh-Pc-Refresh-Auth'
+
 export const TOKEN_TIME_EXP = 1000
-export const USERINFO = 'userInfo'
+export const HRSH_PC_USERINFO = 'Hrsh-Pc-UserInfo'
 
 export const SIDEBAR_TYPE = 'sidebar_type'
 export const TOGGLE_MOBILE_TYPE = 'is_mobile'

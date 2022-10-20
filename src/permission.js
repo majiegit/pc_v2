@@ -5,7 +5,7 @@ import NProgress from 'nprogress' // progress bar
 import '@/components/NProgress/nprogress.less' // progress bar custom style
 import notification from 'ant-design-vue/es/notification'
 import { setDocumentTitle, domTitle } from '@/utils/domUtil'
-import { ACCESS_TOKEN,USERINFO,TOKEN_TIME_EXP } from '@/store/mutation-types'
+import { HRSH_PC_ACCESS_TOKEN,HRSH_PC_USERINFO,TOKEN_TIME_EXP } from '@/store/mutation-types'
 import { i18nRender } from '@/locales'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
@@ -18,22 +18,22 @@ router.beforeEach((to, from, next) => {
   NProgress.start() // start progress bar
   to.meta && (typeof to.meta.title !== 'undefined' && setDocumentTitle(`${i18nRender(to.meta.title)} - ${domTitle}`))
   /* has token */
-  if (storage.get(ACCESS_TOKEN)) {
+  if (storage.get(HRSH_PC_ACCESS_TOKEN)) {
     // 如果有token 情况下
     if (to.path === loginRoutePath) {
       next({ path: defaultRoutePath })
       NProgress.done()
     } else {
       // check login user.roles is null
-      // storage.get(USERINFO)
+      // storage.get(HRSH_PC_USERINFO)
       console.log(store.getters.roles)
       console.log(store.getters.userInfo)
-      if (store.getters.userInfo.username === undefined) {
+      if (store.getters.userInfo.name === undefined) {
         store
           .dispatch('GetInfo')
           .then(res => {
             const result = res.data
-            storage.set(USERINFO, result,TOKEN_TIME_EXP)
+            storage.set(HRSH_PC_USERINFO, result,TOKEN_TIME_EXP)
             // generate dynamic router
             store.dispatch('GenerateRoutes', { result }).then(() => {
               // 根据roles权限生成可访问的路由表
@@ -50,7 +50,6 @@ router.beforeEach((to, from, next) => {
               }
             })
           }).catch(() => {
-            console.log(222)
             // notification.error({
             //   message: '错误',
             //   description: '请求用户信息失败，请重试'

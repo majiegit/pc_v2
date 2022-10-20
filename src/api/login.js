@@ -1,13 +1,11 @@
 import request from '@/utils/request'
-import {Admin_Path} from '@/utils/modulePath'
-
 /**
  * 登录
  * @param parameter
  */
 export function login(parameter) {
   return request({
-    url: Admin_Path + "/auth/login",
+    url: '/hrsh/login/loginByUserCodePassword',
     method: 'post',
     params: parameter
   })
@@ -18,7 +16,7 @@ export function login(parameter) {
  */
 export function getInfo() {
   return request({
-    url: Admin_Path + '/user/userPermissionMenuByToken',
+    url: '/hrsh/psndoc/getPsndocInfo',
     method: 'post'
   })
 }
@@ -28,7 +26,7 @@ export function getInfo() {
  */
 export function logout() {
   return request({
-    url: Admin_Path + "/auth/logout",
+    url: "/hrsh/auth/logout",
     method: 'post',
     headers: {
       'Content-Type': 'application/json;charset=UTF-8'
@@ -41,7 +39,7 @@ export function logout() {
  */
 export function getVerificationCode() {
   return request({
-    url: Admin_Path + "/auth/getVerificationCode",
+    url: "/hrsh/auth/getVerificationCode",
     method: 'post'
   })
 }
@@ -52,7 +50,7 @@ export function getVerificationCode() {
  */
 export function getPhoneVerificationCode(phone) {
   return request({
-    url: Admin_Path + "/auth/getPhoneVerificationCode",
+    url: "/hrsh/auth/getPhoneVerificationCode",
     method: 'post',
     params: {phone: phone}
   })
@@ -64,7 +62,7 @@ export function getPhoneVerificationCode(phone) {
  */
 export function saveRegister(data) {
   return request({
-    url: Admin_Path + "/auth/register",
+    url: "/hrsh/auth/register",
     method: 'post',
     data: data
   })

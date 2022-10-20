@@ -4,7 +4,7 @@ import storage from 'store'
 import notification from 'ant-design-vue/es/notification'
 import message from 'ant-design-vue/es/message'
 import {VueAxios} from './axios'
-import {ACCESS_TOKEN, REFRESH_TOKEN, TOKEN_TIME_EXP} from '@/store/mutation-types'
+import {ACCESS_TOKEN, REFRESH_TOKEN, HRSH_PC_ACCESS_TOKEN,HRSH_PC_REFRESH_TOKEN,TOKEN_TIME_EXP} from '@/store/mutation-types'
 
 // 创建 axios 实例
 const request = axios.create({
@@ -16,8 +16,8 @@ const request = axios.create({
 
 // request 拦截器
 request.interceptors.request.use(config => {
-  const accessToken = storage.get(ACCESS_TOKEN)
-  const refreshToken = storage.get(REFRESH_TOKEN)
+  const accessToken = storage.get(HRSH_PC_ACCESS_TOKEN)
+  const refreshToken = storage.get(HRSH_PC_REFRESH_TOKEN)
   // 如果 token 存在
   // 让每个请求携带自定义 token 请根据实际情况自行修改
   if (accessToken) {
@@ -36,13 +36,13 @@ request.interceptors.response.use(
     // 认证 AccessToken
     let accessToken = response.headers[ACCESS_TOKEN.toLowerCase()]
     if (accessToken) {
-      storage.set(ACCESS_TOKEN, accessToken, TOKEN_TIME_EXP)
+      storage.set(HRSH_PC_ACCESS_TOKEN, accessToken, TOKEN_TIME_EXP)
       store.state.accessToken = accessToken
     }
     // 刷新 RefreshToken
     let refreshToken = response.headers[REFRESH_TOKEN.toLowerCase()]
     if (refreshToken) {
-      storage.set(REFRESH_TOKEN, refreshToken, TOKEN_TIME_EXP)
+      storage.set(HRSH_PC_REFRESH_TOKEN, refreshToken, TOKEN_TIME_EXP)
       store.state.refreshToken = refreshToken
     }
 
@@ -91,6 +91,13 @@ request.interceptors.response.use(
           description: '网络异常，请检查网络'
         })
       }
+
+      store.dispatch('Logout').then(() => {
+        debugger
+        setTimeout(() => {
+          window.location.reload()
+        }, 1500)
+      })
     }
     return Promise.reject(error)
   })
