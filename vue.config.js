@@ -39,6 +39,8 @@ const assetsCDN = {
 
 // vue.config.js
 const vueConfig = {
+  pubilcPath: isProd ?'/hrself':'/',
+  //baseUrl: isProd ?'/hrself':'/',
   configureWebpack: {
     // webpack plugins
     plugins: [

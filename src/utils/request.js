@@ -53,13 +53,15 @@ request.interceptors.response.use(
     if (res.code === 200) {
       return res
     } else if (res.code === 401) {
+      storage.remove('Hrsh-UserInfo')
+      storage.remove('Hrsh-Refresh-Auth')
+      storage.remove('Hrsh-Access-Auth')
       // 如果身份失效，调用注销接口
       notification.error({
         message: '身份已失效',
         description: res.message
       })
       store.dispatch('Logout').then(() => {
-        debugger
         setTimeout(() => {
           window.location.reload()
         }, 1500)
@@ -90,10 +92,17 @@ request.interceptors.response.use(
           message: '网络异常',
           description: '网络异常，请检查网络'
         })
+       // return
+      }
+      if (error.response.status === 404) {
+        notification.error({
+          message: '网络异常',
+          description: '网络异常，请检查网络'
+        })
+        return
       }
 
       store.dispatch('Logout').then(() => {
-        debugger
         setTimeout(() => {
           window.location.reload()
         }, 1500)

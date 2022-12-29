@@ -16,10 +16,15 @@ import { FormModel } from 'ant-design-vue';
 import {TreeSelect} from "ant-design-vue";
 import {Empty} from 'ant-design-vue'
 import {Tree} from 'ant-design-vue'
+import {Anchor} from 'ant-design-vue'
+import {Collapse} from 'ant-design-vue'
+ 
 Vue.use(FormModel);
 Vue.use(Empty);
 Vue.use(Tree);
 Vue.use(TreeSelect);
+Vue.use(Anchor);
+Vue.use(Collapse);
 // mock
 // WARNING: `mockjs` NOT SUPPORT `IE` PLEASE DO NOT USE IN `production` ENV.
 // import './mock'

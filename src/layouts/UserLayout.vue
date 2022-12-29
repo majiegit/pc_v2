@@ -2,34 +2,18 @@
 
   <div id="userLayout" :class="['user-layout-wrapper', isMobile && 'mobile']">
     <div class="container">
-      <div class="user-layout-lang">
-        <select-lang class="select-lang-trigger" />
-      </div>
       <div class="user-layout-content">
-        <div class="top">
-          <div class="header">
-            <a href="/">
-              <img src="~@/assets/logo.svg" class="logo" alt="logo">
-              <span class="title">Jay</span>
-            </a>
-          </div>
-          <div class="desc">
-            {{ $t('layouts.userLayout.title') }}
-          </div>
-        </div>
-
-        <router-view />
-
-        <!--<div class="footer">-->
-          <!--<div class="links">-->
-            <!--<a href="_self">帮助</a>-->
-            <!--<a href="_self">隐私</a>-->
-            <!--<a href="_self">条款</a>-->
-          <!--</div>-->
-          <!--<div class="copyright">-->
-            <!--Copyright &copy; 2018 vueComponent-->
-          <!--</div>-->
-        <!--</div>-->
+        <a-row :gutter="24">
+          <a-col :span="12">
+              <router-view />
+          </a-col>
+           <a-col :span="12" style="text-align: center;">
+              <div class="title-lg">
+                <img src="~@/assets/logo.png" alt="" style="width: 450px;">
+              </div>
+              <img src="~@/assets/login_right.png" style="width:550px" >
+           </a-col>
+         </a-row>
       </div>
     </div>
   </div>
@@ -55,6 +39,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
+
 #userLayout.user-layout-wrapper {
   height: 100%;
 
@@ -70,31 +55,20 @@ export default {
   .container {
     width: 100%;
     min-height: 100%;
-    background: #f0f2f5 url(~@/assets/background.svg) no-repeat 50%;
-    background-size: 100%;
-    //padding: 50px 0 84px;
+    background: #f0f2f5 url(~@/assets/login_bg.png);
+    background-size: 100% 100%;
     position: relative;
 
-    .user-layout-lang {
-      width: 100%;
-      height: 40px;
-      line-height: 44px;
-      text-align: right;
-
-      .select-lang-trigger {
-        cursor: pointer;
-        padding: 12px;
-        margin-right: 24px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
-        vertical-align: middle;
-      }
+    .title-lg{
+      margin-bottom: 30px;
     }
 
     .user-layout-content {
       padding: 32px 0 24px;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 100%;
 
       .top {
         text-align: center;
@@ -138,8 +112,8 @@ export default {
       }
 
       .main {
-        min-width: 260px;
-        width: 368px;
+        min-width: 400px;
+        width: 500px;
         margin: 0 auto;
       }
 

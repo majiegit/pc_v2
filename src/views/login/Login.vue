@@ -7,14 +7,17 @@
       :form="form"
       @submit="handleSubmit"
     >
-      <a-tabs
+      <!-- <a-tabs
         :activeKey="customActiveKey"
         :tabBarStyle="{ textAlign: 'center', borderBottom: 'unset' }"
         @change="handleTabClick"
       >
-        <a-tab-pane key="usercode" :tab="$t('user.login.tab-login-credentials')">
+        <a-tab-pane key="usercode" :tab="$t('user.login.tab-login-credentials')"> -->
           <!--账号密码登录-->
-          <a-form-item>
+          <div class="user-tabs-nav-scroll">
+             <div class="user-text">账号密码登录</div>
+          </div>
+          <a-form-item class="user-form-item">
             <a-input
               size="large"
               type="text"
@@ -28,7 +31,7 @@
             </a-input>
           </a-form-item>
 
-          <a-form-item>
+          <a-form-item class="user-form-item">
             <a-input-password
               size="large"
               :placeholder="$t('user.login.password.placeholder')"
@@ -40,9 +43,9 @@
               <a-icon slot="prefix" type="lock" :style="{ color: 'rgba(0,0,0,.25)' }"/>
             </a-input-password>
           </a-form-item>
-        </a-tab-pane>
-      </a-tabs>
-      <a-form-item style="margin-top:24px">
+        <!-- </a-tab-pane>
+      </a-tabs> -->
+      <a-form-item  class="footer-btn">
         <a-button
           size="large"
           type="primary"
@@ -53,12 +56,20 @@
         >{{ $t('user.login.login') }}
         </a-button>
       </a-form-item>
-
-      <div class="user-login-other">
+        <div class="user-login-other">
         <a-divider>
-          <span style="font-size: 12px; color: #909399;">{{ $t('user.login.sign-in-with') }}</span>
+          <span style="font-size: 14px; color: #909399;">第三方登录方式</span>
         </a-divider>
-        <a>
+        <div class="user-lodingtype">
+          <a >
+          <img src="~@/assets/wechat.png" alt="">
+          </a>
+          <a >
+            <img src="~@/assets/alipay.png" alt="">
+          </a>
+        </div>
+        
+        <!-- <a>
           <a-icon class="item-icon" type="wechat"></a-icon>
         </a>
         <a>
@@ -66,10 +77,9 @@
         </a>
         <a>
           <a-icon class="item-icon" type="qrcode"></a-icon>
-        </a>
+        </a> -->
       </div>
     </a-form>
-
     <two-step-captcha
       v-if="requiredTwoStepCaptcha"
       :visible="stepCaptchaVisible"
@@ -197,6 +207,10 @@
 </script>
 
 <style lang="less" scoped>
+#formLogin{
+  background:#fff;
+ 
+}
   .user-layout-login {
     label {
       font-size: 14px;
@@ -220,10 +234,17 @@
     }
 
     .user-login-other {
-      text-align: left;
-      margin-top: 24px;
+      text-align: center;
+      margin-top: 50px;
       line-height: 22px;
+      .user-lodingtype{
+        padding: 50px 0;
+        img{
+          margin-right: 10px;
+        }
 
+      
+      }
       .item-icon {
         font-size: 24px;
         color: rgba(0, 0, 0, 0.2);
@@ -242,4 +263,32 @@
       }
     }
   }
+</style>
+<style lang="less" >
+  #formLogin{
+ .user-tabs-nav-scroll{
+    background: #fff url(~@/assets/qrcode.png) no-repeat 40%;
+    background-position: right top;
+    background-size: 20%;
+    margin-bottom: 50px;
+    font-size: 16px;
+    .user-text{
+      margin: 0 20px;
+      padding: 20px;
+      color: #02318E;
+      border-bottom: 1px solid #02318E;
+     }
+  }
+  .user-form-item{
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .ant-tabs-content {
+    padding: 0 20px;
+  }
+  .footer-btn{
+    padding: 20px;
+  }
+  
+}
 </style>
