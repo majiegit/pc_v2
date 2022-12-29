@@ -52,7 +52,11 @@ export default {
       this.$router.push('/message')
     },
     logout() {
-      localStorage.clear();
+      //localStorage.clear();
+      storage.remove('Hrsh-Pc-Access-Auth')
+      storage.remove('Hrsh-Pc-Refresh-Auth')
+      storage.remove('Hrsh-Pc-UserInfo')
+      window.location.reload()
       this.$router.push("/login")
      
     },
