@@ -4,7 +4,7 @@
       <div class="header_left" @click="goback">
         <img src="../assets/logo.png" />
       </div>
-      <span class="header_speech">“{{ timeFix }}，每天好心情”</span>
+      <!-- <span class="header_speech">“{{ timeFix }}，每天好心情”</span> -->
       <div class="header-photo">
         <img :src="userinfo.photo" alt="" />
         <span style="margin-right: 24px" @click="handleMessageClick">

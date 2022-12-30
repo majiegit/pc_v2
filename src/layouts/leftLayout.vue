@@ -11,13 +11,13 @@
           <div class="photo">
             <div class="photo-item">
               <img :src="userinfo.photo" alt="" />
-              <span class="photo-icon" @click="handleMessageClick">
+              <!-- <span class="photo-icon" @click="handleMessageClick">
                 <a-icon type="bell" style="font-size: 25px" theme="filled" />
                 <span class="count">8</span>
-              </span>
+              </span> -->
             </div>
             <div class="photo-text">
-              <div>{{userinfo.name}}</div>
+              <div>{{userinfo.name}}1111</div>
               <div class="jobname">{{userinfo.deptname}} / {{userinfo.postname}}</div>
               <div class="explain">这是您加入用友集团的第 {{userinfo.joinsysday}} 天</div>
             </div>

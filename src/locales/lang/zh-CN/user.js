@@ -33,6 +33,7 @@ export default {
   'user.email.wrong-format': '邮箱地址格式错误！',
   'user.username.required': '请输入登录账号！',
   'user.verificationCode.required': '请输入验证码',
+  'user.usercode.required': '请输入登录账号',
   'user.password.required': '请输入登录密码',
   'user.password.twice.msg': '两次输入的密码不匹配!',
   'user.password.strength.msg': '密码强度不够 ',

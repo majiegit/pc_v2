@@ -10,9 +10,9 @@
                 <a-icon type="bell" style="font-size: 25px" theme="filled" />
                 <span class="count">{{count}}</span>
               </span> -->
-              <span style="margin-right:24px"  @click="handleMessageClick">
+              <!-- <span style="margin-right:24px"  @click="handleMessageClick">
                 <a-badge :count="count"><a-avatar style="font-size: 25px;backgroundColor: #fff;color: #333;" theme="filled" icon="bell"/></a-badge>
-              </span>
+              </span> -->
             </div>
             <div class="photo-text">
               <div>{{ userinfo.name }}</div>
@@ -21,7 +21,7 @@
             </div>
           </div>
           <div class="menuData">
-            <a-menu mode="vertical" :default-selected-keys="['1543610120131228089']" >
+            <a-menu mode="vertical" :default-selected-keys="selectedKeys" >
              <a-menu-item  v-for="(item,index) in menuData"  :key="item.role.staff_role_id"  @click="handleClick(item)">
               {{item.role.staff_role_name}}
             </a-menu-item>
@@ -38,9 +38,9 @@
             </div>
           </div>
           <div class="home-col col-1" :span="8"  v-for="(item,index) in selectData"  :key="index" >
-            <div class="col-item" @click='routerpush(item.pc_path)' v-bind:style="{ background: item.icon_color }">
-              <div class="menuListItem">
-                <div v-html="item.icon" class="menuIcon"></div>
+            <div class="col-item" @click='routerpush(item.pc_path)'>
+              <div class="menuListItem" >
+                <div v-html="item.icon" class="menuIcon"  v-bind:style="{ background: item.icon_color }"></div>
               </div>
               <div class="text">{{item.name}}</div>
             </div>
@@ -131,7 +131,7 @@ export default {
       menuData: [],
       selectData:[],
       vertical: 'horizontal',
-      selectedKeys: [],
+      selectedKeys: ['1579627330062413826'],
       openKeys: [],
       pieStyle: {
         stroke: '#fff',
@@ -144,7 +144,7 @@ export default {
       ModalText: 'Content of the modal',
       visible: false,
       confirmLoading: false,
-      count:'0'
+      count:'0',
     }
   },
   computed: {},
@@ -172,8 +172,9 @@ export default {
           this.selectedKeys = []
           this.menuData = res.data
           this.selectData = (res.data && res.data[0]&& res.data[0].menuList) || []
-          let staffRoleId = (res.data && res.data[0]&& res.data[0].role && res.data[0].role.staffRoleId) || ''
+          let staffRoleId = (res.data && res.data[0]&& res.data[0].role && res.data[0].role.staff_role_id) || ''
           this.selectedKeys.push(staffRoleId)
+          console.log(this.selectedKeys)
          } else {
           this.menuData = []
           this.selectData = []
@@ -239,6 +240,22 @@ export default {
       margin-bottom: 20px;
       padding-left: 8px;
       padding-right: 8px;
+      .menuListItem{
+        .menuIcon{
+          border-radius: 100%;
+          width: 80px;
+          height: 80px;
+          text-align: center;
+          margin: 0 auto;
+          position: relative;
+          .icon{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+          }
+        }
+      } 
     }
     .col-title {
       .greet {
@@ -271,7 +288,7 @@ export default {
           font-size: 20px;
           padding-top: 15px;
           font-weight: 400;
-          color: #fff;
+          // color: #fff;
         }
       }
       .col-add {
@@ -391,5 +408,23 @@ export default {
 .menuIcon svg {
   width: 50px;
   height: 50px;
-}       
+}  
+.home-col {
+  .menuListItem{
+    .menuIcon{
+      border-radius: 100%;
+      width: 80px;
+      height: 80px;
+      text-align: center;
+      margin: 0 auto;
+      position: relative;
+      .icon{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
+  } 
+}     
 </style>
