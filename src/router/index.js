@@ -16,9 +16,7 @@ Router.prototype.push = function push (location, onResolve, onReject) {
 
 Vue.use(Router)
 export default new Router({
-  mode: 'history',
+  mode: 'hash',
   routes: routerList,
-  //base: '/'
-  base: process.env.NODE_ENV
-  // base:process.env.NODE_ENV === "developent"?'/admin':"/",
+  base: process.env.NODE_ENV === 'production' ? '/hrself': './',
 })
