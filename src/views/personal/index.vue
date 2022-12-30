@@ -1019,21 +1019,24 @@ export default {
             })
             .catch((res) => {
               this.loadingButton = false
-              this.$message.error({ message: res.message, duration: 1000 })
+              this.$message.error(res.message)
             })
         }
        },
     // 撤回
     rollbackData() {
+      debugger
+      let _this = this
       let params = {
-        tableCode: this.tempData.table_code,
+        tableCode: this.tempData_info.table_code,
       }
       revokeLisn(params).then((res) => {
         this.loadingButton = false
-        this.$message.success({ message: '撤回成功', duration: 500 })
+        this.$message.success('撤回成功')
         setTimeout((res) => {
-          this.rightbody_title = false
-          this.infobody = false
+             _this.rightbody = false
+            _this.infobody = false
+            _this.getdata()
         }, 500)
       })
     },
