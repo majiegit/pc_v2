@@ -158,11 +158,11 @@ export const StartEndDayType = {
 
 export const StartEndDayTypeList = [
   {
-    text: '上午',
+    title: '上午',
     value: '1'
   },
   {
-    text: '下午',
+    title: '下午',
     value: '2'
   }
 ]

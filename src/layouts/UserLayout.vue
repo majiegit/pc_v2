@@ -60,7 +60,7 @@ export default {
     position: relative;
 
     .title-lg{
-      margin-bottom: 30px;
+      margin-bottom: 40px;
     }
 
     .user-layout-content {
@@ -113,7 +113,7 @@ export default {
 
       .main {
         min-width: 400px;
-        width: 500px;
+        width: 450px;
         margin: 0 auto;
       }
 

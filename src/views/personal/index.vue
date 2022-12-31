@@ -17,7 +17,7 @@
           </a-anchor>
         </a-col>
 
-        <a-col class="gutter-row personal-right" :span="20">
+        <a-col class="gutter-row personal-right" :style="{'height': currentHeight}" :span="20">
           <div class="personal-row" :gutter="16">
             <a-row class="info-data">
               <a-col :span="24" class="upload">
@@ -276,7 +276,7 @@
             label-width="100"
             input-align="right"
             ref="formData"
-            :model="info"
+            :model="infoDataForm_info_min[infoIndex]"
             :label-col="{ span: 8 }"
             :wrapper-col="{ span: 16 }"
           >
@@ -290,7 +290,7 @@
                 v-if="[0, 100].includes(field.datatype)"
               >
                 <a-input
-                  v-model="info[field.code]"
+                  v-model="infoDataForm_info_min[infoIndex][field.code]"
                   :maxLength="field.maxlength"
                   :placeholder="getFieldPlaceholder(field)"
                   :disabled="getFieldDisabled(field)"
@@ -305,7 +305,7 @@
                 v-if="[1, 2].includes(field.datatype)"
               >
                 <a-input
-                  v-model="info[field.code]"
+                  v-model="infoDataForm_info_min[infoIndex][field.code]"
                   :rules="getFieldRules(field)"
                   :placeholder="getFieldPlaceholder(field)"
                   :disabled="getFieldDisabled(field)"
@@ -324,7 +324,7 @@
               >
                 <a-date-picker
                   :format="field.datatype == 8 ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD'"
-                  v-model="info[field.code]"
+                  v-model="infoDataForm_info_min[infoIndex][field.code]"
                   :placeholder="getFieldPlaceholder(field)"
                   @change="getDate($event, field, infoIndex)"
                   :rules="getFieldRules(field)"
@@ -341,11 +341,11 @@
               >
                 <a-select
                   show-search
-                  v-model="info[field.code + '_name']"
+                  v-model="infoDataForm_info_min[infoIndex][field.code + '_name']"
                   :placeholder="getFieldPlaceholder(field)"
                   :options="options"
                   :filter-option="filterOption"
-                  @change="getSelectDatelist"
+                  @change="getSelectDatelist($event, field, infoIndex)"
                   @mouseenter="getSelectDate(field, infoIndex)"
                   :disabled="getFieldDisabled(field)"
                 ></a-select>
@@ -360,7 +360,7 @@
                 v-if="field.datatype == 5"
               >
                 <a-input
-                  v-model="info[field.code + '_name']"
+                  v-model="infoDataForm_info_min[infoIndex][field.code + '_name']"
                   :placeholder="getFieldPlaceholder(field)"
                   @click="getReference(field, infoIndex)"
                   :disabled="getFieldDisabled(field)"
@@ -377,7 +377,7 @@
                 v-if="field.datatype == 9"
               >
                 <a-input
-                  v-model="info[field.code]"
+                  v-model="infoDataForm_info_min[infoIndex][field.code]"
                   type="textarea"
                   :maxLength="field.maxlength"
                   :placeholder="getFieldPlaceholder(field)"
@@ -393,7 +393,7 @@
                 :rules="getFieldRules(field)"
               >
                 <a-switch
-                  :checked="info[field.code] == 'Y' ? true : false"
+                  :checked="infoDataForm_info_min[infoIndex][field.code] == 'Y' ? true : false"
                   active-value="Y"
                   inactive-value="N"
                   :disabled="getFieldDisabled(field)"
@@ -487,12 +487,15 @@ export default {
       backData: {}, // 传过来的备份数据
       info_min: {},
       infoDataForm_model:{},
+      currentHeight: '',
       //基础信息
     }
   },
   computed: {},
   created() {
     this.getdata()
+    this.currentHeight = (document.documentElement.clientHeight - 80) + 'px'
+    console.log( this.currentHeight,'px')
     console.log(this.informationIconList)
   },
   methods: {
@@ -836,6 +839,7 @@ export default {
       this.refer_show = false
     },
     getDate(event, field, infoIndex) {
+      debugger
       let layout, date
       layout = field.datatype == 8 ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD'
       if (event) {
@@ -847,7 +851,7 @@ export default {
         return
       }
       if (infoIndex !== '' && infoIndex !== null && infoIndex !== undefined) {
-        this.$set(this.info, field.code, date)
+        this.$set(this.infoDataForm_info_min[infoIndex], field.code, date)
       } else {
         this.$set(this.infoDataForm_info, field.code, date)
       }
@@ -904,15 +908,13 @@ export default {
     // 提交
     submitData() {
       // 校验必填数据
+      let _this = this
       let fieldNames = this.getFieldRequiredAll(this.fieldDataEdit_info)
       const infoDataForm = this.infoDataForm_info
       const infoDataFormBack = this.backData_info.infoDataForm
-      console.log('infoDataForm,infoDataFormBack',infoDataForm,infoDataFormBack)
       const keys = Object.keys(infoDataForm)
       const data = keys.filter((key) => infoDataForm[key] !== infoDataFormBack[key])
-      console.log('111111111111111',data)
-      console.log(fieldNames,keys,data,infoDataForm,infoDataFormBack)
-        // 校验表单
+       // 校验表单
       let isvalidate = false 
        this.$refs.formData_info.validate((valid,data) => {
           console.log(valid,data)
@@ -931,23 +933,22 @@ export default {
             let str = this.judgmentReview(data, this.fieldData_info)
             if (str !== '') {
               console.log(this)
-              this.$confirm({
+              _this.$confirm({
                 title: '以下信息需要审核通过才能生效',
                 content: str,
                 onOk() {
-                  this.checkSubmit()
+                  _this.checkSubmit()
                 },
                 onCancel() {
                   console.log('Cancel')
                 },
               })
             } else {
-              this.$confirm({
+              _this.$confirm({
                 title: '是否确认提交',
                 content: str,
                 onOk() {
-                  console.log(this,'====this')
-                  this.checkSubmit()
+                   _this.checkSubmit()
                 },
                 onCancel() {
                   console.log('Cancel')
@@ -1025,7 +1026,6 @@ export default {
        },
     // 撤回
     rollbackData() {
-      debugger
       let _this = this
       let params = {
         tableCode: this.tempData_info.table_code,
@@ -1092,8 +1092,10 @@ export default {
       }
     }
     .personal-right {
+      padding-right: 23px;
+      overflow-y: scroll;
       .personal-row{
-        padding: 0 30px;
+        padding: 0 30px 30px;
         background: #fff;
       }
       .info-data {
@@ -1183,5 +1185,8 @@ export default {
     width: 200px;
     margin-right: 15px;
   }
+}
+.ant-collapse > .ant-collapse-item:last-child, .ant-collapse > .ant-collapse-item:last-child > .ant-collapse-header{
+  border-radius: 16px;
 }
 </style>

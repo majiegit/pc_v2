@@ -53,9 +53,7 @@ request.interceptors.response.use(
     if (res.code === 200) {
       return res
     } else if (res.code === 401) {
-      storage.remove('Hrsh-UserInfo')
-      storage.remove('Hrsh-Refresh-Auth')
-      storage.remove('Hrsh-Access-Auth')
+      
       // 如果身份失效，调用注销接口
       notification.error({
         message: '身份已失效',

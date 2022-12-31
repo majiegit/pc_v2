@@ -5,24 +5,29 @@
         <div class="Menus">
           <div class="photo">
             <div class="photo-item">
-              <img :src="userinfo.photo" alt="" />
+              <div class="image">
+                <img :src="userinfo.photo" alt="" />
+              </div>
+              
               <!-- <span class="photo-icon" @click="handleMessageClick">
                 <a-icon type="bell" style="font-size: 25px" theme="filled" />
                 <span class="count">{{count}}</span>
               </span> -->
-              <!-- <span style="margin-right:24px"  @click="handleMessageClick">
+              <span style="margin-right:24px"  @click="handleMessageClick">
                 <a-badge :count="count"><a-avatar style="font-size: 25px;backgroundColor: #fff;color: #333;" theme="filled" icon="bell"/></a-badge>
-              </span> -->
+              </span>
             </div>
             <div class="photo-text">
               <div>{{ userinfo.name }}</div>
               <div class="jobname">{{ userinfo.deptname }} / {{ userinfo.postname }}</div>
-              <div class="explain">这是您加入用友集团的第 {{ userinfo.joinsysday }} 天</div>
+              <div class="explain">这是您加入用友集团的第 <span style="color:#0875ff">{{ userinfo.joinsysday }}</span> 天</div>
             </div>
           </div>
           <div class="menuData">
             <a-menu mode="vertical" :default-selected-keys="selectedKeys" >
              <a-menu-item  v-for="(item,index) in menuData"  :key="item.role.staff_role_id"  @click="handleClick(item)">
+               <div v-html="item.role.icon" class="menuIcon" ></div>
+              
               {{item.role.staff_role_name}}
             </a-menu-item>
            </a-menu>
@@ -235,6 +240,8 @@ export default {
     padding: 20px 20px;
     height: 100%;
     background: #fff;
+    box-shadow: 0px 0px 32px 0px rgb(56 ,63 ,98 , 0.2);
+    border-radius: 16px;
     .home-col {
       display: inline-block;
       margin-bottom: 20px;
@@ -282,7 +289,7 @@ export default {
       .col-item {
         border-radius: 10px;
         box-shadow: 0 0 10px rgba(167, 167, 167, 0.4);
-        padding: 20px 0 50px;
+        padding: 35px 0 35px;
        
         .text {
           font-size: 20px;
@@ -310,8 +317,11 @@ export default {
   border-right: 1px solid #e8e8e8;
   background: #fff;
   .ant-menu-item {
-    height: 50px !important;
-    line-height: 50px !important;
+    height: 70px !important;
+    line-height: 70px !important;
+    font-size: 16px;
+    text-align: center;
+    padding: 0 !important;
   }
   .ant-menu-item-selected {
     border-left: 5px solid #2479ed;
@@ -321,11 +331,19 @@ export default {
     .photo-item {
       padding: 25px 0;
       text-align: center;
+      .image{
+          width: 90px;
+          height: 90px;
+          border-radius: 100%;
+         // margin: 0 auto;
+         border: 5px solid #D3E4FB;;
+         display: inline-block;
+      }
       img {
         width: 80px;
         height: 80px;
         border-radius: 100%;
-        margin: 0 auto;
+        // margin: 0 auto;
       }
       .photo-icon {
         display: inline-block;
@@ -347,6 +365,8 @@ export default {
       text-align: center;
       font-size: 16px;
       padding: 0 10px 0;
+      color: #333;
+      font-weight: 500;
       div {
         padding-bottom: 10px;
       }
@@ -355,7 +375,7 @@ export default {
       }
       .explain {
         font-size: 12px;
-        color: #c0c0c0;
+        color: #333;
         border-top: 1px solid #c0c0c0;
         padding-top: 5px;
       }

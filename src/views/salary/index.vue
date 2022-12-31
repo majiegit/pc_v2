@@ -2,7 +2,7 @@
   <div class="salary">
     <div class="salary-body" v-if="salaryData.length != 0">
       <div class="selsecData">
-        <span>查询期间</span>
+        <span>薪资期间</span>
         <a-month-picker
           v-model="beginDate"
           :disabled-date="disabledStartDate"
@@ -524,9 +524,9 @@ export default {
       .salary_total_item {
         border-radius: 10px;
         box-shadow: 0 0 10px rgba(167, 167, 167, 0.4);
-        padding: 20px 10px 50px;
+        padding: 35px 10px 35px;
         .right {
-          margin-top: 20px;
+          margin-top: 40px;
           text-align: right;
         }
       }

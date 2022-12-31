@@ -14,83 +14,64 @@
         </a-button>
       </div>
       <!--请假表单-->
-      <a-form
+      <a-form-model
         ref="billForm"
         :form="form"
+        :model="billInfo"
         :label-col="{ span: 5 }"
         :wrapper-col="{ span: 12 }"
+        :rules="formRules"
         class="leaveForm"
-        @submit="saveBillInfo"
       >
         <!--请假开始时间   时间一组-->
         <div>
-          <a-form-item :label="'开始' + dateType.label" name="begintime">
+          <a-form-model-item :label="'开始' + dateType.label" prop="begintime" :rules="{ required: true, message: '请选择开始' + dateType.label, trigger: 'change'}">
             <a-date-picker
-              format="YYYY-MM-DD"
-               show-time
+              :format="format"
               :placeholder="'请选择开始' + dateType.label"
+              show-time
+              required
+              v-model="billInfo.begintime"
               @change="selectDate(billInfo.begintime, 'begintime', '请选择开始' + dateType.label, dateType.type)"
-              v-decorator="[
-                'billInfo.begintime',
-                {
-                  rules: [{ required: true, message: '开始' + dateType.label }],
-                },
-              ]"
             />
-          </a-form-item>
-          <a-form-item :label="'结束' + dateType.label" name="endtime">
+           </a-form-model-item>
+          <a-form-model-item :label="'结束' + dateType.label" prop="endtime" :rules="{ required: true, message: '请选择结束' + dateType.label, trigger: 'change'}">
             <a-date-picker
-              format="YYYY-MM-DD"
+              :format="format"
+              show-time
+              :required="true"
               :placeholder="'请选择结束' + dateType.label"
               @change="selectDate(billInfo.endtime, 'endtime', '请选择结束' + dateType.label, dateType.type)"
-              v-decorator="[
-                'billInfo.endtime',
-                {
-                  rules: [{ required: true, message: '结束' + dateType.label }],
-                },
-              ]"
             />
-          </a-form-item>
+          </a-form-model-item>
         </div>
 
         <!--上下午标识-->
         <div v-if="StartEndDayTypeShow">
-          <a-form-item label="开始时间">
+          <a-form-model-item label="开始时间" :prop ='StartEndDayTypeList[billInfo.start_day_type]'  :rules="{ required: true, message: '请选择开始时间', trigger: 'change'}">
             <a-select
-              v-decorator="[
-                StartEndDayType[billInfo.start_day_type],
-                {
-                  rules: [{ required: true }],
-                },
-              ]"
+              v-model="billInfo.start_day_type"
+              :options="StartEndDayTypeList"
               placeholder="请选择开始时间"
               @change="selectStartDayType(billInfo.start_day_type, '开始时间', 'start_day_type')"
+             
             >
-              <a-select-option :value="item.value" v-for="(item, index) in StartEndDayTypeList" :key="index">
-                {{ item.text }}
-              </a-select-option>
             </a-select>
-          </a-form-item>
-          <a-form-item label="结束时间">
+          </a-form-model-item>
+          <a-form-model-item label="结束时间" :prop ='StartEndDayTypeList[billInfo.end_day_type]'  :rules="{ required: true, message: '请选择结束时间', trigger: 'change'}">
             <a-select
-              v-decorator="[
-                StartEndDayType[billInfo.end_day_type],
-                {
-                  rules: [{ required: true }],
-                },
-              ]"
+              v-model="billInfo.start_day_type"
+              :options="StartEndDayTypeList"
               placeholder="请选择结束时间"
               @change="selectStartDayType(billInfo.end_day_type, '结束时间', 'end_day_type')"
+              
             >
-              <a-select-option :value="item.value" v-for="(item, index) in StartEndDayTypeList" :key="index">
-                {{ item.text }}
-              </a-select-option>
             </a-select>
-          </a-form-item>
+          </a-form-model-item>
         </div>
 
         <!--请假说明-->
-        <a-form-item label="请输入请假说明">
+        <a-form-model-item label="请输入请假说明">
           <a-textarea
             v-model="billInfo.leaveremark"
             style="height: 130px"
@@ -100,19 +81,19 @@
             placeholder="请输入请假说明"
             show-word-limit
           />
-        </a-form-item>
+        </a-form-model-item>
 
         <!--请假时长-->
-        <a-form-item label="请假时长">
+        <a-form-model-item label="请假时长">
           <a-input v-model="billInfo.leaveday + HrkqMinUnit[billInfo.minunit]" disabled />
-        </a-form-item>
+        </a-form-model-item>
         <!--剩余额度-->
-        <a-form-item :label="billInfo.leavetypename + '剩余额度'">
+        <a-form-model-item :label="billInfo.leavetypename + '剩余额度'">
           <a-input v-model="leaveTypeBalance + HrkqMinUnit[billInfo.minunit]" disabled />
-        </a-form-item>
+        </a-form-model-item>
         <!--保存单据-->
         <SaveButton @save="saveBillInfo"></SaveButton>
-      </a-form>
+      </a-form-model>
     </div>
   </div>
 </template>
@@ -124,7 +105,7 @@ import SaveButton from '@/components/Button/SaveButton'
 import { getItem } from '@/utils/DataUtils'
 import { saveLeaveBill, getLeaveBill, queryLeaveType, queryLeaveLength } from '@/api/leave'
 import { approveStateName, StartEndDayTypeList, whetherYN, StartEndDayType, HrkqMinUnit } from '@/utils/ConstantUtils'
-
+ import {beginGtEndTime, beginEndSameDay} from '@/utils/DateTimeUtils'
 export default {
   name: 'leaveEdit',
   components: { SaveButton },
@@ -155,6 +136,7 @@ export default {
       leaveTypeList: [], // 休假类型集合
       leaveTypeBalance: '', // 休假类型剩额度
       StartEndDayTypeList: StartEndDayTypeList, // 休假类型剩额度
+      format:'YYYY-MM-DD',
     }
   },
   watch: {
@@ -166,9 +148,11 @@ export default {
         if (leaveType.min_unit == '2') {
           this.dateType.label = '日期'
           this.dateType.type = 'date'
-        } else if (leaveType.min_unit == '1') {
+          this.format = 'YYYY-MM-DD'
+         } else if (leaveType.min_unit == '1') {
           this.dateType.label = '时间'
           this.dateType.type = 'datetime'
+          this.format = 'YYYY-MM-DD HH:mm:ss'
         }
         if (leaveType.min_time == '1' && leaveType.min_unit == '2') {
           this.StartEndDayTypeShow = true
@@ -228,6 +212,12 @@ export default {
         this.$message.error('请先选择休假类型')
         return
       }
+      let layout 
+      if(type =='datetime'){
+        layout ='YYYY-MM-DD HH:mm:ss'
+      }else{
+        layout ='YYYY-MM-DD'
+      }
       let selector = {
         title: title,
         field: field,
@@ -238,6 +228,7 @@ export default {
       console.log(selector)
     },
     selectStartDayType(value, title, filed) {
+      debugger
       if (!this.billInfo.begintime) {
         this.$message.error('请先选择开始日期')
         return
@@ -255,7 +246,80 @@ export default {
         value: value,
       }
       this.$set(this.billInfo,selector.field, selector.value)
+      this.selectMorningAfter()
     },
+     /**
+       * 上下午时间选择确认之后
+       */
+      selectMorningAfter() {
+        // 显示上下午
+        if (this.StartEndDayTypeShow) {
+          // 上下午时 需设置开始日期和结束日期 加时间
+          if (this.billInfo.start_day_type == '1') {
+            this.billInfo.begintime = this.billInfo.begintime.substring(0, 10) + ' 08:00:00'
+          }
+          if (this.billInfo.start_day_type == '2') {
+            this.billInfo.begintime = this.billInfo.begintime.substring(0, 10) + ' 20:00:00'
+          }
+          // 上下午时 需设置开始日期和结束日期 加时间
+          if (this.billInfo.end_day_type == '1') {
+            this.billInfo.endtime = this.billInfo.endtime.substring(0, 10) + ' 08:00:00'
+          }
+          if (this.billInfo.end_day_type == '2') {
+            this.billInfo.endtime = this.billInfo.endtime.substring(0, 10) + ' 20:00:00'
+          }
+        } else {
+          // 不显示上下午
+          if(this.dateType.type == 'date'){
+            if(this.billInfo.begintime){
+              this.billInfo.begintime = this.billInfo.begintime.substring(0, 10) + ' 00:00:00'
+            }
+            if(this.billInfo.endtime){
+              this.billInfo.endtime = this.billInfo.endtime.substring(0, 10) + ' 00:00:00'
+            }
+          }
+        }
+        this.afterEdit()
+      },
+        afterEdit() {
+        // 校验开始时间是否 > 结束时间
+        if (this.billInfo.begintime && this.billInfo.endtime) {
+          // 校验开始时间是否 > 结束时间
+          let isGt = beginGtEndTime(this.billInfo.begintime, this.billInfo.endtime)
+          if (isGt) {
+            Toast("开始时间不能大于结束时间")
+            this.billInfo.endtime = ''
+            return
+          }
+          // 判断表单是否显示上下午
+          if (this.StartEndDayTypeShow) {
+            // 有  判断开始时间日期上下午有一个为空 不执行计算时长
+            if (!this.billInfo.begintime || !this.billInfo.endtime || !this.billInfo.start_day_type || !this.billInfo.end_day_type) {
+              return
+            }
+          }
+          this.getLeaveLength()
+        }
+      },
+      /**
+       * 计算请假时长
+       */
+      getLeaveLength() {
+        let params = {
+          begintime: this.billInfo.begintime,
+          endtime: this.billInfo.endtime,
+          pk_leave_type: this.billInfo.pk_leave_type,
+          minunit: this.billInfo.minunit
+        }
+        Toast.loading({
+          message: '计算请假时长中...',
+          duration: 0
+        })
+        queryLeaveLength(params).then(res => {
+          Toast.clear()
+          this.billInfo.leaveday = res.data
+        })
+      },
 
     saveBillInfo() {
       if (!this.checkLeaveType()) {
@@ -263,7 +327,7 @@ export default {
         return
       }
       console.log(this.billInfo)
-      this.form.validateFields(Object.keys(this.formRules)).then(() => {
+      this.$refs.billForm.validateField(Object.keys(this.formRules)).then(() => {
         // 校验保存数据
         if (this.billInfo.leaveday == '0' || this.billInfo.leaveday == '') {
           this.$message.error('请假时长不能为0')
@@ -277,6 +341,7 @@ export default {
   },
 }
 const formRules = {
+  
   leavetype: [
     {
       required: true,

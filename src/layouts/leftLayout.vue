@@ -17,7 +17,7 @@
               </span> -->
             </div>
             <div class="photo-text">
-              <div>{{userinfo.name}}1111</div>
+              <div>{{userinfo.name}}</div>
               <div class="jobname">{{userinfo.deptname}} / {{userinfo.postname}}</div>
               <div class="explain">这是您加入用友集团的第 {{userinfo.joinsysday}} 天</div>
             </div>

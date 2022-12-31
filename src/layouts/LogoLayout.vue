@@ -1,8 +1,11 @@
 <template>
   <a-layout class="logolayout">
     <a-layout-header :style="{ width: '100%', background: '#fff', padding: '0px', 'margin-bottom': '10px' }">
-      <div class="header_left" @click="goback">
-        <img src="../assets/logo.png" />
+      <div class="header_left_min" @click="goback">
+         <div class="header_left_login">
+            <img src="../assets/logo.png" />
+         </div>
+        
       </div>
       <!-- <span class="header_speech">“{{ timeFix }}，每天好心情”</span> -->
       <div class="header-photo">
@@ -82,14 +85,18 @@ export default {
 .logolayout {
   height: 100%;
 }
-.header_left {
-  width: 15%;
+.header_left_min {
+  width: 16.66666667%;
   float: left;
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(90deg, #28b0ff, #0875ff);
+  padding-right: 29px;
+  display: inline-block;
+.header_left_login{
+    background: linear-gradient(90deg, #28b0ff, #0875ff);
+  }
+ 
+
+  
   img {
     width: 70%;
   }

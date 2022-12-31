@@ -273,21 +273,21 @@
     margin-bottom: 50px;
     font-size: 16px;
     .user-text{
-      margin: 0 20px;
+      margin: 0 40px;
       padding: 20px;
       color: #02318E;
       border-bottom: 1px solid #02318E;
      }
   }
   .user-form-item{
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: 40px;
+    padding-right: 40px;
   }
   .ant-tabs-content {
     padding: 0 20px;
   }
   .footer-btn{
-    padding: 20px;
+    padding: 20px 40px;
   }
   
 }
