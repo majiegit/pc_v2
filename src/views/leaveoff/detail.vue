@@ -1,5 +1,6 @@
 <template>
   <div class="detail">
+    <Header ></Header>
     <div class="detail-body">
       <div style="text-align:right"> 
         <a-button  type="primary" @click="deleteBill"  v-if="approvestate == '-1'">删除</a-button>
@@ -84,6 +85,7 @@
 
 <script>
 import storage from 'store'
+import Header from '@/components/Header/Index'
 import ApproveProcess from '@/components/ApprovaProcess/ApproveProcess2'
 import ApplyButton from '@/components/Button/ApplyButton'
 import { getLeaveoffBill, submitLeaveoffBill, recoverLeaveoffBill, deleteLeaveoffBill } from '@/api/leaveoff'
@@ -92,7 +94,7 @@ import { BillTypeCode } from '@/utils/ConstantUtils'
 
 export default {
   name: 'leaveoffDetail',
-  components: { ApproveProcess, ApplyButton },
+  components: { Header,ApproveProcess, ApplyButton },
   data() {
     return {
       approveStateName,

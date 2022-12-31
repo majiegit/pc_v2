@@ -51,7 +51,6 @@ export default {
   watch: {},
   computed: {},
   mounted() {
-    console.log(this.workflownote)
     if (this.workflownote) {
       this.active = this.workflownote.length - 1
     }

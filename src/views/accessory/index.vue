@@ -1,5 +1,6 @@
 <template>
   <div class="accessory">
+    <Header ></Header>
     <div class="accessory-body">
       <div>
         <a-upload
@@ -25,12 +26,13 @@
 
 <script>
 import storage from 'store'
+import Header from '@/components/Header/Index'
 import { getFileList, deleteFile, uploadFile } from '@/api/filemanager'
 import Item from '@/components/AvatarList/Item'
 
 export default {
   name: 'message',
-  components: {},
+  components: {Header},
   data() {
     return {
       loading: true,

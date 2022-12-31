@@ -1,34 +1,62 @@
 <template>
   <div>
-    <Header :title="title" @clickLeft="clickLeft"></Header>
+    <Header ></Header>
     <div class="item_body" :style="{'height': currentHeight}">
       <div v-if="billInfo.pk_psndoc">
         <p class="item_body_title">出差信息</p>
-        <van-cell-group>
-          <van-cell title="出差类型：" :value="billInfo.triptypename"/>
-          <van-cell title="申请人：" :value="billInfo.psndocname"/>
-          <van-cell title="申请时间：" :value="billInfo.applydate"/>
-          <van-cell title="开始时间：" :value="billInfo.tripoffbegintime"/>
-          <van-cell title="结束时间：" :value="billInfo.tripendtime"/>
-          <!--          <van-cell v-if="billInfo.start_day_type" title="开始时间：" :value="StartEndDayType[billInfo.start_day_type]"/>-->
-          <!--          <van-cell v-if="billInfo.end_day_type" title="结婚时间：" :value="StartEndDayType[billInfo.end_day_type]"/>-->
-          <van-cell title="出差时长：" :value="billInfo.tripday + HrkqMinUnit[billInfo.minunit]"/>
-          <van-cell title="出差目的地：" :value="billInfo.otapplylength"/>
-          <van-cell title="出差费用：" :value="billInfo.cost"/>
-          <van-cell title="销差原因：" :value="billInfo.remark"/>
-          <van-cell title="审批状态：" :value="approveStateName[billInfo.approvestatus]"/>
-        </van-cell-group>
+        <a-descriptions>
+          <a-descriptions-item label="出差类型：" >
+           {{billInfo.triptypename}}
+          </a-descriptions-item>
+          <a-descriptions-item label="申请人：" >
+          {{billInfo.psndocname}}
+          </a-descriptions-item>
+          <a-descriptions-item label="申请时间：">
+          {{billInfo.applydate}}
+          </a-descriptions-item>
+          <a-descriptions-item label="开始时间：">
+          {{billInfo.tripoffbegintime}}
+          </a-descriptions-item>
+          <a-descriptions-item label="结束时间：" >
+          {{billInfo.tripendtime}}
+          </a-descriptions-item>
+          <a-descriptions-item label="出差时长：" >
+          {{billInfo.tripday + HrkqMinUnit[billInfo.minunit]}}
+          </a-descriptions-item>
+          <a-descriptions-item label="出差目的地：">
+          {{billInfo.otapplylength}}
+          </a-descriptions-item>
+          <a-descriptions-item label="出差费用：">
+          {{billInfo.cost}}
+          </a-descriptions-item>
+          <a-descriptions-item label="销差原因：">
+          {{billInfo.remark}}
+          </a-descriptions-item>
+          <a-descriptions-item label="审批状态：" >
+          {{approveStateName[billInfo.approvestatus]}}
+          </a-descriptions-item>
+        </a-descriptions>
         <p class="item_body_title">销差信息</p>
-        <van-cell title="销差理由：" :value="billInfo.tripoffremark"/>
-        <van-cell title="实际开始时间：" :value="billInfo.tripoffbegintime"/>
-        <van-cell title="实际结束时间：" :value="billInfo.tripoffendtime"/>
-        <van-cell title="实际出差时长：" :value="billInfo.tripoffday + HrkqMinUnit[billInfo.minunit]"/>
+        <a-descriptions>
+        <a-descriptions-item label="销差理由：" >
+        {{billInfo.tripoffremark}}
+        </a-descriptions-item>
+        <a-descriptions-item label="实际开始时间：">
+        {{billInfo.tripoffbegintime}}
+        </a-descriptions-item>
+        <a-descriptions-item label="实际结束时间：">
+        {{billInfo.tripoffendtime}}
+        </a-descriptions-item>
+        <a-descriptions-item label="实际出差时长：" >
+        {{billInfo.tripoffday + HrkqMinUnit[billInfo.minunit]}}
+        </a-descriptions-item>
+        </a-descriptions>
         <p class="fileClass" @click="fileManager">附件管理</p>
         <!--审批流程-->
         <ApproveProcess :workflownote="billInfo.workflownote" v-if="['102','0','1','2','3'].includes(approvestate)"/>
       </div>
       <div v-else>
-        <van-empty description="暂无数据"/>
+        <a-empty description="暂无数据"/>
       </div>
     </div>
 

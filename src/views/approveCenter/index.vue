@@ -1,5 +1,7 @@
 <template>
-  <div class="myapply">
+  <div>
+  <Header ></Header>
+  <div class="myapply" :style="{'height': currentHeight}">
     <div class="myapply-body">
       <div class="checkStatus">
       <a-tabs :activeKey="approveStatus" @change="handleTabClick" color="#2479ED" title-active-color="#2479ED" title-inactive-color="#000" line-width="100px">
@@ -41,17 +43,19 @@
       </div>
     </div>
   </div>
+  </div>
 </template>
 
 <script>
 import storage from 'store'
+import Header from '@/components/Header/Index'
 import {getMyApprove} from '@/api/approveCenter'
 import {BillTypeList} from '@/utils/util'
 import {approveStateName, approveStateColorList,BillTypeMap} from '@/utils/ConstantUtils'
 
 export default {
   name: 'approveCenter',
-  components: {},
+  components: {Header},
   data() {
     return {
       approveStatus: 'N',
@@ -63,7 +67,8 @@ export default {
       billTypeList: BillTypeList,
       billtype:'',
       approveStateName: approveStateName,
-      approveStateColorList: approveStateColorList
+      approveStateColorList: approveStateColorList,
+      currentHeight:'',
     }
   },
   computed: {},
@@ -78,6 +83,7 @@ export default {
       }
     },
   created() {
+    this.currentHeight = (document.documentElement.clientHeight -74) + 'px'
     this.queryMyApprove();
   },
   mounted() {},

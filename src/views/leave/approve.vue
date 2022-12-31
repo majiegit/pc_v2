@@ -1,13 +1,13 @@
 <template>
   <div class="edit">
-    
+    <Header ></Header>
     1111
   </div>
 </template>
 
 <script>
 import storage from 'store'
-
+import Header from '@/components/Header/Index'
 // import ApproveProcess from '@/components/ApprovaProcess/ApproveProcess2'
 // import ApproveButton from '@/components/Button/ApproveButton'
 import { saveLeaveBill, getLeaveBill, queryLeaveType, queryLeaveLength } from '@/api/leave'
@@ -15,7 +15,7 @@ import { approveStateName, whetherYN, StartEndDayType, HrkqMinUnit } from '@/uti
 
 export default {
   name: 'leaveApprove',
-  // components: {Header, ApproveProcess, ApproveButton},
+   components: {Header, ApproveProcess, ApproveButton},
   data() {
     return {
       formRules,

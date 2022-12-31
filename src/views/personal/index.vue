@@ -1,5 +1,6 @@
 <template>
   <div class="personal">
+    <Header ></Header>
     <div class="personal-body">
       <a-row :gutter="16">
         <a-col class="gutter-row personal-left" :span="4">
@@ -436,16 +437,16 @@
 
 <script>
 import storage from 'store'
+import Header from '@/components/Header/Index'
 import moment from 'moment'
 import notification from 'ant-design-vue/es/notification'
 import { queryPsndocTemp, getSubInfoVO, queryReferencePsn, saveSubInfo, revokeLisn } from '@/api/psndoc'
-
 import { informationIconList } from '@/utils/util'
 import { forEach } from 'store/storages/all'
 import Item from '@/components/AvatarList/Item'
 export default {
   name: 'personal',
-  components: {},
+  components: {Header},
   data() {
     return {
       isedit_show:'',

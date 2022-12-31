@@ -4,8 +4,8 @@
     <div class="proveCheckOption_title">
       <p style="width: 90%; float: left; padding-left: 10px;">审批流程</p>
       <p style="width: 10%; float: left;" @click="arrowShowClick">
-        <van-icon name="arrow-down" v-if="arrowShow"/>
-        <van-icon name="arrow-up" v-else/>
+        <a-icon name="arrow-down" v-if="arrowShow"/>
+        <a-icon name="arrow-up" v-else/>
       </p>
     </div>
     <div class="proveCheckOption_body" v-if="arrowShow">

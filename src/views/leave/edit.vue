@@ -1,5 +1,6 @@
 <template>
   <div class="edit">
+    <Header ></Header>
     <div class="edit-body">
       <!--请假类别-->
       <div class="leave_type">
@@ -101,6 +102,7 @@
 <script>
 import storage from 'store'
 import moment from 'moment'
+import Header from '@/components/Header/Index'
 import SaveButton from '@/components/Button/SaveButton'
 import { getItem } from '@/utils/DataUtils'
 import { saveLeaveBill, getLeaveBill, queryLeaveType, queryLeaveLength } from '@/api/leave'
@@ -108,7 +110,7 @@ import { approveStateName, StartEndDayTypeList, whetherYN, StartEndDayType, Hrkq
  import {beginGtEndTime, beginEndSameDay} from '@/utils/DateTimeUtils'
 export default {
   name: 'leaveEdit',
-  components: { SaveButton },
+  components: { SaveButton,Header },
   data() {
     return {
       formRules,

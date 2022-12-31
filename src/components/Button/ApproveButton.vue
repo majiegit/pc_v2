@@ -1,30 +1,31 @@
 <template>
   <div>
     <!-- 按钮区域-->
-    <van-row type="flex" justify="space-around" class="button_bottom" >
-      <van-col :span="11">
-        <van-button round block type="info" @click="checkBill('Y')" :disabled="!['2','3'].includes(approvestate)">批 准</van-button>
-      </van-col>
-      <van-col :span="11">
-        <van-button round block type="info" @click="reject" :disabled="!['2','3'].includes(approvestate)">驳 回</van-button>
-      </van-col>
-    </van-row>
+    <a-row  :gutter="24">
+      <a-col :span="11">
+        <a-button round block type="info" @click="checkBill('Y')" :disabled="!['2','3'].includes(approvestate)">批 准</a-button>
+      </a-col>
+      <a-col :span="11">
+        <a-button round block type="info" @click="reject" :disabled="!['2','3'].includes(approvestate)">驳 回</a-button>
+      </a-col>
+    </a-row>
 <!--  驳回选择  -->
-    <van-action-sheet
+    <!-- <van-action-sheet
       title="请选择驳回方式"
       v-model="show"
       :actions="approveMenu"
       @select="choosereject"
       close-on-click-action
-    />
+    /> -->
     <!--审批弹框-->
-    <van-dialog v-model="check.show" title="审批意见" show-cancel-button @confirm="checkConfirm">
-      <van-field v-model="check.node" label="" placeholder="请输入审批意见"/>
-    </van-dialog>
+    <a-dialog v-model="check.show" title="审批意见" show-cancel-button @confirm="checkConfirm">
+      <a-input v-model="check.node" label="" placeholder="请输入审批意见"/ >
+    </a-dialog>
   </div>
 </template>
 
 <script>
+import storage from 'store'
 export default {
   name: "ApproveButton",
   props: {
@@ -53,13 +54,10 @@ export default {
     }
   },
   created(){
-    console.log(this.pk_h)
-    console.log(this.approvestate)
     if (!['2','3'].includes(this.approvestate)) {
       console.log('class1')
       return 'class1'
     } else  {}
-    console.log('class2')
     return 'class2'
   },
   methods: {
@@ -96,7 +94,6 @@ export default {
      */
     checkConfirm() {
       this.$message.success('审批中...')
-      
     }
   }
 }
@@ -104,7 +101,7 @@ export default {
 <style scoped>
 .button_bottom {
   width: 100%;
-  height: 50px;
+  height: 44px;
   padding: 5px 0px;
 }
 </style>

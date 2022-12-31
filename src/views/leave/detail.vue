@@ -1,5 +1,6 @@
 <template>
   <div class="detail">
+    <Header></Header>
     <div class="detail-body">
       <div style="text-align:right"> 
         <a-button  type="primary" @click="deleteBill" v-if="approvestate == '-1'">删除</a-button>
@@ -27,7 +28,6 @@
           <a-descriptions-item v-if="billInfo.end_day_type" label="结束时间">
             {{ StartEndDayType[billInfo.end_day_type] }}
           </a-descriptions-item>
-
           <a-descriptions-item label="请假时长">
             {{ billInfo.leaveday + HrkqMinUnit[billInfo.minunit] }}
           </a-descriptions-item>
@@ -64,13 +64,14 @@
 
 <script>
 import storage from 'store'
+import Header from '@/components/Header/Index'
 import { getLeaveBill, submitLeaveBill, recoverLeaveBill, deleteLeaveBill } from '@/api/leave'
 import { approveStateName, whetherYN, StartEndDayType, HrkqMinUnit, BillTypeCode } from '@/utils/ConstantUtils'
 import ApplyButton from '@/components/Button/ApplyButton'
 import ApproveProcess from '@/components/ApprovaProcess/ApproveProcess2'
 export default {
   name: 'leaveDetail',
-  components: { ApplyButton, ApproveProcess },
+  components: { ApplyButton, ApproveProcess,Header },
   data() {
     return {
       HrkqMinUnit,

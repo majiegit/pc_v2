@@ -26,6 +26,17 @@ export function getMessageCount(data) {
     params: data
   })
 }
+/**
+ * 查询用户基本信息
+ * @param parameter
+ */
+export function queryPsndocInfo(params) {
+  return request({
+    url: "/hrsh/psndoc/getPsndocInfo",
+    method: 'post',
+    params: params
+  })
+}
 
 
 

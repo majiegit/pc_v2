@@ -1,6 +1,7 @@
 <template>
   <div class="home">
-    <a-row :gutter="16">
+    <Header ></Header>
+    <a-row :gutter="16" :style="{'height': currentHeight}">
       <a-col class="gutter-row home-left" :span="4" >
         <div class="Menus">
           <div class="photo">
@@ -31,6 +32,9 @@
               {{item.role.staff_role_name}}
             </a-menu-item>
            </a-menu>
+            <div  class="logout-text">
+              <span  @click="logout"> <a-icon type="left-circle" theme="filled" /> 退出登录</span>
+            </div>
           </div>
         </div>
       </a-col>
@@ -107,6 +111,7 @@
 
 <script>
 import storage from 'store'
+import Header from '@/components/Header/Index'
 import RightContent from '@/components/GlobalHeader/RightContent'
 import ALayoutSider from 'ant-design-vue/es/layout/Sider'
 import notification from 'ant-design-vue/es/notification'
@@ -115,7 +120,7 @@ import request from '@/utils/request'
 import Item from '@/components/AvatarList/Item'
 export default {
   name: 'dashboard',
-  components: { ALayoutSider, RightContent },
+  components: { ALayoutSider, RightContent,Header },
   data() {
     return {
       loading: true,
@@ -150,15 +155,17 @@ export default {
       visible: false,
       confirmLoading: false,
       count:'0',
+      currentHeight:''
     }
   },
   computed: {},
   created() {
     let info =storage.get('Hrsh-Pc-UserInfo')
-      this.userinfo = {...info}
-      this.getMenus()
-      this.getMessage()
-      console.log( this.userinfo)
+    this.currentHeight = (document.documentElement.clientHeight -74) + 'px'
+    this.userinfo = {...info}
+    this.getMenus()
+    this.getMessage()
+      
   },
   methods: {
     handleClick (item){
@@ -222,6 +229,16 @@ export default {
     },
     routerpush(router) {
       this.$router.push(`/${router}`)
+    },
+    //退出登录
+     logout() {
+      //localStorage.clear();
+      storage.remove('Hrsh-Pc-Access-Auth')
+      storage.remove('Hrsh-Pc-Refresh-Auth')
+      storage.remove('Hrsh-Pc-UserInfo')
+      window.location.reload()
+      this.$router.push("/login")
+     
     },
   },
 }
@@ -316,6 +333,17 @@ export default {
   margin-right: 15px;
   border-right: 1px solid #e8e8e8;
   background: #fff;
+  position: relative;
+  .logout-text{
+    position: absolute;
+    bottom: 20px;
+    text-align: center;
+    width: 100%;
+    cursor: pointer;
+    font-size: 15px;
+    color: #0875ff;
+    
+  }
   .ant-menu-item {
     height: 70px !important;
     line-height: 70px !important;

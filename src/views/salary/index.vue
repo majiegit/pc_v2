@@ -1,5 +1,7 @@
 <template>
-  <div class="salary">
+  <div style="height: 100%;">
+    <Header ></Header>
+    <div class="salary" :style="{'height': currentHeight}" >
     <div class="salary-body" v-if="salaryData.length != 0">
       <div class="selsecData">
         <span>薪资期间</span>
@@ -191,8 +193,9 @@
         </a-col>
        </a-row>
        <div class="footer-but" v-if="salaryConfirmList.length == 0">
-          <a-button type="primary" size= 'large' ghost @click="drawer_show = false" >没问题</a-button>
           <a-button type="primary" size= 'large'  @click="question = true" >有问题</a-button>
+          <a-button type="primary" size= 'large' ghost @click="drawer_show = false" >没问题</a-button>
+          
       </div>
     </a-drawer>
     <a-modal
@@ -216,17 +219,19 @@
         </template>
     </a-modal>
   </div>
+  </div>
 </template>
 
 <script>
 import storage from 'store'
+import Header from '@/components/Header/Index'
 import moment from 'moment'
 import notification from 'ant-design-vue/es/notification'
 import { querySalaryData, enablePwd, updatePwd, restPwd, checkPwd,salaryConfirmSave,salaryConfirmList } from '@/api/salary'
 
 export default {
   name: 'salary',
-  components: {},
+  components: {Header},
   data() {
     return {
       loading: true,
@@ -288,10 +293,12 @@ export default {
       userInfo: storage.get('Hrsh-Pc-UserInfo'),
       result:'有问题',
       salaryConfirmList: [],
+      currentHeight:'',
     }
   },
   computed: {},
   created() {
+    this.currentHeight = (document.documentElement.clientHeight -74) + 'px'
     //this.querySalaryData()
     
   },
@@ -542,7 +549,7 @@ export default {
         .more {
           background: #2171f2;
           writing-mode: tb-rl;
-          height: 138px;
+          height: 157px;
           justify-content: center;
           display: flex;
           padding: 0 10px;

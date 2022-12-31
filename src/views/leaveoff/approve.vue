@@ -1,42 +1,71 @@
 <template>
   <div>
-    <Header :title="title" @clickLeft="clickLeft"></Header>
+    <Header ></Header>
     <div class="item_body" :style="{'height': currentHeight}">
       <div v-if="billInfo.pk_psndoc">
-        <van-cell-group>
-          <van-cell title="休假类型" :value="billInfo.leavetypename"/>
-          <van-cell title="申请人" :value="billInfo.psndocname"/>
-          <van-cell title="审批状态" :value="approveStateName[billInfo.approvestatus]"/>
-        </van-cell-group>
+        
+         <a-descriptions>
+          <a-descriptions-item label="休假类型">
+            {{ billInfo.leavetypename }}
+          </a-descriptions-item>
+          <a-descriptions-item label="申请人">
+            {{ billInfo.psndocname }}
+          </a-descriptions-item>
+          <a-descriptions-item label="审批状态">
+            {{ approveStateName[billInfo.approvestatus] }}
+          </a-descriptions-item>
+        </a-descriptions>
         <p class="item_body_title">请假信息</p>
-        <van-cell-group>
-          <van-cell :title="'请假开始' + (billInfo.minunit == '2' ? '日期': '时间')"
-                    :value="(billInfo.minunit == '2' ) ? billInfo.leavebegintime.substring(0,10) : billInfo.leavebegintime"/>
-          <van-cell :title="'请假结束' + (billInfo.minunit == '2' ? '日期': '时间')"
-                    :value="(billInfo.minunit == '2' ) ? billInfo.leaveendtime.substring(0,10) : billInfo.leaveendtime"/>
-          <van-cell v-if="billInfo.leave_start_day_type" title="开始时间" :value="StartEndDayType[billInfo.leave_start_day_type]"/>
-          <van-cell v-if="billInfo.leave_end_day_type" title="结束时间" :value="StartEndDayType[billInfo.leave_end_day_type]"/>
-          <van-cell title="请假时长" :value="billInfo.leaveday + HrkqMinUnit[billInfo.minunit]"/>
-          <van-cell title="休假说明" :value="billInfo.leaveremark"/>
-        </van-cell-group>
+        <a-descriptions>
+          <a-descriptions-item :label="'请假开始' + (billInfo.minunit == '2' ? '日期' : '时间')">
+            {{ billInfo.minunit == '2' ? billInfo.leavebegintime.substring(0, 10) : billInfo.leavebegintime }}
+          </a-descriptions-item>
+          <a-descriptions-item :label="'请假结束' + (billInfo.minunit == '2' ? '日期' : '时间')">
+            {{ billInfo.minunit == '2' ? billInfo.leaveendtime.substring(0, 10) : billInfo.leaveendtime }}
+          </a-descriptions-item>
+          <a-descriptions-item v-if="billInfo.leave_start_day_type" label="开始时间">
+            {{ StartEndDayType[billInfo.leave_start_day_type] }}
+          </a-descriptions-item>
+          <a-descriptions-item v-if="billInfo.leave_end_day_type" label="结束时间">
+            {{ StartEndDayType[billInfo.leave_end_day_type] }}
+          </a-descriptions-item>
+          <a-descriptions-item label="请假时长">
+            {{ billInfo.leaveday + HrkqMinUnit[billInfo.minunit] }}
+          </a-descriptions-item>
+          <a-descriptions-item label="休假说明">
+            {{ billInfo.leaveremark }}
+          </a-descriptions-item>
+        </a-descriptions>
         <p class="item_body_title">销假信息</p>
-        <van-cell-group>
-          <van-cell :title="'实际开始' + (billInfo.minunit == '2' ? '日期': '时间')"
-                    :value="(billInfo.minunit == '2' ) ? billInfo.leaveoffbegintime.substring(0,10) : billInfo.leaveoffbegintime"/>
-          <van-cell :title="'实际结束' + (billInfo.minunit == '2' ? '日期': '时间')"
-                    :value="(billInfo.minunit == '2' ) ? billInfo.leaveoffendtime.substring(0,10) : billInfo.leaveoffendtime"/>
-          <van-cell v-if="billInfo.leaveoff_start_day_type" title="实际开始时间" :value="StartEndDayType[billInfo.leaveoff_start_day_type]"/>
-          <van-cell v-if="billInfo.leaveoff_end_day_type" title="实际结束时间" :value="StartEndDayType[billInfo.leaveoff_end_day_type]"/>
-          <van-cell title="实际休假时长" :value="billInfo.leaveoffday + HrkqMinUnit[billInfo.minunit]"/>
-          <van-cell title="销假原因" :value="LeaveOffReason[billInfo.dr_flag]"/>
-          <van-cell title="销假说明" :value="billInfo.leaveoffremark"/>
-        </van-cell-group>
+        <a-descriptions>
+          <a-descriptions-item :label="'实际开始' + (billInfo.minunit == '2' ? '日期' : '时间')">
+            {{ billInfo.minunit == '2' ? billInfo.leaveoffbegintime.substring(0, 10) : billInfo.leaveoffbegintime }}
+          </a-descriptions-item>
+          <a-descriptions-item :label="'实际结束' + (billInfo.minunit == '2' ? '日期' : '时间')">
+            {{ billInfo.minunit == '2' ? billInfo.leaveoffendtime.substring(0, 10) : billInfo.leaveoffendtime }}
+          </a-descriptions-item>
+          <a-descriptions-item v-if="billInfo.leaveoff_start_day_type" label="实际开始时间">
+            {{ StartEndDayType[billInfo.leaveoff_start_day_type] }}
+          </a-descriptions-item>
+          <a-descriptions-item v-if="billInfo.leaveoff_end_day_type" label="实际结束时间">
+            {{ StartEndDayType[billInfo.leaveoff_end_day_type] }}
+          </a-descriptions-item>
+          <a-descriptions-item label="实际休假时长">
+            {{ billInfo.leaveoffday + HrkqMinUnit[billInfo.minunit] }}
+          </a-descriptions-item>
+          <a-descriptions-item label="销假原因">
+            {{ LeaveOffReason[billInfo.dr_flag] }}
+          </a-descriptions-item>
+          <a-descriptions-item label="销假说明">
+            {{ billInfo.leaveoffremark }}
+          </a-descriptions-item>
+        </a-descriptions>
         <p class="fileClass" @click="fileManager">附件管理</p>
         <!--审批流程-->
         <ApproveProcess :workflownote="billInfo.workflownote" v-if="['102','0','1','2','3'].includes(approvestate)"/>
       </div>
       <div v-else>
-        <van-empty description="暂无数据"/>
+        <a-empty description="暂无数据"/>
       </div>
     </div>
 
@@ -47,6 +76,7 @@
 
 <script>
   import storage from 'store'
+  import Header from '@/components/Header/Index'
   import ApproveProcess from '@/components/ApprovaProcess/ApproveProcess2'
   import ApproveButton from '@/components/Button/ApproveButton'
   import {getLeaveoffBill,submitLeaveoffBill, recoverLeaveoffBill,deleteLeaveoffBill} from '@/api/leaveoff'
@@ -54,7 +84,7 @@
   import {BillTypeCode} from '@/utils/ConstantUtils'
   export default {
     name: "approve",
-    components: {Header, ApproveProcess, ApproveButton},
+    components: {Header, ApproveProcess, ApproveButton,Header},
     data() {
       return {
         approveStateName,

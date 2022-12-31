@@ -1,11 +1,11 @@
 <template>
   <div class="edit">
+    <Header ></Header>
     <div class="edit_body" >
      <!--销假记录-->
     <div v-if="waitLeaveShow">
       <leaveRecord @getDetail="getLeaveBill"></leaveRecord>
     </div>
-    
     <!--销假详情-->
     <div v-else>
         <p class="item_body_title">请假信息</p>
@@ -174,6 +174,7 @@
 <script>
   import storage from 'store'
   import moment from 'moment'
+  import Header from '@/components/Header/Index'
   import SaveButton from "@/components/Button/SaveButton";
   import leaveRecord from "./compoents/leaveRecord";
   import {getLeaveoffBill, queryLeaveoffLength, saveLeaveoffBill,queryLeaveIsRevoked} from '@/api/leaveoff'
@@ -192,7 +193,7 @@
 
   export default {
     name: 'leaveoffEdit',
-    components: {SaveButton,leaveRecord},
+    components: {Header,SaveButton,leaveRecord},
     data() {
       return {
         form: this.$form.createForm(this, { name: 'coordinated' }),

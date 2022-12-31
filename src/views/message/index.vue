@@ -37,12 +37,13 @@
 
 <script>
 import storage from 'store'
+import Header from '@/components/Header/Index'
 import notification from 'ant-design-vue/es/notification'
 import { queryNoticeMessageList,queryApproveMessageList } from '@/api/message'
 
 export default {
   name: 'message',
-  components: {  },
+  components: { Header },
   data() {
     return {
       loading: true,

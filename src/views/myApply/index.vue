@@ -1,5 +1,6 @@
 <template>
   <div class="myapply">
+    <Header ></Header>
     <div class="myapply-body">
       <a-select  @change="selectData" v-model="billtype" class="select">
         <a-select-option   v-for="(billtype,index) in billTypeList"  :value="billtype.billtype" :key="index">{{billtype.billtypename}}</a-select-option>
@@ -15,12 +16,13 @@
 
 <script>
 import storage from 'store'
+import Header from '@/components/Header/Index'
 import { getMyApplication } from '@/api/my-apply'
 import {BillTypeList,myapplycolumns,approveStateName} from '@/utils/util'
 import {BillTypeMap} from '@/utils/ConstantUtils'
 export default {
   name: 'myapply',
-  components: {},
+  components: {Header},
   data() {
     return {
       loading: true,
