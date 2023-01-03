@@ -2,20 +2,18 @@
   <a-layout class="logolayout">
     <a-layout-header :style="{ width: '100%', background: '#fff', padding: '0px', 'margin-bottom': '10px' }">
       <div class="header_left_min" @click="goback">
-         <div class="header_left_login">
-            <img src="../../assets/logo.png" />
-         </div>
-        
+        <div class="header_left_login">
+          <img src="../../assets/logo.png" />
+        </div>
       </div>
       <!-- <span class="header_speech">“{{ timeFix }}，每天好心情”</span> -->
-      <div class="header-photo">
+      <div class="header-photo" v-if="isshow !=='false'">{{isshow}}
         <img :src="userinfo.photo" alt="" />
         <span style="margin-right: 24px" @click="handleMessageClick">
           <a-badge :count="count">
-            <a-avatar style="font-size: 25px; backgroundcolor: #fff; color: #333" theme="filled" icon="bell"/>
+            <a-avatar  class="small_bell"  theme="filled" icon="bell" />
           </a-badge>
         </span>
-        <span class="logout-text" @click="logout">退出登录</span>
       </div>
     </a-layout-header>
   </a-layout>
@@ -29,6 +27,12 @@ import { timeFix } from '@/utils/util'
 export default {
   name: 'BasicLayout',
   components: { ALayoutSider, RightContent },
+  props: {
+    isshow: {
+      type: String,
+      default: ''
+    },
+  },
   data() {
     return {
       userinfo: storage.get('Hrsh-Pc-UserInfo'),
@@ -38,8 +42,8 @@ export default {
   },
   created() {
     this.timeFix = timeFix()
+    console.log(this.isshow)
     this.getMessage()
-    console.log('timeFix', timeFix())
   },
   methods: {
     refresh() {
@@ -50,15 +54,6 @@ export default {
     },
     handleMessageClick() {
       this.$router.push('/message')
-    },
-    logout() {
-      //localStorage.clear();
-      storage.remove('Hrsh-Pc-Access-Auth')
-      storage.remove('Hrsh-Pc-Refresh-Auth')
-      storage.remove('Hrsh-Pc-UserInfo')
-      window.location.reload()
-      this.$router.push("/login")
-     
     },
     //获取未读消息个数
     getMessage() {
@@ -84,12 +79,9 @@ export default {
   height: 100%;
   padding-right: 29px;
   display: inline-block;
-  .header_left_login{
-      background: linear-gradient(90deg, #28b0ff, #0875ff);
-    }
- 
-
-  
+  .header_left_login {
+    background: linear-gradient(90deg, #28b0ff, #0875ff);
+  }
   img {
     width: 70%;
   }
@@ -105,7 +97,6 @@ export default {
     width: 50px;
     height: 50px;
     border-radius: 100%;
-    border: 1px solid #f00;
     margin-right: 30px;
   }
   .photo-icon {
@@ -126,6 +117,11 @@ export default {
   .logout-text {
     cursor: pointer;
     color: #0875ff;
+  }
+  .small_bell{
+      font-size: 25px; 
+      background: #fff; 
+      color: #333
   }
 }
 </style>

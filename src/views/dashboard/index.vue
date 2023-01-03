@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <Header ></Header>
+    <Header isshow="false"></Header>
     <a-row :gutter="16" :style="{'height': currentHeight}">
       <a-col class="gutter-row home-left" :span="4" >
         <div class="Menus">
@@ -9,7 +9,6 @@
               <div class="image">
                 <img :src="userinfo.photo" alt="" />
               </div>
-              
               <!-- <span class="photo-icon" @click="handleMessageClick">
                 <a-icon type="bell" style="font-size: 25px" theme="filled" />
                 <span class="count">{{count}}</span>
@@ -27,8 +26,7 @@
           <div class="menuData">
             <a-menu mode="vertical" :default-selected-keys="selectedKeys" >
              <a-menu-item  v-for="(item,index) in menuData"  :key="item.role.staff_role_id"  @click="handleClick(item)">
-               <div v-html="item.role.icon" class="menuIcon" ></div>
-              
+              <a-icon :type="item.role.staff_role_icon" style="font-size: 16px" theme="filled" />
               {{item.role.staff_role_name}}
             </a-menu-item>
            </a-menu>
@@ -334,6 +332,18 @@ export default {
   border-right: 1px solid #e8e8e8;
   background: #fff;
   position: relative;
+  .menuData{
+     .staff_role_icon{
+        width: 20px;
+        height: 20px;
+        overflow: hidden;
+       svg{
+        width: 18px;
+        height: 18px;
+       }
+     }
+  }
+ 
   .logout-text{
     position: absolute;
     bottom: 20px;
