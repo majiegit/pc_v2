@@ -24,7 +24,7 @@
             </div>
           </div>
           <div class="menuData">
-            <a-menu mode="vertical" :default-selected-keys="selectedKeys" >
+            <a-menu mode="vertical"  v-model="selectedKeys">
              <a-menu-item  v-for="(item,index) in menuData"  :key="item.role.staff_role_id"  @click="handleClick(item)">
               <a-icon :type="item.role.staff_role_icon" style="font-size: 16px" theme="filled" />
               {{item.role.staff_role_name}}
@@ -139,7 +139,7 @@ export default {
       menuData: [],
       selectData:[],
       vertical: 'horizontal',
-      selectedKeys: ['1579627330062413826'],
+      selectedKeys: [''],
       openKeys: [],
       pieStyle: {
         stroke: '#fff',
@@ -169,6 +169,7 @@ export default {
     handleClick (item){
       this.selectData= []
       this.selectData = (item.menuList) || []
+      storage.set('Menu_info',  item)
     },
     // 获取权限菜单
     getMenus() {
@@ -181,11 +182,18 @@ export default {
         if (res.code == '200') {
           this.selectedKeys = []
           this.menuData = res.data
-          this.selectData = (res.data && res.data[0]&& res.data[0].menuList) || []
-          let staffRoleId = (res.data && res.data[0]&& res.data[0].role && res.data[0].role.staff_role_id) || ''
+          
+          let staffRoleId
+          let Menu_info = storage.get('Menu_info')
+          if(Menu_info && Menu_info.menuList &&Menu_info.menuList.length>0){
+            this.selectData =Menu_info.menuList
+            staffRoleId = Menu_info.role.staff_role_id
+          }else{
+            this.selectData = (res.data && res.data[0]&& res.data[0].menuList) || []
+            staffRoleId = (res.data && res.data[0]&& res.data[0].role && res.data[0].role.staff_role_id) || ''
+          }
           this.selectedKeys.push(staffRoleId)
-          console.log(this.selectedKeys)
-         } else {
+          } else {
           this.menuData = []
           this.selectData = []
         }
@@ -197,7 +205,6 @@ export default {
         userId: this.userinfo.user_id,
       }
       getMessageCount(params).then((res) => {
-        console.log(res)
         if (res.code == '200') {
          this.count = res.data
         } else {
