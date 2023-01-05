@@ -1,7 +1,7 @@
 <template>
   <div class="myapply">
     <Header ></Header>
-    <div class="myapply-body">
+    <div class="myapply-body"  :style="{'height': currentHeight}">
       <a-select  @change="selectData" v-model="billtype" class="select">
         <a-select-option   v-for="(billtype,index) in billTypeList"  :value="billtype.billtype" :key="index">{{billtype.billtypename}}</a-select-option>
       </a-select>
@@ -34,6 +34,7 @@ export default {
       columns:myapplycolumns,
       approveStateName:approveStateName,
       billtype:'',
+      currentHeight: '',
     }
   },
   computed: {},
@@ -49,6 +50,8 @@ export default {
     },
   created() {
     this.queryMyApplication();
+    this.currentHeight = (document.documentElement.clientHeight - 80) + 'px'
+     console.log(this.currentHeight)
   },
   mounted() {},
   methods: {
@@ -63,7 +66,6 @@ export default {
               item.approveStateName = this.approveStateName[item.approvestatus]
             });
           }
-          
           this.ApplyList = res.data
           this.ApplyListAll = res.data
           
@@ -90,7 +92,7 @@ export default {
 
 <style lang="less" scoped>
 .myapply {
-  padding:  20px;
+ // padding:  20px;
   height: 100%;
   background: #fff;
   .myapply-body {

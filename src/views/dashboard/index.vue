@@ -1,33 +1,53 @@
 <template>
   <div class="home">
-    <Header isshow="false"></Header>
-    <a-row :gutter="16" :style="{'height': currentHeight}">
+    <!-- <Header isshow="false"></Header> -->
+    <a-row :gutter="16" style="overflow: hidden;">
       <a-col class="gutter-row home-left" :span="4" >
+       
         <div class="Menus">
+          <div class="header_left_min" >
+            <div class="header_left_login">
+              <img src="../../assets/logo.png" />
+            </div>
+          </div>
           <div class="photo">
             <div class="photo-item">
               <div class="image">
                 <img :src="userinfo.photo" alt="" />
               </div>
-              <!-- <span class="photo-icon" @click="handleMessageClick">
-                <a-icon type="bell" style="font-size: 25px" theme="filled" />
-                <span class="count">{{count}}</span>
-              </span> -->
-              <span style="margin-right:24px"  @click="handleMessageClick">
-                <a-badge :count="count"><a-avatar style="font-size: 25px;backgroundColor: #fff;color: #333;" theme="filled" icon="bell"/></a-badge>
+              <span style="margin-right: 24px;position: absolute;"  @click="handleMessageClick">
+                <a-badge :count="count">
+                  <a-avatar style=" background: none; color:#666">
+                    <template #icon> 
+                      <a-icon  style="font-size: 25px;"  type="bell" theme="filled" />
+                    </template>
+                  </a-avatar>
+                </a-badge>
               </span>
             </div>
             <div class="photo-text">
               <div>{{ userinfo.name }}</div>
               <div class="jobname">{{ userinfo.deptname }} / {{ userinfo.postname }}</div>
-              <div class="explain">这是您加入用友集团的第 <span style="color:#0875ff">{{ userinfo.joinsysday }}</span> 天</div>
+              <div class="explain">今天是您加入公司的第 
+                <span v-if="userinfo.joinsysyear > 0">
+                  <span style="color:#0875ff">{{ userinfo.joinsysyear }}</span> 年
+                </span>
+                <span>
+                  <span style="color:#0875ff">{{ userinfo.joinsysday }}</span> 天
+                </span>
+                
+              </div>
             </div>
           </div>
           <div class="menuData">
             <a-menu mode="vertical"  v-model="selectedKeys">
              <a-menu-item  v-for="(item,index) in menuData"  :key="item.role.staff_role_id"  @click="handleClick(item)">
-              <a-icon :type="item.role.staff_role_icon" style="font-size: 16px" theme="filled" />
-              {{item.role.staff_role_name}}
+              <span style=" margin: 0 10px">
+                <a-icon :type="item.role.staff_role_icon" style="font-size: 16px" theme="filled" />
+              </span>
+              <span>
+                {{item.role.staff_role_name}}
+              </span>
             </a-menu-item>
            </a-menu>
             <div  class="logout-text">
@@ -37,28 +57,31 @@
         </div>
       </a-col>
       <a-col class="gutter-row home-right" :span="20">
-        <div class="home-row" :gutter="16">
-          <div class="home-col col-2" :span="8">
-            <div class="col-title">
-              <span class="greet">欢迎进入</span>
-              <img :src="imgTitle" alt="" />
-            </div>
-          </div>
-          <div class="home-col col-1" :span="8"  v-for="(item,index) in selectData"  :key="index" >
-            <div class="col-item" @click='routerpush(item.pc_path)'>
-              <div class="menuListItem" >
-                <div v-html="item.icon" class="menuIcon"  v-bind:style="{ background: item.icon_color }"></div>
+        <div class="home-right-body">
+            <div class="home-row" :gutter="16">
+            <div class="home-col col-2" :span="8">
+              <div class="col-title">
+                <span class="greet">欢迎进入</span>
+                <img :src="imgTitle" alt="" />
               </div>
-              <div class="text">{{item.name}}</div>
             </div>
+            <div class="home-col col-1" :span="8"  v-for="(item,index) in selectData"  :key="index" >
+              <div class="col-item" @click='routerpush(item.pc_path)'>
+                <div class="menuListItem" >
+                  <div v-html="item.icon" class="menuIcon"  v-bind:style="{ background: item.icon_color }"></div>
+                </div>
+                <div class="text">{{item.name}}</div>
+              </div>
+            </div>
+            <!-- <div class="home-col col-1" @click="showModal">
+              <div class="col-item col-add">
+                <a-icon type="plus" style="font-size: 50px" />
+                <div class="text">添加</div>
+              </div>
+            </div> -->
           </div>
-           <!-- <div class="home-col col-1" @click="showModal">
-            <div class="col-item col-add">
-              <a-icon type="plus" style="font-size: 50px" />
-              <div class="text">添加</div>
-            </div>
-          </div> -->
         </div>
+        
       </a-col>
     </a-row>
     <a-modal
@@ -259,11 +282,19 @@ export default {
     height: 100%;
   }
   .home-right {
-    padding: 20px 20px;
+   
     height: 100%;
-    background: #fff;
-    box-shadow: 0px 0px 32px 0px rgb(56 ,63 ,98 , 0.2);
-    border-radius: 16px;
+    padding: 20px 20px 20px 0 !important;
+    background: #f0f2f5; 
+    .home-right-body{
+      height: 100%;
+      background: #fff;
+      box-shadow: 0px 0px 10px 0px rgb(222 ,235 ,252 , 0.2);
+      border-radius: 16px;
+      overflow-y: scroll;
+       padding: 20px ;
+      // margin-top: 10px;
+    }
     .home-col {
       display: inline-block;
       margin-bottom: 20px;
@@ -312,7 +343,6 @@ export default {
         border-radius: 10px;
         box-shadow: 0 0 10px rgba(167, 167, 167, 0.4);
         padding: 35px 0 35px;
-       
         .text {
           font-size: 20px;
           padding-top: 15px;
@@ -328,7 +358,21 @@ export default {
   }
   .home-left{
     height: 100%;
-    background: #f0f2f5;    
+    background: #f0f2f5; 
+    .header_left_min {
+      // padding-right: 15px;
+      display: inline-block;
+      height: 64px;
+      .header_left_login {
+        line-height: 64px;
+        background: linear-gradient(90deg, #28b0ff, #0875ff);
+        text-align: center;
+        // padding-right: 15px;
+      }
+      img {
+        width: 70%;
+      }
+    }   
   }
 }
 </style>
@@ -365,8 +409,9 @@ export default {
     height: 70px !important;
     line-height: 70px !important;
     font-size: 16px;
-    text-align: center;
+   // text-align: center;
     padding: 0 !important;
+    margin: 0 !important;
   }
   .ant-menu-item-selected {
     border-left: 5px solid #2479ed;
@@ -423,6 +468,7 @@ export default {
         color: #333;
         border-top: 1px solid #c0c0c0;
         padding-top: 5px;
+        padding-bottom: 30px;
       }
     }
   }

@@ -1,173 +1,174 @@
 <template>
-  <div style="height: 100%;">
-    <Header ></Header>
-    <div class="salary" :style="{'height': currentHeight}" >
-    <div class="salary-body" v-if="salaryData.length != 0">
-      <div class="selsecData">
-        <span>薪资期间</span>
-        <a-month-picker
-          v-model="beginDate"
-          :disabled-date="disabledStartDate"
-          :default-value="moment('2015-06', 'YYYY-MM')"
-          format="YYYY-MM"
-          placeholder="开始日期"
-          @openChange="handleStartOpenChange"
-          @change="Startchange"
-        />
-        ~
-        <a-month-picker
-          v-model="endDate"
-          :disabled-date="disabledEndDate"
-          :default-value="moment('2015-07', 'YYYY-MM')"
-          format="YYYY-MM"
-          placeholder="结束日期"
-          :open="endOpen"
-          @change="Endchange"
-          @openChange="handleEndOpenChange"
-        />
-        <a-button type="primary" @click="querySalaryData"> 查询 </a-button>
-      </div>
-      <div class="salary_total gutter-example">
-        <a-row :gutter="16">
-          <a-col class="gutter-row" :span="22">
-            <a-row :gutter="16">
-              <a-col class="gutter-row" :span="6" v-for="(item, index) in summarizing" :key="index">
-                <div :class="item.color" class="salary_total_item">
-                  <div>{{ item.title }}</div>
-                  <div class="right">
-                    {{ (salaryData && salaryData.summarySalary && salaryData.summarySalary[item.field]) || 0 }}
+  <div style="height: 100%">
+    <Header></Header>
+    <div class="salary" :style="{ height: currentHeight }">
+      <div class="salary-body" v-if="salaryData.length != 0">
+        <div class="selsecData">
+          <span>薪资期间</span>
+          <a-month-picker
+            v-model="beginDate"
+            :disabled-date="disabledStartDate"
+            :default-value="moment('2015-06', 'YYYY-MM')"
+            format="YYYY-MM"
+            placeholder="开始日期"
+            @openChange="handleStartOpenChange"
+            @change="Startchange"
+          />
+          ~
+          <a-month-picker
+            v-model="endDate"
+            :disabled-date="disabledEndDate"
+            :default-value="moment('2015-07', 'YYYY-MM')"
+            format="YYYY-MM"
+            placeholder="结束日期"
+            :open="endOpen"
+            @change="Endchange"
+            @openChange="handleEndOpenChange"
+          />
+          <a-button type="primary" @click="querySalaryData"> 查询 </a-button>
+        </div>
+        <div class="salary_total gutter-example">
+          <a-row :gutter="16">
+            <a-col class="gutter-row" :span="22">
+              <a-row :gutter="16">
+                <a-col class="gutter-row" :span="6" v-for="(item, index) in summarizing" :key="index">
+                  <div :class="item.color" class="salary_total_item">
+                    <div>{{ item.title }}</div>
+                    <div class="right">
+                      {{ (salaryData && salaryData.summarySalary && salaryData.summarySalary[item.field]) || 0 }}
+                    </div>
                   </div>
+                </a-col>
+              </a-row>
+            </a-col>
+            <a-col class="gutter-row more-col" :span="2">
+              <div class="more" @click="more = true">更多</div>
+            </a-col>
+          </a-row>
+        </div>
+        <div class="salary_username">
+          <span class="name">{{ userinfo.name }}</span>
+          <span class="orgname">{{ userinfo.orgname }}</span>
+        </div>
+        <div class="salary_List gutter-example">
+          <a-row :gutter="16">
+            <a-col
+              class="gutter-row"
+              :span="6"
+              v-for="(list, index) in salaryData.salaryList"
+              :key="index"
+              @click="getsalaryitem(list)"
+            >
+              <a-row type="flex">
+                <div class="flex paySlipVOs">
+                  <span>{{ list.cyear }}年{{ list.cperiod }}月</span>
+                  <span class="right">{{ list.name }}</span>
                 </div>
-              </a-col>
-            </a-row>
-          </a-col>
-          <a-col class="gutter-row more-col" :span="2">
-            <div class="more" @click="more = true">更多</div>
-          </a-col>
-        </a-row>
+                <a-col :span="24" class="paySlipVOs" v-for="(item, index2) in summarizing" :key="index2">
+                  <span>{{ item.title }}:</span>
+                  <span class="right">{{ list[item.field] }}</span>
+                </a-col>
+              </a-row>
+            </a-col>
+          </a-row>
+        </div>
       </div>
-      <div class="salary_username">
-        <span class="name">{{ userinfo.name }}</span>
-        <span class="orgname">{{ userinfo.orgname }}</span>
-      </div>
-      <div class="salary_List gutter-example">
-        <a-row :gutter="16">
-          <a-col class="gutter-row" :span="6" v-for="(list, index) in salaryData.salaryList" :key="index"  @click="getsalaryitem(list)">
-            <a-row type="flex">
-              <div class="flex paySlipVOs">
-                <span>{{ list.cyear }}年{{ list.cperiod }}月</span>
-                <span class="right">{{ list.name }}</span>
-              </div>
-              <a-col
-                :span="24"
-                class="paySlipVOs"
-                v-for="(item, index2) in summarizing"
-                :key="index2"
-              >
-                <span>{{ item.title }}:</span>
-                <span class="right">{{ list[item.field]}}</span>
-              </a-col>
-            </a-row>
-          </a-col>
-        </a-row>
-      </div>
-    </div>
-    <a-modal
-      :title="title"
-      :width="500"
-      :visible="visible"
-      :confirm-loading="confirmLoading"
-      :closable="setIconvisible"
-      @cancel="clickCloseIcon()"
-    >
-      <div class="verify" v-show="checkPwdShow">
-        <a-form :form="form1" :label-col="{ span: 6 }" :wrapper-col="{ span: 15 }" @submit="handleSubmit1">
-          <a-form-item label="薪资密码">
-            <a-input
-              placeholder="请输入薪资密码"
-              type="password"
-              v-model="password"
-              v-decorator="[
-                'password',
-                {
-                  rules: [{ required: true, message: '请输入薪资密码' }],
-                },
-              ]"
-            />
-          </a-form-item>
-          <a-form-item :wrapper-col="{ span: 12, offset: 6 }">
-            <a-button type="primary" class="btn" html-type="submit"> 验证 </a-button>
-          </a-form-item>
-        </a-form>
-      </div>
-      <div class="submit" v-show="updatePwdShow">
-        <a-form :form="form" :label-col="{ span: 6 }" :wrapper-col="{ span: 15 }" @submit="handleSubmit">
-          <a-form-item label="旧密码">
-            <a-input
-              placeholder="请输入旧密码"
-              type="password"
-              v-model="oldPassword"
-              v-decorator="[
-                'oldPassword',
-                {
-                  rules: [{ required: true, message: '请输入旧密码' }],
-                },
-              ]"
-            />
-          </a-form-item>
-          <a-form-item label="新密码">
-            <a-input
-              placeholder="请输入新密码"
-              type="password"
-              v-model="newPassword"  
-              v-decorator="[
-                'newPassword',
-                {
-                  rules: [{ required: true, message: '请输入新密码' }],
-                },
-              ]"
-            />
-          </a-form-item>
-          <a-form-item label="确认密码">
-            <a-input
-              placeholder="请确认密码"
-              type="password"
-              v-model="confirmPassword"
-              v-decorator="[
-                'confirmPassword',
-                {
-                  rules: [{ required: true, message: '请确认密码' }],
-                },
-              ]"
-            />
-          </a-form-item>
+      <a-modal
+        :title="title"
+        :width="500"
+        :visible="visible"
+        :confirm-loading="confirmLoading"
+        :closable="setIconvisible"
+        @cancel="clickCloseIcon()"
+      >
+        <div class="verify" v-show="checkPwdShow">
+          <a-form :form="form1" :label-col="{ span: 6 }" :wrapper-col="{ span: 15 }" @submit="handleSubmit1">
+            <a-form-item label="薪资密码">
+              <a-input
+                placeholder="请输入薪资密码"
+                type="password"
+                v-model="password"
+                v-decorator="[
+                  'password',
+                  {
+                    rules: [{ required: true, message: '请输入薪资密码' }],
+                  },
+                ]"
+              />
+            </a-form-item>
+            <a-form-item :wrapper-col="{ span: 12, offset: 6 }">
+              <a-button type="primary" class="btn" html-type="submit"> 验证 </a-button>
+            </a-form-item>
+          </a-form>
+        </div>
+        <div class="submit" v-show="updatePwdShow">
+          <a-form :form="form" :label-col="{ span: 6 }" :wrapper-col="{ span: 15 }" @submit="handleSubmit">
+            <a-form-item label="旧密码">
+              <a-input
+                placeholder="请输入旧密码"
+                type="password"
+                v-model="oldPassword"
+                v-decorator="[
+                  'oldPassword',
+                  {
+                    rules: [{ required: true, message: '请输入旧密码' }],
+                  },
+                ]"
+              />
+            </a-form-item>
+            <a-form-item label="新密码">
+              <a-input
+                placeholder="请输入新密码"
+                type="password"
+                v-model="newPassword"
+                v-decorator="[
+                  'newPassword',
+                  {
+                    rules: [{ required: true, message: '请输入新密码' }],
+                  },
+                ]"
+              />
+            </a-form-item>
+            <a-form-item label="确认密码">
+              <a-input
+                placeholder="请确认密码"
+                type="password"
+                v-model="confirmPassword"
+                v-decorator="[
+                  'confirmPassword',
+                  {
+                    rules: [{ required: true, message: '请确认密码' }],
+                  },
+                ]"
+              />
+            </a-form-item>
 
-          <a-form-item :wrapper-col="{ span: 12, offset: 6 }">
-            <a-button type="primary" class="btn" html-type="submit"> 确认 </a-button>
-          </a-form-item>
-        </a-form>
-      </div>
+            <a-form-item :wrapper-col="{ span: 12, offset: 6 }">
+              <a-button type="primary" class="btn" html-type="submit"> 确认 </a-button>
+            </a-form-item>
+          </a-form>
+        </div>
 
-      <template slot="footer" class="footer">
-        <a-row type="flex">
-          <a-col :span="12"> 首次使用请先重置密码 </a-col>
-          <a-col :span="12" class="moreEvent2">
-            <span @click="resetPwd">重置密码</span>
-            <span @click="updateShow">修改密码</span>
-          </a-col>
-        </a-row>
-      </template>
-    </a-modal>
-     <a-modal
-      title="问题"
-      :width="500"
-      :visible="question"
-      :confirm-loading="confirmLoading"
-      :closable='false'
-      @cancel="question=false"
-      @ok="onSubmit"
-    >
-      <a-textarea
+        <template slot="footer" class="footer">
+          <a-row type="flex">
+            <a-col :span="12"> 首次使用请先重置密码 </a-col>
+            <a-col :span="12" class="moreEvent2">
+              <span @click="resetPwd">重置密码</span>
+              <span @click="updateShow">修改密码</span>
+            </a-col>
+          </a-row>
+        </template>
+      </a-modal>
+      <a-modal
+        title="问题"
+        :width="500"
+        :visible="question"
+        :confirm-loading="confirmLoading"
+        :closable="false"
+        @cancel="question = false"
+        @ok="onSubmit"
+      >
+        <a-textarea
           v-model="problem"
           style="height: 130px"
           autosize
@@ -176,49 +177,41 @@
           placeholder="请输入所在问题"
           show-word-limit
         />
-    </a-modal>
-    <a-drawer
-      :title="modeltitle"
-       width='600px'
-      :maskClosable="true"
-      :visible="drawer_show"
-      @close="drawer_show = false"
-     >
-      <a-row :gutter="24" v-for="(item,index) in paySlipVOs" :key="index" class="drawer-data">
-        <a-col :span="12">
-          {{item.name}}
-        </a-col>
-        <a-col :span="12">
-          {{item.value}}
-        </a-col>
-       </a-row>
-       <div class="footer-but" v-if="salaryConfirmList.length == 0">
-          <a-button type="primary" size= 'large'  @click="question = true" >有问题</a-button>
-          <a-button type="primary" size= 'large' ghost @click="drawer_show = false" >没问题</a-button>
-          
-      </div>
-    </a-drawer>
-    <a-modal
-      title="更多合计"
-      :width="500"
-      :visible="more"
-      :confirm-loading="confirmLoading"
-      @cancel="more=false"
-      
-     >
-      <a-row :gutter="24" v-for="(item,index) in summarySalaryItems" :key="index" class="more-model">
-        <a-col :span="12">
-          {{item.name}}
-        </a-col>
-        <a-col :span="12">
-          {{item.value}}
-        </a-col>
-       </a-row>
+      </a-modal>
+      <a-drawer
+        :title="modeltitle"
+        width="600px"
+        :maskClosable="true"
+        :visible="drawer_show"
+        @close="drawer_show = false"
+      >
+        <a-row :gutter="24" v-for="(item, index) in paySlipVOs" :key="index" class="drawer-data">
+          <a-col :span="12">
+            {{ item.name }}
+          </a-col>
+          <a-col :span="12">
+            {{ item.value }}
+          </a-col>
+        </a-row>
+        <div class="footer-but" v-if="salaryConfirmList && salaryConfirmList.length == 0">
+          <a-button type="primary" size="large" @click="question = true">有问题</a-button>
+          <a-button type="primary" size="large" ghost @click="submitOk">没问题</a-button>
+        </div>
+      </a-drawer>
+      <a-modal title="更多合计" :width="500" :visible="more" :confirm-loading="confirmLoading" @cancel="more = false">
+        <a-row :gutter="24" v-for="(item, index) in summarySalaryItems" :key="index" class="more-model">
+          <a-col :span="12">
+            {{ item.name }}
+          </a-col>
+          <a-col :span="12">
+            {{ item.value }}
+          </a-col>
+        </a-row>
         <template slot="footer">
           <a></a>
         </template>
-    </a-modal>
-  </div>
+      </a-modal>
+    </div>
   </div>
 </template>
 
@@ -227,11 +220,19 @@ import storage from 'store'
 import Header from '@/components/Header/Index'
 import moment from 'moment'
 import notification from 'ant-design-vue/es/notification'
-import { querySalaryData, enablePwd, updatePwd, restPwd, checkPwd,salaryConfirmSave,salaryConfirmList } from '@/api/salary'
+import {
+  querySalaryData,
+  enablePwd,
+  updatePwd,
+  restPwd,
+  checkPwd,
+  salaryConfirmSave,
+  salaryConfirmList,
+} from '@/api/salary'
 
 export default {
   name: 'salary',
-  components: {Header},
+  components: { Header },
   data() {
     return {
       loading: true,
@@ -240,7 +241,7 @@ export default {
       setIconvisible: false,
       more: false,
       title: '薪资密码验证',
-      modeltitle:'',
+      modeltitle: '',
       drawer_show: false,
       confirmLoading: false,
       checkPwdShow: true,
@@ -286,21 +287,20 @@ export default {
       userinfo: storage.get('Hrsh-Pc-UserInfo'),
       checkPwdShow: true, // 验证密码
       enableSalaryPwd: true, // 是否需要薪资密码验证
-      problem:'',
-      summarySalaryItems:[],//合计项
-      salaryDetail:[],
-      paySlipVOs:[],
+      problem: '',
+      summarySalaryItems: [], //合计项
+      salaryDetail: [],
+      paySlipVOs: [],
       userInfo: storage.get('Hrsh-Pc-UserInfo'),
-      result:'有问题',
+      result: '有问题',
       salaryConfirmList: [],
-      currentHeight:'',
+      currentHeight: '',
     }
   },
   computed: {},
   created() {
-    this.currentHeight = (document.documentElement.clientHeight -74) + 'px'
+    this.currentHeight = document.documentElement.clientHeight - 74 + 'px'
     //this.querySalaryData()
-    
   },
 
   mounted() {
@@ -373,7 +373,7 @@ export default {
             if (res.code == '200') {
               this.$message.success(res.message)
               this.visible = false
-               this.querySalaryData()
+              this.querySalaryData()
             }
           })
         }
@@ -417,17 +417,16 @@ export default {
       let params = {
         beginDate: this.beginDate && this.beginDate.replace('-', ''),
         endDate: this.endDate && this.endDate.replace('-', ''),
-       }
+      }
       querySalaryData(params).then((res) => {
         this.salaryData = (res && res.data) || []
-        this.summarySalaryItems =this.salaryData.summarySalaryItems
-        
+        this.summarySalaryItems = this.salaryData.summarySalaryItems
       })
     },
-    getsalaryitem(item){
-      this.modeltitle =`${item.cyear}年${item.cperiod}月 - ${item.name}`
-      this.salaryDetail = item,
-      this.paySlipVOs = (this.salaryDetail&& this.salaryDetail.salaryListItem&& this.salaryDetail.salaryListItem.paySlipVOs) ||[]
+    getsalaryitem(item) {
+      this.modeltitle = `${item.cyear}年${item.cperiod}月 - ${item.name}`;
+      this.salaryDetail = item
+      this.paySlipVOs = (this.salaryDetail && this.salaryDetail.salaryListItem && this.salaryDetail.salaryListItem.paySlipVOs) || []
       this.drawer_show = true
       this.querySalaryConfirmList()
     },
@@ -460,7 +459,6 @@ export default {
     },
     // 修改密码关闭按钮
     clickCloseIcon() {
-      
       this.checkPwdShow = true
       this.updatePwdShow = false
       this.setIconvisible = false
@@ -468,37 +466,40 @@ export default {
       this.oldPassword = ''
       this.newPassword = ''
       this.confirmPassword = ''
-      
     },
+    //没有问题
+    submitOk() {
+      this.onSubmit()
+    },
+    //有问题提交
     onSubmit() {
-       let salaryListItem = this.salaryDetail
-        let params = {
-          pk_wa_data: salaryListItem.pk_wa_data,
-          orgname: this.userInfo.orgname,
-          cperiod: salaryListItem.cperiod,
-          cyear: salaryListItem.cyear,
-          waclassname: salaryListItem.waClassName,
-          psncode: this.userInfo.code,
-          psnname: this.userInfo.name,
-          deptname: this.userInfo.deptname,
-          result: this.result,
-          memo: this.problem,
-        }
-        salaryConfirmSave(params).then(res => {
-          this.question =false
-          this.querySalaryConfirmList()
-        })
-      },
-      querySalaryConfirmList(){
-        
-        let pk_wa_data =  (this.salaryDetail&& this.salaryDetail.salaryListItem&&this.salaryDetail.salaryListItem.pk_wa_data)|| ''
-        let params = {
-          pk_wa_data: pk_wa_data
-        }
-        salaryConfirmList(params).then(res => {
-           this.salaryConfirmList = res.data
-        })
-      },
+      let salaryListItem = this.salaryDetail.salaryListItem
+      let params = {
+        pk_wa_data: salaryListItem.pk_wa_data,
+        orgname: this.userInfo.orgname,
+        cperiod: salaryListItem.cperiod,
+        cyear: salaryListItem.cyear,
+        waclassname: salaryListItem.waClassName,
+        psncode: this.userInfo.code,
+        psnname: this.userInfo.name,
+        deptname: this.userInfo.deptname,
+        result: this.result,
+        memo: this.problem,
+      }
+      salaryConfirmSave(params).then((res) => {
+        this.question = false
+        this.querySalaryConfirmList()
+      })
+    },
+    querySalaryConfirmList() {
+      let pk_wa_data =(this.salaryDetail && this.salaryDetail.salaryListItem && this.salaryDetail.salaryListItem.pk_wa_data) || ''
+      let params = {
+        pk_wa_data: pk_wa_data,
+      }
+      salaryConfirmList(params).then((res) => {
+        this.salaryConfirmList = res.data
+      })
+    },
   },
 }
 </script>
@@ -526,8 +527,6 @@ export default {
     .salary_total {
       color: #fff;
       font-size: 16px;
-      .gutter-row {
-      }
       .salary_total_item {
         border-radius: 10px;
         box-shadow: 0 0 10px rgba(167, 167, 167, 0.4);
@@ -628,27 +627,26 @@ export default {
     width: 100%;
   }
 }
-.more-model{
+.more-model {
   padding: 10px 0;
-  border-bottom: 1px dashed #999; 
-  font-size: 16px; 
+  border-bottom: 1px dashed #999;
+  font-size: 16px;
   margin: 0;
- }
- .drawer-data{
-    padding: 10px 0;
-    border-bottom: 1px dashed #999; 
-    font-size: 14px; 
-    margin: 0;
-  
- }
- .ant-drawer{
-    .footer-but{
-      text-align: center;
-      padding-top: 50px;
-      .ant-btn{
-        width: 200px;
-        margin-right: 15px;
-      }
+}
+.drawer-data {
+  padding: 10px 0;
+  border-bottom: 1px dashed #999;
+  font-size: 14px;
+  margin: 0;
+}
+.ant-drawer {
+  .footer-but {
+    text-align: center;
+    padding-top: 50px;
+    .ant-btn {
+      width: 200px;
+      margin-right: 15px;
     }
- }
+  }
+}
 </style>

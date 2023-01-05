@@ -13,7 +13,11 @@
           <a-list item-layout="horizontal" :data-source="noticeMessageList">
             <a-list-item slot="renderItem" slot-scope="item">
               <a-list-item-meta :description="item.content" @click="noticeitem(item)">
-                <a slot="title" href="javascript:void(0)" >{{ item.subject }}
+                <a slot="title" href="javascript:void(0)" >
+                  {{ item.subject }}
+                  <a-tag plain :type="item.isread === 'Y' ? 'primary' : 'warning'">{{item.isread === 'Y' ? '已读' :
+                '未读'}}
+              </a-tag>
                  <span class="time">{{ item.sendtime }}</span>
                 </a>
               </a-list-item-meta>
@@ -24,7 +28,11 @@
           <a-list item-layout="horizontal" :data-source="approveMessageList">
             <a-list-item slot="renderItem" slot-scope="item">
               <a-list-item-meta :description="item.content" >
-                <a slot="title" href="javascript:void(0)">{{ item.subject }} 
+                <a slot="title" href="javascript:void(0)">
+                  {{ item.subject }} 
+                   <a-tag plain :type="item.isread === 'Y' ? 'primary' : 'warning'">{{item.isread === 'Y' ?
+                    '已审批':'未审批'}}
+                  </a-tag>
                 <span class="time">{{ item.sendtime }}</span></a>
               </a-list-item-meta>
             </a-list-item>

@@ -1,10 +1,10 @@
 <template>
   <div class="personal">
     <Header ></Header>
-    <div class="personal-body">
+    <div class="personal-body"  :style="{'height': currentHeight}">
       <a-row :gutter="16">
-        <a-col class="gutter-row personal-left" :span="4">
-          <a-anchor :affix="false">
+        <a-col class="gutter-row personal-left"   :span="4">
+          <a-anchor :affix="false" :style="{'height': currentHeight}">
             <a-anchor-link v-for="(item, index) in templateData" :href="`#${item.infoset_code}`" :key="index">
               <template #title>
                 <a-icon
@@ -18,7 +18,7 @@
           </a-anchor>
         </a-col>
 
-        <a-col class="gutter-row personal-right" :style="{'height': currentHeight}" :span="20">
+        <a-col class="gutter-row personal-right"  :style="{'height': currentHeight}"  :span="20">
           <div class="personal-row" :gutter="16">
             <a-row class="info-data">
               <a-col :span="24" class="upload">
@@ -496,20 +496,11 @@ export default {
   created() {
     this.getdata()
     this.currentHeight = (document.documentElement.clientHeight - 80) + 'px'
+    console.log(this.currentHeight)
     console.log( this.currentHeight,'px')
     console.log(this.informationIconList)
   },
   methods: {
-    onSubmit() {
-      this.$refs.ruleForm.validate((valid) => {
-        if (valid) {
-          alert('submit!')
-        } else {
-          console.log('error submit!!')
-          return false
-        }
-      })
-    },
     resetForm() {
       this.$refs.ruleForm.resetFields()
     },
@@ -654,7 +645,11 @@ export default {
         fieldEditData = this.tempData_info.tablefield
         let table_code = this.tempData_info.table_code
         this.infoDataForm_info_min = []
-        let info = JSON.parse(JSON.stringify(this.infoData_info))
+        let info
+        if(this.infoData_info!==undefined){
+          info = JSON.parse(JSON.stringify(this.infoData_info))
+        }
+        // let info = JSON.parse(JSON.stringify(this.infoData_info))
         if (info && info.length > 0) {
           info.forEach((item, index) => {
             item.table_code = table_code
@@ -840,7 +835,6 @@ export default {
       this.refer_show = false
     },
     getDate(event, field, infoIndex) {
-      debugger
       let layout, date
       layout = field.datatype == 8 ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD'
       if (event) {
@@ -918,7 +912,6 @@ export default {
        // 校验表单
       let isvalidate = false 
        this.$refs.formData_info.validate((valid,data) => {
-          console.log(valid,data)
           if (!valid) {
            isvalidate  = false
            
@@ -933,7 +926,6 @@ export default {
           }else{
             let str = this.judgmentReview(data, this.fieldData_info)
             if (str !== '') {
-              console.log(this)
               _this.$confirm({
                 title: '以下信息需要审核通过才能生效',
                 content: str,
@@ -962,12 +954,14 @@ export default {
     // 提交保存
     checkSubmit() {
       this.loadingButton = true
+      let arr =[]
+      arr.push(this.infoDataForm_info)
       let params = {
-        data: this.infoDataForm_info,
+        data: arr,
       }
       saveSubInfo(params)
         .then((res) => {
-          //this.loadingButton = false
+          this.loadingButton = false
           this.$message.success('提交成功')
           setTimeout((res) => {
             this.rightbody_title = false
@@ -975,33 +969,34 @@ export default {
           }, 500)
         })
         .catch((res) => {
-          //this.loadingButton = false
+          this.loadingButton = false
           this.$message.error(res.message)
         })
     },
     // 提交
     submitData_min(e) {
-      //console.log(this.info)
-      console.log(this.infoDataForm_info_min)
       let _this = this
       // 校验表单
       let isvalidate = false 
        for (let i = 0; i < this.infoDataForm_info_min.length; i++) {
-          this.$refs.formData[i].validate((valid,data) => {
-          console.log(valid,data)
-          if (!valid) {
-            isvalidate = false
+         if(this.$refs.formData[i]!==undefined && this.$refs.formData[i]!==null){
+            this.$refs.formData[i].validate((valid) => {
+              if (!valid) {
+                isvalidate = false
 
-            return false
-           
-          } else {
-             isvalidate = true
-              return true
+                return false
+              
+              } else {
+                isvalidate = true
+                  return true
+              }
+            })
+         }else{
+           isvalidate = true
+         }
+         if(!isvalidate){
+            break
           }
-        })
-        if(!isvalidate){
-          break
-        }
         }
         if(isvalidate){
           let data = this.infoDataForm_info_min.filter((item) => item.optype)
@@ -1085,6 +1080,9 @@ export default {
 <style lang="less" scoped>
 .personal {
   .personal-body {
+    .ant-row{
+      margin: 0 !important;
+    }
     .personal-item {
       color: #333;
       margin-bottom: 15px;
@@ -1092,9 +1090,14 @@ export default {
         padding-left: 10px;
       }
     }
+    .personal-left{
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
     .personal-right {
       padding-right: 23px;
       overflow-y: scroll;
+      background: #f0f2f5;
       .personal-row{
         padding: 0 30px 30px;
         background: #fff;

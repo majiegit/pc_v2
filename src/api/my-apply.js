@@ -8,7 +8,7 @@ export function getMyApplication(params) {
   return request({
     url: "/hrsh/myapply/getMyApplication",
     method: 'post',
-    params: params
+    data: params
   })
 }
 

@@ -1,7 +1,7 @@
 <template>
   <div class="edit">
     <Header ></Header>
-    <div class="edit-body">
+    <div class="edit-body"  :style="{'height': currentHeight}">
       <!--请假类别-->
       <div class="leave_type">
         <a-button
@@ -139,6 +139,7 @@ export default {
       leaveTypeBalance: '', // 休假类型剩额度
       StartEndDayTypeList: StartEndDayTypeList, // 休假类型剩额度
       format:'YYYY-MM-DD',
+      currentHeight:'',
     }
   },
   watch: {
@@ -163,6 +164,9 @@ export default {
         }
       }
     },
+  },
+  created() {
+    this.currentHeight = (document.documentElement.clientHeight -74) + 'px'
   },
   mounted() {
     this.queryLeaveType()
@@ -379,8 +383,8 @@ const formRules = {
 
 <style lang='less' scoped>
 .edit {
-  padding: 20px;
-  height: 100%;
+  // padding: 20px;
+  // height: 100%;
   background: #fff;
   .edit-body {
     height: 100%;

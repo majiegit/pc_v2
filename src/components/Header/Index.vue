@@ -11,8 +11,13 @@
         <img :src="userinfo.photo" alt="" />
         <span style="margin-right: 24px" @click="handleMessageClick">
           <a-badge :count="count">
-            <a-avatar  class="small_bell"  theme="filled" icon="bell" />
+            <a-avatar style=" background: none; color:#666">
+              <template #icon> 
+                <a-icon  style="font-size: 25px;"  type="bell" theme="filled" />
+              </template>
+            </a-avatar>
           </a-badge>
+          
         </span>
       </div>
     </a-layout-header>
@@ -77,10 +82,12 @@ export default {
 .header_left_min {
   width: 16.66666667%;
   height: 100%;
-  padding-right: 29px;
+  //padding-right: 29px;
   display: inline-block;
   .header_left_login {
     background: linear-gradient(90deg, #28b0ff, #0875ff);
+    text-align: center;
+    padding-right: 15px;
   }
   img {
     width: 70%;
