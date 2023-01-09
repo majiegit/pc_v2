@@ -2,10 +2,12 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import login from '@/router/login'
 import home from '@/router/home'
+import fixed from '@/router/fixed'
 
 export const routerList = [].concat(
   login,
-  home
+  home,
+  fixed
 )
 // hack router push callback
 const originalPush = Router.prototype.push
